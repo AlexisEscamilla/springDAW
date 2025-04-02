@@ -1,0 +1,350 @@
+<html lang="es" xmlns:th="http://www.thymeleaf.org"></html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MusiConnect - Mensajes</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #121212;
+            color: white;
+        }
+        
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 20px;
+            padding-bottom: 80px;
+        }
+        
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #1DB954;
+        }
+        
+        .search-bar {
+            flex-grow: 1;
+            margin: 0 20px;
+            position: relative;
+        }
+        
+        .search-bar input {
+            width: 100%;
+            padding: 10px 15px;
+            border-radius: 20px;
+            border: none;
+            background-color: #282828;
+            color: white;
+        }
+        
+        .user-profile {
+            display: flex;
+            align-items: center;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #333;
+            margin-right: 10px;
+        }
+        
+        .messages-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .message-card {
+            display: flex;
+            background-color: #181818;
+            border-radius: 10px;
+            padding: 15px;
+            transition: background-color 0.3s;
+            cursor: pointer;
+        }
+        
+        .message-card:hover {
+            background-color: #282828;
+        }
+        
+        .message-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background-color: #333;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+        
+        .message-content {
+            flex-grow: 1;
+        }
+        
+        .message-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+        
+        .message-sender {
+            font-weight: 600;
+        }
+        
+        .message-time {
+            color: #B3B3B3;
+            font-size: 14px;
+        }
+        
+        .message-preview {
+            color: #B3B3B3;
+            font-size: 14px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .unread-badge {
+            width: 10px;
+            height: 10px;
+            background-color: #1DB954;
+            border-radius: 50%;
+            margin-left: 5px;
+            display: inline-block;
+        }
+        
+        .section-title {
+            font-size: 22px;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #282828;
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+        
+        .tab.active {
+            border-bottom: 2px solid #1DB954;
+            color: #1DB954;
+        }
+        
+        .new-message-button {
+            position: fixed;
+            right: 20px;
+            bottom: 80px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background-color: #1DB954;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: #181818;
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0;
+            border-top: 1px solid #282828;
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #B3B3B3;
+        }
+        
+        .nav-item.active {
+            color: #1DB954;
+        }
+        
+        .nav-icon {
+            font-size: 20px;
+            margin-bottom: 5px;
+        }
+        
+        .nav-text {
+            font-size: 12px;
+        }
+        
+        .music-preview {
+            display: flex;
+            align-items: center;
+            background-color: #282828;
+            border-radius: 5px;
+            padding: 10px;
+            margin-top: 8px;
+        }
+        
+        .music-thumbnail {
+            width: 40px;
+            height: 40px;
+            background-color: #333;
+            border-radius: 5px;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">MusiConnect</div>
+            <div class="search-bar">
+                <input type="text" placeholder="Buscar conversaciones">
+            </div>
+            <div class="user-profile">
+                <div class="user-avatar"></div>
+                <span>Usuario</span>
+            </div>
+        </header>
+        
+        <div class="tabs">
+            <div class="tab active">Todos</div>
+            <div class="tab">Bandas</div>
+            <div class="tab">Artistas</div>
+            <div class="tab">Fans</div>
+        </div>
+        
+        <div class="messages-container">
+            <div class="message-card">
+                <div class="message-avatar"></div>
+                <div class="message-content">
+                    <div class="message-header">
+                        <div class="message-sender">Banda Local <span class="unread-badge"></span></div>
+                        <div class="message-time">10:45 AM</div>
+                    </div>
+                    <div class="message-preview">¡Hola! Nos encantaría que escucharas nuestra nueva canción y nos dieras tu opinión.</div>
+                    <div class="music-preview">
+                        <div class="music-thumbnail"></div>
+                        <div>
+                            <div>Nuevo Single</div>
+                            <div style="font-size: 12px; color: #B3B3B3;">Banda Local</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="message-card">
+                <div class="message-avatar"></div>
+                <div class="message-content">
+                    <div class="message-header">
+                        <div class="message-sender">Club de Música <span class="unread-badge"></span></div>
+                        <div class="message-time">Ayer</div>
+                    </div>
+                    <div class="message-preview">Te invitamos al evento de lanzamiento del nuevo álbum de Artista Famoso. ¡No te lo pierdas!</div>
+                </div>
+            </div>
+            
+            <div class="message-card">
+                <div class="message-avatar"></div>
+                <div class="message-content">
+                    <div class="message-header">
+                        <div class="message-sender">Guitarrista Profesional</div>
+                        <div class="message-time">Ayer</div>
+                    </div>
+                    <div class="message-preview">Gracias por seguirme. ¿Qué tipo de música te gusta tocar?</div>
+                </div>
+            </div>
+            
+            <div class="message-card">
+                <div class="message-avatar"></div>
+                <div class="message-content">
+                    <div class="message-header">
+                        <div class="message-sender">Fan de Rock</div>
+                        <div class="message-time">25/03</div>
+                    </div>
+                    <div class="message-preview">¡Increíble playlist de rock clásico! ¿Has escuchado el nuevo álbum de Arctic Monkeys?</div>
+                </div>
+            </div>
+            
+            <div class="message-card">
+                <div class="message-avatar"></div>
+                <div class="message-content">
+                    <div class="message-header">
+                        <div class="message-sender">Productor Musical</div>
+                        <div class="message-time">22/03</div>
+                    </div>
+                    <div class="message-preview">He escuchado tu demo y me gustaría hablar sobre una posible colaboración.</div>
+                </div>
+            </div>
+            
+            <div class="message-card">
+                <div class="message-avatar"></div>
+                <div class="message-content">
+                    <div class="message-header">
+                        <div class="message-sender">DJ Local</div>
+                        <div class="message-time">18/03</div>
+                    </div>
+                    <div class="message-preview">Estoy organizando un evento el próximo fin de semana. ¿Te gustaría participar?</div>
+                </div>
+            </div>
+            
+            <div class="message-card">
+                <div class="message-avatar"></div>
+                <div class="message-content">
+                    <div class="message-header">
+                        <div class="message-sender">MusiConnect</div>
+                        <div class="message-time">15/03</div>
+                    </div>
+                    <div class="message-preview">¡Bienvenido a MusiConnect! Descubre, conecta y comparte tu pasión por la música.</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="new-message-button">+</div>
+    </div>
+    
+    <div class="bottom-nav">
+        <div class="nav-item">
+            <div class="nav-icon">🏠</div>
+            <div class="nav-text">Inicio</div>
+        </div>
+        <div class="nav-item">
+            <div class="nav-icon">🔍</div>
+            <div class="nav-text">Explorar</div>
+        </div>
+        <div class="nav-item active">
+            <div class="nav-icon">💬</div>
+            <div class="nav-text">Mensajes</div>
+        </div>
+        <div class="nav-item">
+            <div class="nav-icon">📚</div>
+            <div class="nav-text">Biblioteca</div>
+        </div>
+        <div class="nav-item">
+            <div class="nav-icon">🔔</div>
+            <div class="nav-text">Notificaciones</div>
+        </div>
+    </div>
+</body>
+</html>

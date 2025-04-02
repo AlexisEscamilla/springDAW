@@ -1,0 +1,244 @@
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  	<meta charset="UTF-8">
+  	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  	<title>Rolas</title>
+  	<link rel="stylesheet" href="/css/stylesFeed.css">
+</head>
+<body>
+  <div class="bg-gradient bg-gradient-1"></div>
+  <div class="bg-gradient bg-gradient-2"></div>
+  <div class="bg-gradient bg-gradient-3"></div>
+
+  <div class="container">
+    <header>
+        <div class="logo">
+            <img class = "imagi" src="https://images.vexels.com/media/users/3/150846/isolated/preview/a77bce5e752802277f78088150b16923-musica-de-icono-de-auriculares-de-audio.png" alt="rolas">
+            <div class="logo-icon"></div>
+            <a href="/index">Rolas</a>
+        </div>
+        
+        <div class="action-buttons">
+          <button class="btn btn-outline">
+              <img class="ajuste" src="https://cdn-icons-png.flaticon.com/512/4675/4675185.png">
+          </button>
+      
+          <!-- Botón que abre el modal -->
+          <button type="button" class="btn btn-primary" onclick="abrirModal()">Cerrar Sesión</button>
+      </div>
+      
+      <!-- Modal de confirmación -->
+      <div id="modalLogout" class="modal" style="display: none;">
+          <div class="modal-content">
+              <p>¿Estás seguro de que deseas cerrar sesión?</p>
+              <div class="modal-buttons">
+                  <form th:action="@{/logout}" method="post">
+                      <button type="submit" class="btn btn-danger">Sí, salir</button>
+                  </form>
+                  <button type="button" class="btn btn-secondary" onclick="cerrarModal()">Cancelar</button>
+              </div>
+          </div>
+      </div>      
+		
+    </header>
+
+    <main class="feed-container">
+      <!-- Left Sidebar -->
+      <aside class="sidebar">
+        <div class="profile-card">
+			<div class="profile-avatar">
+			    <!-- Si el usuario tiene imagen de perfil -->
+			    <img th:if="${usuario.profilePicture != null}" 
+			         th:src="@{'/uploads/' + ${usuario.profilePicture}}" 
+			         class="avatar-img" alt="Avatar" />
+
+			    <!-- Si no tiene imagen, muestra inicial -->
+			    <div th:if="${usuario.profilePicture == null}" 
+			         th:text="${usuario.nombre.substring(0,1)}" 
+			         class="avatar-placeholder"></div>
+			</div>
+        
+		  	  <h2 th:text="${usuario.nombre}">Nombre</h2>
+		      <div class="profile-username" th:text="'@' + ${usuario.username}">@usuario</div>
+          <div class="profile-stats">
+            <div class="stat">
+              <div class="stat-value">248</div>
+              <div class="stat-label">Posts</div>
+            </div>
+            <div class="stat">
+              <div class="stat-value">1.2K</div>
+              <div class="stat-label">Following</div>
+            </div>
+            <div class="stat">
+              <div class="stat-value">3.5K</div>
+              <div class="stat-label">Followers</div>
+            </div>
+          </div>
+        </div>
+        <div class="sidebar-menu">
+          <h3>Menu</h3>
+          <a href="/explorar" class="menu-item">
+            <div class="menu-text">Explorar</div>
+          </a>
+          <a href="/notificaciones" class="menu-item">
+            <div class="menu-text">Notificaciones</div>
+          </a>
+          <a href="/chats" class="menu-item">
+            <div class="menu-text">Chats</div>
+          </a>
+          <a href="/canciones" class="menu-item">
+            <div class="menu-text">Coleccion</div>
+          </a>
+          <a href="/perfil" class="menu-item">
+            <div class="menu-text">Profile</div>
+          </a>
+        </div>
+      </aside>
+
+      <!-- Main Feed -->
+      <section class="feed">
+        <div class="post-creator">
+          <div class="post-input-container">
+            <div class="creator-avatar">
+				<!-- Si el usuario tiene imagen de perfil -->
+							    <img th:if="${usuario.profilePicture != null}" 
+							         th:src="@{'/uploads/' + ${usuario.profilePicture}}" 
+							         class="avatar-imgcreator" alt="Avatar" />
+
+							    <!-- Si no tiene imagen, muestra inicial -->
+							    <div th:if="${usuario.profilePicture == null}" 
+							         th:text="${usuario.nombre.substring(0,1)}" 
+							         class="avatar-placeholder"></div>
+			</div>
+            <textarea class="post-input" placeholder="¿Qué estas pensado?"></textarea>
+          </div>
+          <div class="post-actions">
+            <div class="post-attachments">
+              <button class="attachment-btn">📷 Imagen</button>
+              <button class="attachment-btn">🔗 Link</button>
+            </div>
+            <button class="btn btn-primary">Publicar</button>
+          </div>
+        </div>
+
+        <div class="post">
+          <div class="post-header">
+            <div class="creator-avatar">E</div>
+            <div class="post-user-info">
+              <div class="post-user-name">Ethereum Official</div>
+              <div class="post-username">@ethereum · <span class="post-time">2h</span></div>
+            </div>
+          </div>
+          <div class="post-content">
+            <p>Exciting news! Our latest protocol update is now live. This brings significant improvements to scalability and transaction speeds. Check out the documentation for all the details.</p>
+          </div>
+          <img src="/api/placeholder/600/300" alt="Ethereum Update" class="post-image">
+          <div class="post-interactions">
+            <div class="interaction">❤️ 1.2K</div>
+            <div class="interaction">💬 148</div>
+            <div class="interaction">🔄 356</div>
+            <div class="interaction">⬆️ Share</div>
+          </div>
+        </div>
+
+        <div class="post">
+          <div class="post-header">
+            <div class="creator-avatar">A</div>
+            <div class="post-user-info">
+              <div class="post-user-name">Alice Blockchain</div>
+              <div class="post-username">@alicechain · <span class="post-time">4h</span></div>
+            </div>
+          </div>
+          <div class="post-content">
+            <p>Just deployed my first smart contract using thirdweb! The process was so smooth and intuitive. Highly recommend their developer tools if you're getting started with web3 development.</p>
+            <p>Here's a quick demo of my NFT marketplace in action:</p>
+          </div>
+          <img src="/api/placeholder/600/400" alt="NFT Marketplace Demo" class="post-image">
+          <div class="post-interactions">
+            <div class="interaction">❤️ 832</div>
+            <div class="interaction">💬 76</div>
+            <div class="interaction">🔄 215</div>
+            <div class="interaction">⬆️ Share</div>
+          </div>
+        </div>
+
+        <div class="post">
+          <div class="post-header">
+            <div class="creator-avatar">D</div>
+            <div class="post-user-info">
+              <div class="post-user-name">DeFi Daily</div>
+              <div class="post-username">@defidaily · <span class="post-time">6h</span></div>
+            </div>
+          </div>
+          <div class="post-content">
+            <p>Market Analysis: The total value locked (TVL) in DeFi protocols has increased by 18% this month, reaching a new all-time high. This growth is primarily driven by new lending platforms and yield aggregators.</p>
+            <p>What projects are you currently most bullish on?</p>
+          </div>
+          <div class="post-interactions">
+            <div class="interaction">❤️ 567</div>
+            <div class="interaction">💬 203</div>
+            <div class="interaction">🔄 129</div>
+            <div class="interaction">⬆️ Share</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Right Sidebar -->
+      <aside class="trending-sidebar sidebar">
+        <h3 style="margin-bottom: 16px;">Trending in Web3</h3>
+        <div class="trending-card">
+          <div class="trending-title">#ETHMerge</div>
+          <div class="trending-meta">8,245 posts</div>
+        </div>
+        <div class="trending-card">
+          <div class="trending-title">#NFTSummer</div>
+          <div class="trending-meta">5,123 posts</div>
+        </div>
+        <div class="trending-card">
+          <div class="trending-title">#DeFiRevolution</div>
+          <div class="trending-meta">3,872 posts</div>
+        </div>
+        
+        <h3 style="margin: 24px 0 16px;">Who to Follow</h3>
+        <div class="who-to-follow">
+          <div class="who-to-follow-item">
+            <div class="creator-avatar" style="width: 40px; height: 40px; font-size: 14px;">V</div>
+            <div class="follow-info">
+              <div class="follow-name">Vitalik Buterin</div>
+              <div class="follow-username">@vitalik</div>
+            </div>
+            <button class="btn btn-outline" style="padding: 6px 12px; font-size: 12px;">Follow</button>
+          </div>
+          <div class="who-to-follow-item">
+            <div class="creator-avatar" style="width: 40px; height: 40px; font-size: 14px;">C</div>
+            <div class="follow-info">
+              <div class="follow-name">Chainlink Official</div>
+              <div class="follow-username">@chainlink</div>
+            </div>
+            <button class="btn btn-outline" style="padding: 6px 12px; font-size: 12px;">Follow</button>
+          </div>
+          <div class="who-to-follow-item">
+            <div class="creator-avatar" style="width: 40px; height: 40px; font-size: 14px;">S</div>
+            <div class="follow-info">
+              <div class="follow-name">Solana Foundation</div>
+              <div class="follow-username">@solana</div>
+            </div>
+            <button class="btn btn-outline" style="padding: 6px 12px; font-size: 12px;">Follow</button>
+          </div>
+        </div>
+      </aside>
+    </main>
+  </div>
+
+  <script>
+  function abrirModal() {
+    document.getElementById("modalLogout").style.display = "block";
+  }
+
+  function cerrarModal() {
+    document.getElementById("modalLogout").style.display = "none";
+  }
+  </script>
+    
+</body>
+</html>

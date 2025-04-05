@@ -1,0 +1,828 @@
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  	<meta charset="UTF-8">
+  	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  	<title>Rolas</title>
+    <style>
+        :root {
+  --primary: #4f46e5;
+  --secondary: #7c3aed;
+  --dark: #0f172a;
+  --light: #f8fafc;
+  --accent: #06b6d4;
+  --card-bg: rgba(30, 41, 59, 0.5);
+  --border-color: rgba(255, 255, 255, 0.1);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+}
+
+body {
+  background-color: var(--dark);
+  color: var(--light);
+  overflow-x: hidden;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* Header */
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 0;
+  position: relative;
+  z-index: 10;
+}
+
+.logo {
+font-size: 44px;
+margin-left: 450px;
+font-weight: 700;
+background: linear-gradient(to right, var(--primary), var(--accent));
+-webkit-background-clip: text;
+background-clip: text;
+-webkit-text-fill-color: transparent;
+display: flex;
+align-items: center;
+}
+
+.logo-icon {
+width: 8px;
+height: 35px;
+margin-right: 12px;
+margin-left: 12px;
+background: linear-gradient(to right, var(--primary), var(--secondary));
+border-radius: 8px;
+display: flex;
+align-items: center;
+justify-content: center;
+}
+
+
+.imagi{
+width: 70px;
+height: 70px;
+}
+
+
+nav ul {
+  display: flex;
+  list-style: none;
+  gap: 32px;
+}
+
+nav a {
+  color: var(--light);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+nav a:hover {
+  color: var(--accent);
+}
+
+.action-buttons {
+  display: flex;
+  gap: 16px;
+}
+
+.btn {
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-primary {
+  background: linear-gradient(to right, var(--primary), var(--secondary));
+  color: white;
+  border: none;
+  font-size: 15px;
+}
+
+.btn-outline {
+  background: transparent;
+  color: var(--light);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* Background effects */
+.bg-gradient {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.15;
+  z-index: 1;
+}
+
+.bg-gradient-1 {
+  background: var(--primary);
+  top: -200px;
+  left: -200px;
+  width: 600px;
+  height: 600px;
+  animation: float 15s ease-in-out infinite;
+}
+
+.bg-gradient-2 {
+  background: var(--secondary);
+  bottom: -200px;
+  right: -200px;
+  width: 600px;
+  height: 600px;
+  animation: float 20s ease-in-out infinite reverse;
+}
+
+.bg-gradient-3 {
+  background: var(--accent);
+  top: 30%;
+  right: 10%;
+  width: 400px;
+  height: 400px;
+  animation: float 18s ease-in-out infinite;
+}
+
+/* Animation for gradient backgrounds */
+@keyframes float {
+  0% {
+    transform: translateY(0) translateX(0);
+  }
+  50% {
+    transform: translateY(-20px) translateX(10px);
+  }
+  100% {
+    transform: translateY(0) translateX(0);
+  }
+}
+
+/* Feed Layout */
+.feed-container {
+  display: grid;
+  grid-template-columns: 1fr 2.5fr 1fr;
+  gap: 24px;
+  padding: 40px 0;
+  position: relative;
+  z-index: 2;
+}
+
+/* Sidebar */
+.sidebar {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 24px;
+  height: fit-content;
+  position: sticky;
+  top: 24px;
+}
+
+
+.avatar-img {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.avatar-imgcreator {
+width: 170px;
+height: 170px;
+object-fit: cover;
+}
+
+.avatar-placeholder {
+  width: 100px;
+  height: 100px;
+  background-color: #ddd;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36px;
+  color: #555;
+}
+
+
+.profile-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 24px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.profile-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: linear-gradient(to right, var(--primary), var(--secondary));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 32px;
+  font-weight: bold;
+  margin-bottom: 16px;
+}
+
+.profile-song{
+  width: 250px;
+  height: 250px;
+  background: linear-gradient(to right, var(--primary), var(--secondary));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 32px;
+  font-weight: bold;
+  margin-bottom: 16px;
+}
+
+.profile-songlist{
+  width: 50px;
+  height: 50px;
+  background: linear-gradient(to right, var(--primary), var(--secondary));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 32px;
+  font-weight: bold;
+  margin-bottom: 16px;
+  flex-shrink: 0;
+  margin-right: 16px;
+}
+
+
+.avatar-imgcreator {
+width: 250px;
+height: 250px;
+object-fit: cover;
+}
+
+
+.avatar-imgcreatorlist {
+width: 60px;
+height: 60px;
+object-fit: cover;
+}
+
+.profile-name {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.profile-username {
+  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: 16px;
+}
+
+.profile-stats {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.stat {
+  text-align: center;
+}
+
+.stat-value {
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.sidebar-menu h3 {
+  font-size: 16px;
+  margin-bottom: 16px;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: background 0.2s;
+  text-decoration: none; /* Elimina el subrayado de los enlaces */
+  color: inherit; /* Hereda el color del contenedor */
+}
+
+.menu-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.menu-item.active {
+  background: rgba(79, 70, 229, 0.2);
+  border-left: 3px solid var(--primary);
+}
+
+.menu-text {
+  font-weight: 500;
+  color: inherit; /* Asegura que el texto herede el color del enlace */
+}
+
+/* Main feed */
+.post-creator {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 24px;
+  place-items: center;
+  margin-bottom: 24px;
+}
+
+.post-input-container {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.creator-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: linear-gradient(to right, var(--primary), var(--secondary));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+  flex-shrink: 0;
+}
+
+.post-input {
+  flex-grow: 1;
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 12px 16px;
+  color: white;
+  resize: none;
+  min-height: 60px;
+}
+
+.post-input:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.post-actions {
+  display: flex;
+  align-items: center;
+}
+
+.post-attachments {
+  display: flex;
+  gap: 16px;
+}
+
+.attachment-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: rgba(255, 255, 255, 0.7);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  transition: background 0.2s;
+}
+
+.attachment-btn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: white;
+}
+
+.post {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 24px;
+  transition: transform 0.2s;
+}
+
+.post:hover {
+  transform: translateY(-2px);
+}
+
+.post-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.post-user-info {
+  margin-left: 12px;
+}
+
+.post-user-name {
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.post-username, .post-time {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 14px;
+}
+
+.post-content {
+  margin-bottom: 16px;
+  line-height: 1.5;
+}
+
+.post-image {
+  width: 100%;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  border: 1px solid var(--border-color);
+}
+
+.post-interactions {
+  display: flex;
+  justify-content: space-between;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-color);
+}
+
+.interaction {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.interaction:hover {
+  color: var(--accent);
+}
+
+/* Trending sidebar */
+.trending-card {
+  padding: 16px;
+  background: rgba(15, 23, 42, 0.7);
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+
+.trending-cardLista {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  background: rgba(15, 23, 42, 0.7);
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+.trending-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.trending-meta {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: 9px;
+
+}
+
+.btn-play {
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  font-size: 18px;
+  margin-left: 340px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-play:hover {
+  background: var(--secondary);
+}
+
+.who-to-follow-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.who-to-follow-item:last-child {
+  border-bottom: none;
+}
+
+.follow-info {
+  flex-grow: 1;
+  margin-left: 12px;
+}
+
+.follow-name {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.follow-username {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+  .feed-container {
+    grid-template-columns: 1fr 3fr;
+  }
+  
+  .trending-sidebar {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .feed-container {
+    grid-template-columns: 1fr;
+  }
+  
+  .sidebar {
+    display: none;
+  }
+  
+  nav ul {
+    display: none;
+  }
+}
+
+.ajuste{
+    width: 25px;
+    height: 25px;
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0; top: 0;
+  width: 100%; height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+  background: linear-gradient(to right, var(--primary), var(--secondary));
+  color: white;
+  border: none;
+  font-size: 15px;  
+  margin: 15% auto;
+  padding: 20px;
+  border-radius: 10px;
+  width: 300px;
+  text-align: center;
+  font-weight: 500;
+}
+.btn-subir {
+  font-size: 25px;
+  width: 600px;
+}
+.modal-buttons {
+  margin-top: 15px;
+  display: flex;
+  justify-content: space-around;
+}
+
+.btn.btn-danger {
+  background-color: #e74c3c;
+  color: white;
+}
+
+.btn.btn-secondary {
+  background-color: #ccc;
+  color: #333;
+}
+    </style>
+</head>
+<body>
+  <div class="bg-gradient bg-gradient-1"></div>
+  <div class="bg-gradient bg-gradient-2"></div>
+  <div class="bg-gradient bg-gradient-3"></div>
+
+  <div class="container">
+    <header>
+        <div class="logo">
+            <img class = "imagi" src="https://images.vexels.com/media/users/3/150846/isolated/preview/a77bce5e752802277f78088150b16923-musica-de-icono-de-auriculares-de-audio.png" alt="rolas">
+            <div class="logo-icon"></div>
+            <a href="/index">Rolas</a>
+        </div>
+        
+        <div class="action-buttons">
+          <button class="btn btn-outline">
+              <img class="ajuste" src="https://cdn-icons-png.flaticon.com/512/4675/4675185.png">
+          </button>
+      
+          <!-- Botón que abre el modal -->
+          <button type="button" class="btn btn-primary" onclick="abrirModal()">Cerrar Sesión</button>
+      </div>
+      
+      <!-- Modal de confirmación -->
+      <div id="modalLogout" class="modal" style="display: none;">
+          <div class="modal-content">
+              <p>¿Estás seguro de que deseas cerrar sesión?</p>
+              <div class="modal-buttons">
+                  <form th:action="@{/logout}" method="post">
+                      <button type="submit" class="btn btn-danger">Sí, salir</button>
+                  </form>
+                  <button type="button" class="btn btn-secondary" onclick="cerrarModal()">Cancelar</button>
+              </div>
+          </div>
+      </div>      
+		
+    </header>
+
+    <main class="feed-container">
+      <!-- Left Sidebar -->
+      <aside class="sidebar">
+        <div class="profile-card">
+			<div class="profile-avatar">
+			    <!-- Si el usuario tiene imagen de perfil -->
+			    <img th:if="${usuario.profilePicture != null}" 
+			         th:src="@{'/uploads/' + ${usuario.profilePicture}}" 
+			         class="avatar-img" alt="Avatar" />
+			</div>
+        
+		  	  <h2 th:text="${usuario.nombre}">Nombre</h2>
+		      <div class="profile-username" th:text="'@' + ${usuario.username}">@usuario</div>
+          <div class="profile-stats">
+            <div class="stat">
+              <div class="stat-value">248</div>
+              <div class="stat-label">Posts</div>
+            </div>
+            <div class="stat">
+              <div class="stat-value">1.2K</div>
+              <div class="stat-label">Following</div>
+            </div>
+            <div class="stat">
+              <div class="stat-value">3.5K</div>
+              <div class="stat-label">Followers</div>
+            </div>
+          </div>
+        </div>
+        <div class="sidebar-menu">
+          <a href="#" class="menu-item" th:classappend="${tipo == 'canciones'} ? 'active'" onclick="cambiarContenido('canciones')">
+              <div class="menu-text">Canciones</div>
+          </a>
+          <a href="#" class="menu-item" th:classappend="${tipo == 'albums'} ? 'active'" onclick="cambiarContenido('albums')">
+              <div class="menu-text">Albums</div>
+          </a>
+        </div>
+      </aside>
+
+      <!-- Main Feed -->
+      <section class="feed">
+        
+    
+        <!-- Contenedor dinámico -->
+        <div id="contenido-dinamico">          
+            <!-- Mostrar canciones -->
+            <div th:if="${tipo == 'canciones'}">
+                <div class="post-creator">
+                  <div class="post-actions">
+                      <a href="/subirCancion">
+                          <button class="btn btn-primary btn-subir">Subir canción</button>
+                      </a>
+                  </div>
+                </div>
+                <div class="post">
+                  <div th:if="${#lists.isEmpty(canciones)}" class="no-canciones">
+                    <p>No tienes canciones subidas. ¡Sube tu primera canción ahora!</p>
+                </div>
+                <div th:each="cancion : ${canciones}" class="trending-cardLista">
+                    <div class="profile-songlist">
+                        <img th:src="@{${cancion.coverUrl}}" class="avatar-imgcreatorlist" alt="Portada de la canción">
+                    </div>
+                    <div class="trending-content">
+                        <div class="trending-title" th:text="${cancion.title}">Título de la canción</div>
+                        <div class="trending-meta" th:text="${cancion.duration}">Duración</div>
+                    </div>
+                    <button class="btn btn-play">▶</button>
+                </div>
+                </div>  
+            </div>
+    
+            <!-- Mostrar álbumes -->
+              
+            <div th:if="${tipo == 'albums'}">
+              <div class="post-creator">
+                <div class="post-actions">
+                    <a href="/subirAlbum">
+                        <button class="btn btn-primary btn-subir">Subir Album</button>
+                    </a>
+                </div>
+              </div>
+
+              <div class="post">
+                <div th:if="${#lists.isEmpty(albums)}" class="no-albums">
+                  <p>No tienes álbumes creados. ¡Crea tu primer álbum ahora!</p>
+              </div>
+              <div th:each="album : ${albums}" class="trending-cardLista">
+                  <div class="profile-songlist">
+                      <img th:src="@{'/uploads/' + ${album.coverArt}}" class="avatar-imgcreatorlist" alt="Portada del álbum">
+                  </div>
+                  <div class="trending-content">
+                      <div class="trending-title" th:text="${album.title}">Título del álbum</div>
+                      <div class="trending-meta" th:text="${album.releaseDate}">Fecha de lanzamiento</div>
+                  </div>
+              </div>
+              </div> 
+            </div>
+        </div>
+    </section>
+
+      <!-- Right Sidebar -->
+      <!-- Right Sidebar -->
+      <aside id="right-sidebar" class="trending-sidebar sidebar" style="display: none;">
+        <h3 style="margin-bottom: 16px;">Informacion</h3>
+        <div class="trending-card" style="place-items: center;">
+          <div class="trending-title">Titulo</div>
+          <div class="trending-meta">Esclava(Remix)</div>
+          <div class="trending-title">Duracion </div>
+          <div class="trending-meta">280</div>
+          <div class="trending-title">Genero</div>
+          <div class="trending-meta">Trap</div>
+          <div class="trending-title">Album</div>
+          <div class="trending-meta">Bellakos</div>
+          <div class="profile-song">
+            <!-- Si el usuario tiene imagen de perfil -->
+            <img th:if="${usuario.profilePicture != null}" 
+                th:src="@{'/uploads/' + ${usuario.profilePicture}}" 
+                class="avatar-imgcreator" alt="Avatar" />
+          </div>
+        </div>
+      </aside>
+    </main>
+  </div>
+
+  <script>
+    function cambiarContenido(tipo) {
+          const url = `/colecciones?tipo=${tipo}`;
+          fetch(url)
+              .then(response => response.text())
+              .then(html => {
+                  const parser = new DOMParser();
+                  const doc = parser.parseFromString(html, 'text/html');
+                  const nuevoContenido = doc.querySelector('#contenido-dinamico').innerHTML;
+                  document.querySelector('#contenido-dinamico').innerHTML = nuevoContenido;
+
+                  // Actualizar la clase activa en el sidebar
+                  document.querySelectorAll('.menu-item').forEach(item => item.classList.remove('active'));
+                  document.querySelector(`.menu-item[onclick="cambiarContenido('${tipo}')"]`).classList.add('active');
+              })
+              .catch(error => console.error('Error al cargar el contenido:', error));
+      }
+
+    // Selecciona todos los elementos trending-cardLista
+    const trendingCards = document.querySelectorAll('.trending-content');
+    const rightSidebar = document.getElementById('right-sidebar');
+
+    // Agrega un evento de clic a cada card
+    trendingCards.forEach(card => {
+      card.addEventListener('click', () => {
+        // Muestra el right-sidebar
+        rightSidebar.style.display = 'block';
+      });
+    });
+  </script>
+    
+</body>
+</html>

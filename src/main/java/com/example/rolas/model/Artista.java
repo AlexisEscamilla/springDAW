@@ -1,15 +1,7 @@
 package com.example.rolas.model;
 
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+import java.util.Set;
 
 @Entity
 @Table(name = "artistas")
@@ -21,65 +13,78 @@ public class Artista {
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
-    private User user;  
-    
+    private User user;
+
     private String bio;
     private boolean verificado;
     private String discografica;
+    
+
+    // Relación con la tabla SongArtists (mappedBy hace referencia a 'artista' en SongArtists)
+    @OneToMany(mappedBy = "artista", cascade = CascadeType.ALL)
+    private Set<SongArtists> songArtists;
+
+    // Relación con la tabla AlbumArtists
+    @OneToMany(mappedBy = "artista", cascade = CascadeType.ALL)
+    private Set<AlbumArtists> albumArtists;
 
     // Getters y setters
 
-    public Artista() { }
-
-    public Artista(User user, String bio, boolean verificado, String discografica) {
-        this.user = user;
-        this.bio = bio;
-        this.verificado = verificado;
-        this.discografica = discografica;
+    public Set<SongArtists> getSongArtists() {
+        return songArtists;
     }
 
-	public String getBio() {
-		return bio;
-	}
+    public void setSongArtists(Set<SongArtists> songArtists) {
+        this.songArtists = songArtists;
+    }
 
-	public void setBio(String bio) {
-		this.bio = bio;
-	}
+    public Set<AlbumArtists> getAlbumArtists() {
+        return albumArtists;
+    }
 
-	public boolean isVerificado() {
-		return verificado;
-	}
+    public void setAlbumArtists(Set<AlbumArtists> albumArtists) {
+        this.albumArtists = albumArtists;
+    }
 
-	public void setVerificado(boolean verificado) {
-		this.verificado = verificado;
-	}
+    public Integer getId() {
+        return id;
+    }
 
-	public String getDiscografica() {
-		return discografica;
-	}
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
-	public void setDiscografica(String discografica) {
-		this.discografica = discografica;
-	}
+    public User getUser() {
+        return user;
+    }
 
-	
+    public void setUser(User user) {
+        this.user = user;
+    }
 
-	public Integer getId() {
-		return id;
-	}
+    public String getBio() {
+        return bio;
+    }
 
-	public void setId(Integer id) {
-		this.id = id;
-	}
+    public void setBio(String bio) {
+        this.bio = bio;
+    }
 
-	public User getUser() {
-		return user;
-	}
+    public boolean isVerificado() {
+        return verificado;
+    }
 
-	public void setUser(User user) {
-		this.user = user;
-	}
-    
-    
+    public void setVerificado(boolean verificado) {
+        this.verificado = verificado;
+    }
+
+    public String getDiscografica() {
+        return discografica;
+    }
+
+    public void setDiscografica(String discografica) {
+        this.discografica = discografica;
+    }
 }
+
 

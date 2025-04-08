@@ -5,7 +5,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +17,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import com.example.rolas.model.Songs;
 import com.example.rolas.model.User;
@@ -23,6 +26,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 
+import com.example.rolas.model.AlbumArtists;
 import com.example.rolas.model.Albums;
 import com.example.rolas.model.Artista;
 import com.example.rolas.model.SongArtists;
@@ -169,6 +173,26 @@ public class SongsController {
         return "redirect:/colecciones";  // Asegúrate de tener la ruta correcta
     }
     
+    @GetMapping("/buscarCanciones")
+    @ResponseBody
+    public List<Map<String, String>> buscarCanciones(@RequestParam("query") String query) {
+        List<Songs> canciones = songRepositorio.findByTitleContainingIgnoreCase(query);
+        List<Map<String, String>> resultados = new ArrayList<>();
+        for (Songs cancion : canciones) {
+            Map<String, String> resultado = new HashMap<>();
+            resultado.put("id", cancion.getId().toString());
+            resultado.put("title", cancion.getTitle());
 
+            Optional<AlbumArtists> albumArtist = albumArtistRepositorio.findByAlbum(cancion.getAlbum());
+            if (albumArtist.isPresent()) {
+                resultado.put("artist", albumArtist.get().getArtista().getUser().getNombre());
+            } else {
+                resultado.put("artist", "Desconocido");
+            }
+
+            resultados.add(resultado);
+        }
+        return resultados;
+    }
 
 }

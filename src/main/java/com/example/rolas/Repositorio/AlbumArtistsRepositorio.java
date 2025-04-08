@@ -13,6 +13,7 @@ import com.example.rolas.model.Artista;
 @Repository
 public interface AlbumArtistsRepositorio extends JpaRepository<AlbumArtists, Integer> {
 	 List<AlbumArtists> findByArtistaId(Integer artistaId);
+	 Optional<AlbumArtists> findByAlbum(Albums album);
 	 
 }
 

@@ -14,4 +14,5 @@ public interface  SongsRepositorio extends JpaRepository<Songs, Integer>{
 	 Optional<Songs> findByTitle(String title);
 	 @Query("SELECT s FROM Songs s JOIN s.songArtists sa WHERE sa.artista.id = :artistaId")
 	 List<Songs> findByArtistaId(@Param("artistaId") Integer artistaId);
+	 List<Songs> findByTitleContainingIgnoreCase(String title);
 }

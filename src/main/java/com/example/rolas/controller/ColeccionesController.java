@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.example.rolas.Repositorio.AlbumsRepositorio;
+import com.example.rolas.Repositorio.PlaylistSongsRepositorio;
+import com.example.rolas.Repositorio.PlaylistsRepositorio;
 import com.example.rolas.Repositorio.AlbumArtistsRepositorio;
 import com.example.rolas.Repositorio.SongsRepositorio;
 import com.example.rolas.Repositorio.UserRepositorio;
@@ -19,6 +21,7 @@ import com.example.rolas.model.Albums;
 import com.example.rolas.model.Artista;
 import com.example.rolas.model.Songs;
 import com.example.rolas.model.User;
+import com.example.rolas.model.Playlists;
 import com.example.rolas.service.UserService;
 import java.util.List;
 
@@ -36,6 +39,12 @@ public class ColeccionesController {
     
     @Autowired
     private AlbumArtistsRepositorio albumsartistsRepositorio;
+    
+    @Autowired
+    private PlaylistsRepositorio playlistsRepositorio;
+    
+    @Autowired
+    private PlaylistSongsRepositorio playlistSongsRepositorio;
 	
 	@GetMapping("/colecciones")
     public String mostrarColecciones(@AuthenticationPrincipal UserDetails userDetails,
@@ -58,11 +67,19 @@ public class ColeccionesController {
                     // Obtener los álbumes del artista
                     List<Albums> albums = albumsRepositorio.findByAlbumArtists_Artista(artista);
                     model.addAttribute("albums", albums);
-                }
+                } else if (tipo.equals("playlists")) {
+                   // Obtener las playlists del usuario con sus canciones
+                    List<Playlists> playlists = playlistsRepositorio.findByUser(usuario);
+                    playlists.forEach(playlist -> {
+                        playlist.setPlaylistSongs(playlistSongsRepositorio.findByPlaylist(playlist));
+                    });
+                    model.addAttribute("playlists", playlists);
+                } 
             } else {
                 model.addAttribute("canciones", List.of());
                 model.addAttribute("albums", List.of());
-            }
+                model.addAttribute("playlists", List.of());
+            } 
         } else {
             return "redirect:/feed";
         }

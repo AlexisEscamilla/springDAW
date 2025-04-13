@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Detalles del Álbum</title>
+    <link rel="stylesheet" href="/css/stylesMostrar.css" />
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <a href="/colecciones" class="btn btn-back">⬅ Volver</a>
+      </header>
+
+      <main>
+        <div class="album-details">
+          <img
+            th:src="@{'/uploads/' + ${album.coverArt}}"
+            alt="Portada del álbum"
+            class="album-cover"
+          />
+          <h1 th:text="${album.title}">Título del Álbum</h1>
+          <p th:text="${album.releaseDate}">Fecha de lanzamiento</p>
+        </div>
+
+        <div class="album-songs">
+          <h2>Canciones</h2>
+          <ul>
+            <li th:each="cancion : ${album.songs}">
+              <a
+                th:href="@{/mostrarCancion/{id}(id=${cancion.id})}"
+                th:text="${cancion.title}"
+                >Título de la canción</a
+              >
+            </li>
+          </ul>
+        </div>
+      </main>
+    </div>
+  </body>
+</html>

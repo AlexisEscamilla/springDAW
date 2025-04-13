@@ -4,6 +4,7 @@ import com.example.rolas.model.User;
 import com.example.rolas.service.UserService;
 
 import java.security.Principal;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,17 +14,30 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-
+import org.springframework.web.bind.annotation.PathVariable;
 
 import com.example.rolas.Repositorio.UserRepositorio;
+import com.example.rolas.Repositorio.SongsRepositorio;
+import com.example.rolas.Repositorio.AlbumsRepositorio;
+import com.example.rolas.Repositorio.PlaylistsRepositorio;
+import com.example.rolas.Repositorio.SongCommentsRepositorio;
+import com.example.rolas.model.Songs;
+import com.example.rolas.model.Albums;
+import com.example.rolas.model.Playlists;
+import com.example.rolas.model.SongComments;
 
 @Controller
 public class WebController {
 	
 	@Autowired
 	private UserRepositorio userRepositorio;
+	
+	
 	@Autowired
-    private UserService userService;
+	private AlbumsRepositorio albumRepositorio;
+	
+	@Autowired
+	private PlaylistsRepositorio playlistsRepositorio;
 	
     @GetMapping("/")
     public String home() {
@@ -54,8 +68,21 @@ public class WebController {
         return "feed";
     }
 
-
+    @GetMapping("/mostrarAlbum/{id}")
+    public String mostrarAlbum(@PathVariable Integer id, Model model) {
+        Albums album = albumRepositorio.findById(id)
+            .orElseThrow(() -> new RuntimeException("Álbum no encontrado"));
+        model.addAttribute("album", album);
+        return "mostrarAlbum";
+    }
     
+    @GetMapping("/mostrarPlaylist/{id}")
+    public String mostrarPlaylist(@PathVariable Integer id, Model model) {
+        Playlists playlist = playlistsRepositorio.findById(id)
+            .orElseThrow(() -> new RuntimeException("Playlist no encontrada"));
+        model.addAttribute("playlist", playlist);
+        return "mostrarPlaylist";
+    }
     @GetMapping("/chats")
     public String chats() {
         return "chats";

@@ -33,8 +33,30 @@ public class User implements UserDetails {
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
+    
+    @Column(name = "seguidores", nullable = false)
+    private int seguidores = 0;
+    
+    @Column(name = "siguiendo", nullable = false)
+    private int siguiendo = 0;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    public int getSeguidores() {
+		return seguidores;
+	}
+
+	public void setSeguidores(int seguidores) {
+		this.seguidores = seguidores;
+	}
+
+	public int getSiguiendo() {
+		return siguiendo;
+	}
+
+	public void setSiguiendo(int siguiendo) {
+		this.siguiendo = siguiendo;
+	}
+
+	@OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Artista artista;  // Relación con Artista si es artista
 
     public User() {

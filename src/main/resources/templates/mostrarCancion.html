@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Detalles de la Canción</title>
+    <style>
+      .btn-like {
+        font-size: 24px;
+        color: gray;
+        background: none;
+        border: none;
+        cursor: pointer;
+        transition: color 0.3s ease;
+      }
+
+      .btn-like.liked {
+        color: purple; /* Cambia a morado cuando está en estado "liked" */
+      }
+
+      .btn-like:hover {
+        color: red; /* Cambia a rojo al pasar el mouse */
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <a href="/colecciones" class="btn btn-back">⬅ Volver</a>
+      </header>
+
+      <main>
+        <div class="song-details">
+          <img
+            th:src="@{${cancion.coverUrl}}"
+            alt="Portada de la canción"
+            class="song-cover"
+          />
+          <h1 th:text="${cancion.title}">Título de la canción</h1>
+          <p th:text="${cancion.duration}">Duración</p>
+          <p th:text="${cancion.gender}">Género</p>
+        </div>
+
+        <div class="song-actions">
+          <button
+            id="like-btn"
+            class="btn btn-like"
+            th:classappend="${userHasLiked} ? 'liked' : ''"
+            th:onclick="'toggleLike(' + ${cancion.id} + ')'"
+          >
+            ❤️
+          </button>
+          <span id="like-count" th:text="${cancion.likeCount} + ' Likes'"
+            >0 Likes</span
+          >
+        </div>
+
+        <div class="comments-section">
+          <h2>Comentarios</h2>
+          <form
+            th:action="@{/songs/{id}/comment(id=${cancion.id})}"
+            method="post"
+          >
+            <textarea
+              name="comment"
+              placeholder="Escribe un comentario..."
+              required
+            ></textarea>
+            <button type="submit" class="btn btn-comment">Comentar</button>
+          </form>
+
+          <div class="comments-list">
+            <div th:each="comentario : ${comentarios}" class="comment">
+              <p>
+                <strong th:text="${comentario.user.nombre}">Usuario</strong>:
+                <span th:text="${comentario.commentText}">Comentario</span>
+              </p>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script>
+      function toggleLike(songId) {
+        fetch(`/songs/${songId}/like`, { method: "POST" })
+          .then((response) => response.text())
+          .then((status) => {
+            const likeBtn = document.getElementById("like-btn");
+            const likeCount = document.getElementById("like-count");
+
+            if (status === "liked") {
+              likeBtn.classList.add("liked");
+              likeCount.textContent =
+                parseInt(likeCount.textContent) + 1 + " Likes";
+            } else if (status === "unliked") {
+              likeBtn.classList.remove("liked");
+              likeCount.textContent =
+                parseInt(likeCount.textContent) - 1 + " Likes";
+            }
+          })
+          .catch((error) => console.error("Error al dar like:", error));
+      }
+    </script>
+  </body>
+</html>

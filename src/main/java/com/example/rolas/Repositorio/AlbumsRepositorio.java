@@ -9,7 +9,7 @@ import java.util.List;
 @Repository
 public interface AlbumsRepositorio extends JpaRepository<Albums, Integer> {
 
-    // Usamos la relación de la tabla intermedia 'AlbumArtists' para buscar los álbumes de un artista
     List<Albums> findByAlbumArtists_Artista(Artista artista);
+    List<Albums> findByTitleContainingIgnoreCase(String title);
 }
 

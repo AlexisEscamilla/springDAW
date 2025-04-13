@@ -19,7 +19,7 @@
             alt="rolas"
           />
           <div class="logo-icon"></div>
-          <a href="/index">Rolas</a>
+          <a href="/feed">Rolas</a>
         </div>
 
         <div class="action-buttons">
@@ -76,15 +76,15 @@
             </div>
             <div class="profile-stats">
               <div class="stat">
-                <div class="stat-value">248</div>
+                <div class="stat-value">0</div>
                 <div class="stat-label">Posts</div>
               </div>
               <div class="stat">
-                <div class="stat-value">1.2K</div>
+                <div class="stat-value" th:text="${usuario.siguiendo}">0</div>
                 <div class="stat-label">Following</div>
               </div>
               <div class="stat">
-                <div class="stat-value">3.5K</div>
+                <div class="stat-value" th:text="${usuario.seguidores}">0</div>
                 <div class="stat-label">Followers</div>
               </div>
             </div>
@@ -158,6 +158,11 @@
                       Duración
                     </div>
                   </div>
+                  <a
+                    th:href="@{/mostrarCancion/{id}(id=${cancion.id})}"
+                    class="btn btn-details"
+                    >Ver Canción</a
+                  >
                   <button class="btn btn-play">▶</button>
                 </div>
               </div>
@@ -195,6 +200,11 @@
                     <div class="trending-meta" th:text="${album.releaseDate}">
                       Fecha de lanzamiento
                     </div>
+                    <a
+                      th:href="@{/mostrarAlbum/{id}(id=${album.id})}"
+                      class="btn btn-details"
+                      >Ver Álbum</a
+                    >
                   </div>
                 </div>
               </div>
@@ -253,6 +263,11 @@
                     >
                       +
                     </button>
+                    <a
+                      th:href="@{/mostrarPlaylist/{id}(id=${playlist.id})}"
+                      class="btn btn-details"
+                      >Ver Playlist</a
+                    >
                   </div>
                   <!-- Contenedor para las canciones del playlist -->
                   <div
@@ -554,6 +569,13 @@
           localStorage.setItem("musicPlayerState", JSON.stringify(state));
         });
       });
+
+      function likeSong(songId) {
+        fetch(`/songs/${songId}/like`, { method: "POST" })
+          .then((response) => response.text())
+          .then((message) => alert(message))
+          .catch((error) => console.error("Error al dar like:", error));
+      }
     </script>
   </body>
 </html>

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Perfil</title>
+    <link rel="stylesheet" href="/css/stylesPerfil.css" />
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <a href="/feed" class="btn btn-back">⬅ Volver</a>
+      </header>
+
+      <main>
+        <div class="profile-header">
+          <div class="profile-avatar">
+            <img
+              th:src="@{'/uploads/' + ${usuario.profilePicture}}"
+              alt="Avatar"
+              class="avatar-img"
+            />
+          </div>
+          <h1 th:text="${usuario.nombre}">Nombre del Usuario</h1>
+          <p th:text="'@' + ${usuario.username}">@username</p>
+          <div class="profile-stats">
+            <div class="stat">
+              <span th:text="${usuario.seguidores}">0</span> Seguidores
+            </div>
+            <div class="stat">
+              <span th:text="${usuario.siguiendo}">0</span> Siguiendo
+            </div>
+          </div>
+          <div class="follow-actions">
+            <button
+              id="follow-btn"
+              class="btn btn-follow"
+              th:if="${!isFollowing}"
+              th:onclick="'followUser(' + ${usuario.id} + ')'"
+            >
+              Seguir
+            </button>
+            <button
+              id="unfollow-btn"
+              class="btn btn-unfollow"
+              th:if="${isFollowing}"
+              th:onclick="'unfollowUser(' + ${usuario.id} + ')'"
+            >
+              Dejar de seguir
+            </button>
+          </div>
+        </div>
+
+        <div class="profile-content">
+          <h2>Canciones</h2>
+          <div th:each="cancion : ${canciones}">
+            <a
+              th:href="@{/mostrarCancion/{id}(id=${cancion.id})}"
+              th:text="${cancion.title}"
+              >Título de la canción</a
+            >
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script>
+      console.log("Follow button:", document.getElementById("follow-btn"));
+      console.log("Unfollow button:", document.getElementById("unfollow-btn"));
+      function followUser(userId) {
+        fetch(`/users/${userId}/follow`, { method: "POST" })
+          .then((response) => response.text())
+          .then((status) => {
+            if (status === "followed") {
+              const followBtn = document.getElementById("follow-btn");
+              const unfollowBtn = document.getElementById("unfollow-btn");
+
+              if (followBtn) followBtn.style.display = "none";
+              if (unfollowBtn) unfollowBtn.style.display = "inline-block";
+            }
+          })
+          .catch((error) =>
+            console.error("Error al seguir al usuario:", error)
+          );
+      }
+
+      function unfollowUser(userId) {
+        fetch(`/users/${userId}/unfollow`, { method: "POST" })
+          .then((response) => response.text())
+          .then((status) => {
+            if (status === "unfollowed") {
+              const followBtn = document.getElementById("follow-btn");
+              const unfollowBtn = document.getElementById("unfollow-btn");
+
+              if (unfollowBtn) unfollowBtn.style.display = "none";
+              if (followBtn) followBtn.style.display = "inline-block";
+            }
+          })
+          .catch((error) =>
+            console.error("Error al dejar de seguir al usuario:", error)
+          );
+      }
+    </script>
+  </body>
+</html>

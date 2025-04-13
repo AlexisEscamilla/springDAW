@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Resultados de Búsqueda</title>
+    <link rel="stylesheet" href="/css/stylesBusqueda.css" />
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <a href="/feed" class="btn btn-back">⬅ Volver</a>
+      </header>
+
+      <main>
+        <h1>Resultados de Búsqueda</h1>
+
+        <section>
+          <h2>Canciones</h2>
+          <div th:if="${#lists.isEmpty(canciones)}">
+            No se encontraron canciones.
+          </div>
+          <ul>
+            <li th:each="cancion : ${canciones}">
+              <a
+                th:href="@{/mostrarCancion/{id}(id=${cancion.id})}"
+                th:text="${cancion.title}"
+                >Título de la canción</a
+              >
+            </li>
+          </ul>
+        </section>
+
+        <section>
+          <h2>Artistas</h2>
+          <div th:if="${#lists.isEmpty(usuarios)}">
+            No se encontraron artistas.
+          </div>
+          <ul>
+            <li th:each="usuario : ${usuarios}">
+              <a
+                th:href="@{/mostrarPerfil/{id}(id=${usuario.id})}"
+                th:text="${usuario.nombre}"
+                >Nombre del artista</a
+              >
+            </li>
+          </ul>
+        </section>
+
+        <section>
+          <h2>Álbumes</h2>
+          <div th:if="${#lists.isEmpty(albums)}">
+            No se encontraron álbumes.
+          </div>
+          <ul>
+            <li th:each="album : ${albums}">
+              <a
+                th:href="@{/mostrarAlbum/{id}(id=${album.id})}"
+                th:text="${album.title}"
+                >Título del álbum</a
+              >
+            </li>
+          </ul>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>

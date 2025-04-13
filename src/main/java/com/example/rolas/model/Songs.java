@@ -28,8 +28,19 @@ public class Songs {
 
     @Column(name = "cover_url")
     private String coverUrl; // URL de la portada de la canción
+    
+    @Column(name = "like_count")
+    private int likeCount; 
 
-    @ManyToOne
+    public int getLikeCount() {
+		return likeCount;
+	}
+
+	public void setLikeCount(int likeCount) {
+		this.likeCount = likeCount;
+	}
+
+	@ManyToOne
     @JoinColumn(name = "album_id")
     private Albums album;  // Relación con el álbum al que pertenece la canción
 

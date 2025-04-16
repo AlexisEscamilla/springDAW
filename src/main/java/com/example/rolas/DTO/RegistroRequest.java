@@ -1,4 +1,4 @@
-package com.example.rolas.dto;
+package com.example.rolas.DTO;
 
 public class RegistroRequest {
     private String nombre;

@@ -1,8 +1,8 @@
 package com.example.rolas.service;
 
-import com.example.rolas.dto.LoginRequest;
-import com.example.rolas.dto.RegistroRequest;
 import com.example.rolas.model.User;
+import com.example.rolas.DTO.LoginRequest;
+import com.example.rolas.DTO.RegistroRequest;
 import com.example.rolas.Repositorio.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;

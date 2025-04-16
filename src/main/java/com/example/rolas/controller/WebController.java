@@ -83,11 +83,5 @@ public class WebController {
         model.addAttribute("playlist", playlist);
         return "mostrarPlaylist";
     }
-    @GetMapping("/chats")
-    public String chats() {
-        return "chats";
-    }
-    
-  
     
 }

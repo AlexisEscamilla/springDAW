@@ -1,10 +1,10 @@
 package com.example.rolas.controller;
 
+import com.example.rolas.DTO.LoginRequest;
+import com.example.rolas.DTO.MensajeResponse;
+import com.example.rolas.DTO.RegistroRequest;
 import com.example.rolas.Repositorio.ArtistaRepositorio;
 import com.example.rolas.Repositorio.UserRepositorio;
-import com.example.rolas.dto.LoginRequest;
-import com.example.rolas.dto.MensajeResponse;
-import com.example.rolas.dto.RegistroRequest;
 import com.example.rolas.model.Artista;
 import com.example.rolas.model.User;
 import com.example.rolas.service.UserService;

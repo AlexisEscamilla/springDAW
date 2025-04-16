@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <title>Chats - Rolas</title>
+    <meta charset="UTF-8" />
+  </head>
+  <body>
+    <!-- Modal para crear un chat individual -->
+    <div id="createChatModal" style="display: none">
+      <h2>Crear Chat</h2>
+      <form id="createChatForm" onsubmit="createChat(event)">
+        <input
+          type="text"
+          id="chatName"
+          placeholder="Nombre del chat (opcional)"
+        />
+        <h3>Selecciona un usuario:</h3>
+        <select id="userSelect" name="userId" required>
+          <option value="" disabled selected>Selecciona un usuario</option>
+          <option
+            th:each="user : ${followers}"
+            th:value="${user.id}"
+            th:text="${user.nombre}"
+          ></option>
+        </select>
+        <button type="submit">Crear</button>
+      </form>
+    </div>
+
+    <!-- Modal para crear un grupo -->
+    <div id="createChatGroupModal" style="display: none">
+      <h2>Crear Grupo</h2>
+      <form id="createGroupForm" onsubmit="createGroup(event)">
+        <input
+          type="text"
+          id="groupName"
+          placeholder="Nombre del grupo"
+          required
+        />
+        <h3>Selecciona usuarios para el grupo:</h3>
+
+        <!-- Listado de seguidores -->
+        <div id="userCheckboxes">
+          <ul>
+            <li th:each="user : ${followers}">
+              <label th:for="'user-' + ${user.id}">
+                <input
+                  type="checkbox"
+                  th:id="'user-' + ${user.id}"
+                  th:value="${user.id}"
+                  name="users"
+                />
+                <span th:text="${user.nombre}"></span>
+              </label>
+            </li>
+          </ul>
+        </div>
+
+        <button type="submit">Crear Grupo</button>
+      </form>
+    </div>
+    <div style="display: flex">
+      <!-- Barra lateral -->
+      <div style="width: 25%; border-right: 1px solid #ccc; padding: 10px">
+        <h2>Chats</h2>
+        <button onclick="openCreateChatModal()">Crear Chat</button>
+        <button onclick="openCreateChatGroupModal()">Crear Grupo</button>
+        <ul id="chatList">
+          <li th:each="chat : ${conversations}">
+            <a
+              href="#"
+              th:onclick="'selectChat(' + ${chat.id} + ');'"
+              th:data-chat-id="${chat.id}"
+              th:text="${chat.groupName != null ? chat.groupName : 'Chat'}"
+            ></a>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Área de mensajes -->
+      <div style="width: 75%; padding: 10px">
+        <h2 th:text="${user.username}" id="nombreDEUSUARIO"></h2>
+        <div
+          id="messages"
+          style="
+            height: 300px;
+            overflow-y: scroll;
+            border: 1px solid #ccc;
+            padding: 10px;
+          "
+        ></div>
+        <form id="sendMessageForm" onsubmit="sendMessage(event)">
+          <input
+            type="text"
+            id="messageText"
+            placeholder="Escribe un mensaje..."
+            required
+          />
+          <button type="submit">Enviar</button>
+        </form>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/stompjs/lib/stomp.min.js"></script>
+    <script>
+      let stompClient = null;
+      let selectedChatId = null;
+
+      function connect() {
+        const socket = new SockJS("/ws");
+        stompClient = Stomp.over(socket);
+        stompClient.connect({}, function () {
+          console.log("Conectado a WebSocket");
+          stompClient.subscribe("/topic/messages", function (message) {
+            showMessage(JSON.parse(message.body));
+          });
+        });
+      }
+      connect();
+
+      function sendMessage(event) {
+        event.preventDefault();
+        if (!stompClient || !stompClient.connected) {
+          console.error("WebSocket no está conectado");
+          return;
+        }
+
+        if (!selectedChatId) {
+          console.error("No se ha seleccionado un chat");
+          return;
+        }
+
+        const messageText = document.getElementById("messageText").value;
+
+        // Obtén el username del sender desde el elemento con ID "nombreDEUSUARIO"
+        const nombreUsuario = document
+          .getElementById("nombreDEUSUARIO")
+          .textContent.trim();
+
+        if (!nombreUsuario) {
+          console.error("No se pudo obtener el nombre de usuario del sender");
+          return;
+        }
+
+        const message = {
+          conversation: { id: selectedChatId },
+          mensajeText: messageText,
+          sender: { username: nombreUsuario }, // Incluye el `username` del usuario autenticado
+        };
+
+        stompClient.send("/app/chat", {}, JSON.stringify(message));
+        document.getElementById("messageText").value = ""; // Limpia el campo de texto
+      }
+
+      function createChat(event) {
+        event.preventDefault();
+        const chatName = document.getElementById("chatName").value;
+        const userId = document.getElementById("userSelect").value;
+
+        fetch("/chats/create", {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: new URLSearchParams({ groupName: chatName, userId: userId }),
+        })
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error("Error al crear el chat");
+            }
+            return response.json();
+          })
+          .then((chat) => {
+            const chatList = document.getElementById("chatList");
+            const li = document.createElement("li");
+            li.innerHTML = `<a href="#" onclick="loadMessages(${chat.id});">${
+              chat.groupName || "Chat"
+            }</a>`;
+            chatList.appendChild(li);
+            document.getElementById("createChatModal").style.display = "none";
+          })
+          .catch((error) => console.error(error));
+      }
+
+      function createGroup(event) {
+        event.preventDefault();
+        const groupName = document.getElementById("groupName").value;
+
+        // Obtener los IDs de los usuarios seleccionados
+        const selectedUsers = Array.from(
+          document.querySelectorAll("#userCheckboxes input:checked")
+        ).map((checkbox) => checkbox.value);
+
+        // Enviar los datos al servidor
+        fetch("/chats/createGroup", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            groupName: groupName,
+            userIds: selectedUsers,
+          }),
+        })
+          .then((response) => response.json())
+          .then((group) => {
+            const chatList = document.getElementById("chatList");
+            const li = document.createElement("li");
+            li.innerHTML = `<a href="#" onclick="loadMessages(${group.id});">${group.groupName}</a>`;
+            chatList.appendChild(li);
+            document.getElementById("createChatGroupModal").style.display =
+              "none";
+          })
+          .catch((error) => console.error("Error al crear el grupo:", error));
+      }
+
+      function openCreateChatModal() {
+        document.getElementById("createChatModal").style.display = "block";
+      }
+
+      function openCreateChatGroupModal() {
+        document.getElementById("createChatGroupModal").style.display = "block";
+      }
+
+      function loadMessages(chatId) {
+        if (!chatId) {
+          console.error("El ID del chat no es válido");
+          return;
+        }
+        fetch(`/chats/${chatId}`)
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error(
+                `Error al cargar los mensajes: ${response.status}`
+              );
+            }
+            return response.json();
+          })
+          .then((messages) => {
+            if (!Array.isArray(messages)) {
+              throw new Error("La respuesta no es un array de mensajes");
+            }
+            const messagesDiv = document.getElementById("messages");
+            messagesDiv.innerHTML = "";
+            messages.forEach((msg) => {
+              const div = document.createElement("div");
+              div.textContent = msg.mensajeText;
+              messagesDiv.appendChild(div);
+            });
+          })
+          .catch((error) => console.error(error));
+      }
+
+      function selectChat(chatId) {
+        selectedChatId = chatId; // Almacena el ID del chat seleccionado
+        console.log("Chat seleccionado:", chatId);
+        loadMessages(chatId); // Carga los mensajes del chat seleccionado
+      }
+    </script>
+  </body>
+</html>

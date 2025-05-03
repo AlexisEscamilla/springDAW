@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Explorar</title>
+    <link rel="stylesheet" href="/css/stylesFeed.css" />
+    <style>
+      .search-results h3 {
+        margin-top: 24px;
+        font-size: 20px;
+        color: var(--accent);
+      }
+      .search-results ul {
+        list-style: none;
+        padding-left: 0;
+      }
+      .search-results li {
+        padding: 8px 0;
+        border-bottom: 1px solid var(--border-color);
+      }
+
+      .resultado-item {
+        display: block;
+        text-decoration: none;
+        margin: 8px 0;
+        padding: 10px;
+        border-radius: 8px;
+        background-color: #1e1e1e;
+        transition: background 0.2s;
+        color: white;
+      }
+
+      .resultado-item:hover {
+        background-color: #2c2c2c;
+      }
+
+      .resultado-contenido {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .resultado-img {
+        width: 40px;
+        height: 40px;
+        object-fit: cover;
+        border-radius: 8px;
+      }
+
+      .imagen_perfil {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        margin-right: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Background effects -->
+    <div class="bg-gradient bg-gradient-1"></div>
+    <div class="bg-gradient bg-gradient-2"></div>
+    <div class="bg-gradient bg-gradient-3"></div>
+
+    <div class="container">
+      <!-- Header -->
+      <header>
+        <div class="logo">
+          <div class="logo-icon"></div>
+          Rolas
+          <div class="logo-icon"></div>
+        </div>
+        <nav>
+          <ul>
+            <li><a href="/inicio">Inicio</a></li>
+            <li><a href="/explorar" class="active">Explorar</a></li>
+            <li><a href="/perfil">Perfil</a></li>
+          </ul>
+        </nav>
+        <div class="action-buttons">
+          <a href="/logout" class="btn btn-outline">Cerrar sesión</a>
+        </div>
+      </header>
+
+      <!-- Buscador y resultados -->
+      <section class="feed">
+        <div class="search-bar" style="margin-bottom: 40px">
+          <input
+            type="text"
+            id="searchInput"
+            placeholder="Buscar canciones, artistas, álbumes..."
+            class="search-input"
+            style="
+              width: 100%;
+              padding: 12px 16px;
+              border-radius: 8px;
+              border: none;
+              background: var(--card-bg);
+              color: var(--light);
+            "
+          />
+        </div>
+
+        <div class="search-results" id="searchResults"></div>
+        <div id="resultados"></div>
+      </section>
+    </div>
+
+    <script>
+      const input = document.getElementById("searchInput");
+      const resultsContainer = document.getElementById("searchResults");
+
+      input.addEventListener("input", async () => {
+        const query = input.value.trim();
+        if (query.length === 0) {
+          resultsContainer.innerHTML = "";
+          return;
+        }
+
+        try {
+          const response = await fetch(
+            `/api/buscar?query=${encodeURIComponent(query)}`
+          );
+          const data = await response.json();
+          renderResultados(data); // 👉 Aquí llamas la función que construye los links
+        } catch (err) {
+          resultsContainer.innerHTML =
+            "<p style='color: red;'>Error al buscar.</p>";
+        }
+      });
+
+      function renderResultados(data) {
+        const contenedor = document.getElementById("resultados");
+        contenedor.innerHTML = "";
+
+        // Canciones
+        if (data.canciones && data.canciones.length > 0) {
+          const h3 = document.createElement("h3");
+          h3.textContent = "Canciones";
+          contenedor.appendChild(h3);
+
+          data.canciones.forEach((c) => {
+            const link = document.createElement("a");
+            link.href = `/mostrarCancion/${c.id}`;
+            link.classList.add("resultado-item");
+
+            const wrapper = document.createElement("div");
+            wrapper.classList.add("resultado-contenido");
+
+            const img = document.createElement("img");
+            img.src = c.coverUrl;
+            img.alt = c.title;
+            img.classList.add("resultado-img");
+
+            const texto = document.createElement("div");
+            texto.innerHTML = `
+        <strong>🎵 ${c.title}</strong><br>
+        <small>Duración: ${c.duration} | Género: ${c.gender}</small>
+      `;
+
+            wrapper.appendChild(img);
+            wrapper.appendChild(texto);
+            link.appendChild(wrapper);
+            contenedor.appendChild(link);
+          });
+        }
+
+        // Álbumes
+        if (data.albums && data.albums.length > 0) {
+          const h3 = document.createElement("h3");
+          h3.textContent = "Álbumes";
+          contenedor.appendChild(h3);
+
+          data.albums.forEach((a) => {
+            const link = document.createElement("a");
+            link.href = `/mostrarAlbum/${a.id}`;
+            link.classList.add("resultado-item");
+
+            const wrapper = document.createElement("div");
+            wrapper.classList.add("resultado-contenido");
+
+            const img = document.createElement("img");
+            img.src = "/uploads/" + a.coverArt;
+            img.alt = a.title;
+            img.classList.add("resultado-img");
+
+            const texto = document.createElement("div");
+            texto.innerHTML = `
+        <strong>💿 ${a.title}</strong><br>
+        <small>Lanzado: ${a.releaseDate}</small>
+      `;
+
+            wrapper.appendChild(img);
+            wrapper.appendChild(texto);
+            link.appendChild(wrapper);
+            contenedor.appendChild(link);
+          });
+        }
+
+        // Usuarios
+        if (data.usuarios && data.usuarios.length > 0) {
+          const h3 = document.createElement("h3");
+          h3.textContent = "Artistas";
+          contenedor.appendChild(h3);
+
+          data.usuarios.forEach((u) => {
+            const link = document.createElement("a");
+            link.href = `/mostrarPerfil/${u.id}`;
+            link.classList.add("resultado-item");
+
+            const wrapper = document.createElement("div");
+            wrapper.classList.add("resultado-contenido");
+
+            const img = document.createElement("img");
+            img.src = "/uploads/" + u.profilePicture;
+            img.alt = u.nombre;
+            img.classList.add("resultado-img");
+
+            const texto = document.createElement("div");
+            texto.innerHTML = `
+        <strong>👤 ${u.nombre}</strong><br>
+        <small>@${u.username}</small>
+      `;
+
+            wrapper.appendChild(img);
+            wrapper.appendChild(texto);
+            link.appendChild(wrapper);
+            contenedor.appendChild(link);
+          });
+        }
+      }
+
+      // Función para mostrar duración en formato mm:ss
+      function formatoDuracion(segundos) {
+        const min = Math.floor(segundos / 60);
+        const sec = segundos % 60;
+        return `${min}:${sec.toString().padStart(2, "0")}`;
+      }
+    </script>
+  </body>
+</html>

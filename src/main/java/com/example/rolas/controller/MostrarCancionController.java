@@ -21,6 +21,7 @@ import com.example.rolas.model.SongComments;
 import com.example.rolas.model.SongLikes;
 import com.example.rolas.model.Songs;
 import com.example.rolas.model.User;
+import com.example.rolas.service.NotificationService;
 
 @Controller
 public class MostrarCancionController {
@@ -36,6 +37,9 @@ public class MostrarCancionController {
 	
 	@Autowired
 	private SongLikesRepositorio songLikesRepositorio;
+	
+	@Autowired
+	private NotificationService notificationService;
 	
 	@GetMapping("/mostrarCancion/{id}")
 	public String mostrarCancion(@PathVariable Integer id, Model model) {
@@ -75,6 +79,16 @@ public class MostrarCancionController {
 
 	    // Guardar el comentario
 	    songCommentsRepositorio.save(comentario);
+
+	    // Crear una notificación para cada artista de la canción
+	    cancion.getSongArtists().forEach(artist -> {
+	        notificationService.createNotification(
+	            artist.getArtista().getUser(), // Usuario que recibe la notificación (artista)
+	            "comment",        // Tipo de notificación
+	            user,             // Usuario que hizo el comentario
+	            cancion.getId()   // ID de la canción
+	        );
+	    });
 
 	    // Redirigir a la página de la canción
 	    return "redirect:/mostrarCancion/" + id;

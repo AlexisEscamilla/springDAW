@@ -37,6 +37,10 @@ public class AlbumArtists {
     public Artista getArtista() {
         return artista;
     }
+    
+    public User getUsuario() {
+        return artista.getUser();
+    }
 
     public void setArtista(Artista artista) {
         this.artista = artista;

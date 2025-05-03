@@ -83,7 +83,7 @@
             </div>
             <div class="profile-stats">
               <div class="stat">
-                <div class="stat-value">0</div>
+                <div class="stat-value" th:text="${usuario.numPosts}">0</div>
                 <div class="stat-label">Posts</div>
               </div>
               <div class="stat">
@@ -101,7 +101,7 @@
             <a href="/explorar" class="menu-item">
               <div class="menu-text">Explorar</div>
             </a>
-            <a href="/notificaciones" class="menu-item">
+            <a href="/mostrarNotificaciones" class="menu-item">
               <div class="menu-text">Notificaciones</div>
             </a>
             <a href="/chats" class="menu-item">
@@ -116,137 +116,84 @@
           </div>
         </aside>
 
-        <div class="search-bar">
-          <form th:action="@{/buscar}" method="get">
-            <input
-              type="text"
-              name="query"
-              placeholder="Buscar canciones, artistas, álbumes..."
-              class="search-input"
-            />
-            <button type="submit" class="btn btn-search">🔍</button>
-          </form>
-        </div>
-
         <!-- Main Feed -->
         <section class="feed">
           <div class="post-creator">
-            <div class="post-input-container">
+            <form th:action="@{/feed/create}" method="post">
+              <div class="post-input-container">
+                <div class="creator-avatar">
+                  <img
+                    th:if="${usuario.profilePicture != null}"
+                    th:src="@{'/uploads/' + ${usuario.profilePicture}}"
+                    class="avatar-imgcreator"
+                    alt="Avatar"
+                  />
+                  <div
+                    th:if="${usuario.profilePicture == null}"
+                    th:text="${usuario.nombre.substring(0,1)}"
+                    class="avatar-placeholder"
+                  ></div>
+                </div>
+                <textarea
+                  name="content"
+                  class="post-input"
+                  placeholder="¿Qué estás pensando?"
+                  required
+                ></textarea>
+              </div>
+              <div class="post-actions">
+                <input type="file" name="imageUrl" class="attachment-btn" />
+                <button type="submit" class="btn btn-primary">Publicar</button>
+              </div>
+            </form>
+          </div>
+
+          <div th:each="post : ${posts}" class="post">
+            <div class="post-header">
               <div class="creator-avatar">
-                <!-- Si el usuario tiene imagen de perfil -->
                 <img
-                  th:if="${usuario.profilePicture != null}"
-                  th:src="@{'/uploads/' + ${usuario.profilePicture}}"
+                  th:if="${post.user.profilePicture != null}"
+                  th:src="@{'/uploads/' + ${post.user.profilePicture}}"
                   class="avatar-imgcreator"
                   alt="Avatar"
                 />
-
-                <!-- Si no tiene imagen, muestra inicial -->
                 <div
-                  th:if="${usuario.profilePicture == null}"
-                  th:text="${usuario.nombre.substring(0,1)}"
+                  th:if="${post.user.profilePicture == null}"
+                  th:text="${post.user.nombre.substring(0,1)}"
                   class="avatar-placeholder"
                 ></div>
               </div>
-              <textarea
-                class="post-input"
-                placeholder="¿Qué estas pensado?"
-              ></textarea>
-            </div>
-            <div class="post-actions">
-              <div class="post-attachments">
-                <button class="attachment-btn">📷 Imagen</button>
-                <button class="attachment-btn">🔗 Link</button>
-              </div>
-              <button class="btn btn-primary">Publicar</button>
-            </div>
-          </div>
-
-          <div class="post">
-            <div class="post-header">
-              <div class="creator-avatar">E</div>
               <div class="post-user-info">
-                <div class="post-user-name">Ethereum Official</div>
+                <div class="post-user-name" th:text="${post.user.nombre}">
+                  Nombre
+                </div>
                 <div class="post-username">
-                  @ethereum · <span class="post-time">2h</span>
+                  <span th:text="'@' + ${post.user.username}">@usuario</span> ·
+                  <span
+                    class="post-time"
+                    th:text="${#temporals.format(post.createdAt, 'HH:mm')}"
+                  >
+                    Hace 2h
+                  </span>
                 </div>
               </div>
             </div>
             <div class="post-content">
-              <p>
-                Exciting news! Our latest protocol update is now live. This
-                brings significant improvements to scalability and transaction
-                speeds. Check out the documentation for all the details.
-              </p>
+              <p th:text="${post.content}">Contenido del post</p>
             </div>
-            <img
-              src="/api/placeholder/600/300"
-              alt="Ethereum Update"
-              class="post-image"
-            />
-            <div class="post-interactions">
-              <div class="interaction">❤️ 1.2K</div>
-              <div class="interaction">💬 148</div>
-              <div class="interaction">🔄 356</div>
-              <div class="interaction">⬆️ Share</div>
-            </div>
-          </div>
-
-          <div class="post">
-            <div class="post-header">
-              <div class="creator-avatar">A</div>
-              <div class="post-user-info">
-                <div class="post-user-name">Alice Blockchain</div>
-                <div class="post-username">
-                  @alicechain · <span class="post-time">4h</span>
-                </div>
-              </div>
-            </div>
-            <div class="post-content">
-              <p>
-                Just deployed my first smart contract using thirdweb! The
-                process was so smooth and intuitive. Highly recommend their
-                developer tools if you're getting started with web3 development.
-              </p>
-              <p>Here's a quick demo of my NFT marketplace in action:</p>
-            </div>
-            <img
-              src="/api/placeholder/600/400"
-              alt="NFT Marketplace Demo"
-              class="post-image"
-            />
-            <div class="post-interactions">
-              <div class="interaction">❤️ 832</div>
-              <div class="interaction">💬 76</div>
-              <div class="interaction">🔄 215</div>
-              <div class="interaction">⬆️ Share</div>
-            </div>
-          </div>
-
-          <div class="post">
-            <div class="post-header">
-              <div class="creator-avatar">D</div>
-              <div class="post-user-info">
-                <div class="post-user-name">DeFi Daily</div>
-                <div class="post-username">
-                  @defidaily · <span class="post-time">6h</span>
-                </div>
-              </div>
-            </div>
-            <div class="post-content">
-              <p>
-                Market Analysis: The total value locked (TVL) in DeFi protocols
-                has increased by 18% this month, reaching a new all-time high.
-                This growth is primarily driven by new lending platforms and
-                yield aggregators.
-              </p>
-              <p>What projects are you currently most bullish on?</p>
+            <div
+              th:if="${!#strings.isEmpty(post.imageUrl) and post.imageUrl != '/uploads/'}"
+            >
+              <img
+                th:src="@{'/uploads/' + ${post.imageUrl}}"
+                alt="Imagen del post"
+                class="post-image"
+              />
             </div>
             <div class="post-interactions">
-              <div class="interaction">❤️ 567</div>
-              <div class="interaction">💬 203</div>
-              <div class="interaction">🔄 129</div>
-              <div class="interaction">⬆️ Share</div>
+              <div class="interaction">❤️ 0</div>
+              <div class="interaction">💬 0</div>
+              <div class="interaction">🔄 0</div>
             </div>
           </div>
         </section>

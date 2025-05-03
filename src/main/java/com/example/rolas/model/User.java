@@ -46,6 +46,28 @@ public class User implements UserDetails {
     public int getSeguidores() {
 		return seguidores;
 	}
+    
+    @Column(name = "num_posts", nullable = false)
+    private Integer numPosts;
+    
+    
+
+	public String getProfile_picture() {
+		return profile_picture;
+	}
+
+	public void setProfile_picture(String profile_picture) {
+		this.profile_picture = profile_picture;
+	}
+
+
+	public Integer getNumPosts() {
+		return numPosts;
+	}
+
+	public void setNumPosts(Integer numPosts) {
+		this.numPosts = numPosts;
+	}
 
 	public void setSeguidores(int seguidores) {
 		this.seguidores = seguidores;

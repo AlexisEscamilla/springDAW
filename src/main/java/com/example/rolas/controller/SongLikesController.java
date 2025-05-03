@@ -12,6 +12,7 @@ import com.example.rolas.Repositorio.UserRepositorio;
 import com.example.rolas.model.SongLikes;
 import com.example.rolas.model.Songs;
 import com.example.rolas.model.User;
+import com.example.rolas.service.NotificationService;
 
 @Controller
 @RequestMapping("/songs")
@@ -25,6 +26,9 @@ public class SongLikesController {
 
     @Autowired
     private UserRepositorio userRepositorio;
+    
+    @Autowired
+    private NotificationService notificationService;
 
     @PostMapping("/{id}/like")
     @ResponseBody
@@ -41,16 +45,27 @@ public class SongLikesController {
         if (songLikesRepositorio.existsByUserAndSong(user, song)) {
             // Si ya dio like, eliminar el like
             SongLikes like = songLikesRepositorio.findByUserAndSong(user, song);
-            song.setLikeCount(Math.max(0,song.getLikeCount() - 1));
+            song.setLikeCount(Math.max(0, song.getLikeCount() - 1));
             songLikesRepositorio.delete(like);
             return "unliked";
         } else {
             // Si no dio like, agregar un nuevo like
-        	song.setLikeCount(Math.max(0, song.getLikeCount() + 1));
-        	SongLikes like = new SongLikes();
+            song.setLikeCount(song.getLikeCount() + 1);
+            SongLikes like = new SongLikes();
             like.setUser(user);
             like.setSong(song);
             songLikesRepositorio.save(like);
+
+            // Crear una notificación para cada artista de la canción
+            song.getSongArtists().forEach(artist -> {
+                notificationService.createNotification(
+                    artist.getArtista().getUser(), // Usuario que recibe la notificación (artista)
+                    "like",           // Tipo de notificación
+                    user,             // Usuario que dio like
+                    song.getId()      // ID de la canción
+                );
+            });
+
             return "liked";
         }
     }

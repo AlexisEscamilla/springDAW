@@ -10,6 +10,7 @@ import com.example.rolas.Repositorio.FollowersRepositorio;
 import com.example.rolas.Repositorio.UserRepositorio;
 import com.example.rolas.model.Followers;
 import com.example.rolas.model.User;
+import com.example.rolas.service.NotificationService;
 
 import jakarta.transaction.Transactional;
 
@@ -23,6 +24,9 @@ public class FollowersController {
     @Autowired
     private UserRepositorio userRepositorio;
 
+    @Autowired
+    private NotificationService notificationService;
+    
     @PostMapping("/{id}/follow")
     @ResponseBody
     public String followUser(@PathVariable Integer id, @AuthenticationPrincipal UserDetails userDetails) {
@@ -51,6 +55,14 @@ public class FollowersController {
 
         userRepositorio.save(following);
         userRepositorio.save(follower);
+
+        // Crear una notificación para el usuario seguido
+        notificationService.createNotification(
+            following,       // Usuario que recibe la notificación
+            "new_follower",  // Tipo de notificación
+            follower,        // Usuario que comenzó a seguir
+            null             // No se necesita un contentId para esta notificación
+        );
 
         return "followed";
     }

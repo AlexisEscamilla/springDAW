@@ -95,9 +95,8 @@ public class SongsController {
         String audioFileName = audioFile.getOriginalFilename();
         String coverFileName = coverFile.getOriginalFilename();
         Path audioPath = Path.of("uploads", audioFileName);
-        Path coverPath = Path.of("uploads", coverFileName);
+        Path coverPath = Path.of(coverFileName);
 
-        
         try {
             // Crear la carpeta de uploads si no existe
             File uploadDir = new File("uploads");

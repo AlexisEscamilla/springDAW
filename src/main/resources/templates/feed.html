@@ -149,6 +149,7 @@
           </div>
 
           <div th:each="post : ${posts}" class="post">
+            <!-- Información del post -->
             <div class="post-header">
               <div class="creator-avatar">
                 <img
@@ -178,22 +179,117 @@
                 </div>
               </div>
             </div>
+
+            <!-- Contenido del post -->
             <div class="post-content">
               <p th:text="${post.content}">Contenido del post</p>
             </div>
-            <div
-              th:if="${!#strings.isEmpty(post.imageUrl) and post.imageUrl != '/uploads/'}"
-            >
+
+            <div th:if="${!#strings.isEmpty(post.imageUrl)}">
               <img
                 th:src="@{'/uploads/' + ${post.imageUrl}}"
                 alt="Imagen del post"
                 class="post-image"
               />
             </div>
+
+            <!-- Interacciones -->
             <div class="post-interactions">
-              <div class="interaction">❤️ 0</div>
-              <div class="interaction">💬 0</div>
-              <div class="interaction">🔄 0</div>
+              <!-- Botón de Like -->
+              <form
+                th:action="@{/posts/{postId}/likes(postId=${post.id})}"
+                method="post"
+              >
+                <button type="submit" class="interaction">
+                  ❤️ <span th:text="${post.likeCount}">0</span>
+                </button>
+              </form>
+
+              <!-- Botón para mostrar comentarios -->
+              <button
+                type="button"
+                class="interaction"
+                onclick="toggleComments('comments-${post.id}')"
+              >
+                💬
+                <span th:text="${#lists.size(comments.?[post.id == post.id])}"
+                  >0</span
+                >
+              </button>
+            </div>
+
+            <!-- Comentarios -->
+            <div
+              id="comments-${post.id}"
+              class="comments-section"
+              style="display: none"
+            >
+              <form
+                th:action="@{/posts/{postId}/comments(postId=${post.id})}"
+                method="post"
+                enctype="multipart/form-data"
+              >
+                <textarea
+                  name="commentText"
+                  class="comment-input"
+                  placeholder="Escribe un comentario..."
+                  required
+                ></textarea>
+                <input type="file" name="imageUrl" class="attachment-btn" />
+                <button type="submit" class="btn btn-primary">Comentar</button>
+              </form>
+
+              <div
+                th:each="comment : ${comments}"
+                th:if="${comment != null and comment.post.id == post.id}"
+                class="comment"
+              >
+                <div class="comment-header">
+                  <div class="creator-avatar">
+                    <img
+                      th:if="${comment.user.profilePicture != null}"
+                      th:src="@{'/uploads/' + ${comment.user.profilePicture}}"
+                      class="avatar-imgcreator"
+                      alt="Avatar"
+                    />
+                    <div
+                      th:if="${comment.user.profilePicture == null}"
+                      th:text="${comment.user.nombre.substring(0,1)}"
+                      class="avatar-placeholder"
+                    ></div>
+                  </div>
+                  <div class="comment-user-info">
+                    <div
+                      class="comment-user-name"
+                      th:text="${comment.user.nombre}"
+                    >
+                      Nombre
+                    </div>
+                    <div class="comment-username">
+                      <span th:text="'@' + ${comment.user.username}"
+                        >@usuario</span
+                      >
+                      ·
+                      <span
+                        class="comment-time"
+                        th:text="${#temporals.format(comment.createdAt, 'HH:mm')}"
+                      >
+                        Hace 1h
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <div class="comment-content">
+                  <p th:text="${comment.commentText}">Texto del comentario</p>
+                  <div th:if="${!#strings.isEmpty(comment.imagenAdjuntada)}">
+                    <img
+                      th:src="@{'/uploads/' + ${comment.imagenAdjuntada}}"
+                      alt="Imagen del comentario"
+                      class="comment-image"
+                    />
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </section>
@@ -282,6 +378,15 @@
 
       function cerrarModal() {
         document.getElementById("modalLogout").style.display = "none";
+      }
+
+      function toggleComments(commentsId) {
+        const commentsSection = document.getElementById(commentsId);
+        if (commentsSection.style.display === "none") {
+          commentsSection.style.display = "block";
+        } else {
+          commentsSection.style.display = "none";
+        }
       }
     </script>
   </body>

@@ -1,7 +1,9 @@
 package com.example.rolas.controller;
 
 import com.example.rolas.model.Post;
+import com.example.rolas.model.PostComments;
 import com.example.rolas.model.User;
+import com.example.rolas.service.PostCommentsService;
 import com.example.rolas.service.PostService;
 import com.example.rolas.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,14 +24,27 @@ public class FeedController {
 
     @Autowired
     private UserService userService;
+    
+    @Autowired
+    private PostCommentsService postCommentsService;
 
     @GetMapping
     public String getFeed(@AuthenticationPrincipal UserDetails userDetails, Model model) {
         User user = userService.findByUsername(userDetails.getUsername());
-        List<Post> posts = postService.getPostsFromFollowing(user.getId());
-
+        List<Post> posts = postService.getPostsFromFollowing(user.getId()); 
+        List<PostComments> allComments = postCommentsService.getAllCommentsForPosts(posts);
+        
+        System.out.println("Comentarios:");
+        allComments.forEach(comment -> {
+            if (comment != null) {
+                System.out.println("Comentario ID: " + comment.getId() + ", Texto: " + comment.getCommentText());
+            } else {
+                System.out.println("Comentario nulo encontrado");
+            }
+        });
         model.addAttribute("usuario", user);
         model.addAttribute("posts", postService.getPostsFromFollowing(user.getId()));
+        model.addAttribute("comments", allComments);
 
         return "feed";
     }

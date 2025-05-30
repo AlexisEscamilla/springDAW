@@ -6,28 +6,67 @@
     <style>
         /* Estilos globales */
         :root {
-            --primary-color: #6c5ce7;
-            --bg-dark: #1a1b2e;
-            --bg-card: #232442;
-            --text-color: #ffffff;
-            --secondary-text: #a0a0b0;
-            --accent-color: #6c5ce7;
-            --error-color: #ff5e5e;
-            --success-color: #5eff7f;
+        --primary: #4f46e5;
+        --secondary: #7c3aed;
+        --dark: #0f172a;
+        --light: #f8fafc;
+        --accent: #06b6d4;
+        --card-bg: rgba(30, 41, 59, 0.5);
+        --border-color: rgba(255, 255, 255, 0.1);
+        --error-color: #ef4444;
         }
+
         
         body {
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-            background-color: var(--bg-dark);
-            color: var(--text-color);
+            background-color: var(--dark);
+            color: var(--light);
+            overflow-x: hidden;
             line-height: 1.6;
         }
         
         * {
+            margin: 0;
+            padding: 0;
             box-sizing: border-box;
+            font-family: Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
         }
+        
+
+
+        .bg-gradient {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.15;
+  z-index: 1;
+}
+
+.bg-gradient-1 {
+  background: var(--primary);
+  top: -200px;
+  left: -200px;
+  width: 600px;
+  height: 600px;
+  animation: float 15s ease-in-out infinite;
+}
+
+.bg-gradient-2 {
+  background: var(--secondary);
+  bottom: -200px;
+  right: -200px;
+  width: 600px;
+  height: 600px;
+  animation: float 20s ease-in-out infinite reverse;
+}
+
+.bg-gradient-3 {
+  background: var(--accent);
+  top: 30%;
+  right: 10%;
+  width: 400px;
+  height: 400px;
+  animation: float 18s ease-in-out infinite;
+}
         
         /* Cabecera */
         .header {
@@ -47,14 +86,14 @@
             align-items: center;
             font-weight: bold;
             font-size: 24px;
-            background: linear-gradient(to right, var(--primary), var(--accent));
+            background: transparent;
             text-decoration: none; /* Elimina el subrayado de los enlaces */
             color: inherit; /* Hereda el color del contenedor */
         }
         
         .logo-icon {
             margin-right: 10px;
-            color: var(--primary-color);
+            color: var(--primary);
             
         }
 
@@ -76,7 +115,7 @@
         }
         
         .nav-link:hover {
-            color: var(--primary-color);
+            color: var(--primary);
         }
         
         .user-menu {
@@ -88,7 +127,7 @@
             width: 40px;
             height: 40px;
             border-radius: 50%;
-            background-color: var(--primary-color);
+            background-color: var(--primary);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -171,7 +210,7 @@
             width: 180px;
             height: 180px;
             border-radius: 50%;
-            background-color: var(--primary-color);
+            background-color: var(--primary);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -293,7 +332,7 @@
         
         .form-input:focus, .form-textarea:focus {
             outline: none;
-            border-color: var(--primary-color);
+            border-color: var(--primary);
         }
         
         .form-textarea {
@@ -343,7 +382,7 @@
         }
         
         .btn-primary {
-            background-color: var(--primary-color);
+            background-color: var(--primary);
             color: white;
             border: none;
         }
@@ -393,7 +432,7 @@
         }
         
         input:checked + .toggle-slider {
-            background-color: var(--primary-color);
+            background-color: var(--primary);
         }
         
         input:checked + .toggle-slider:before {
@@ -456,30 +495,109 @@
                 display: none;
             }
         }
+
+
+        .modal {
+  position: fixed;
+  z-index: 9999;
+  left: 0; top: 0; right: 0; bottom: 0;
+  width: 100vw; height: 100vh;
+  background: rgba(0,0,0,0.5);
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+.modal-content {
+  background: #232442;
+  color: white;
+  border-radius: 12px;
+  padding: 32px 24px;
+  max-width: 400px;
+  margin: auto;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+}
+.modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.btn-danger{
+    background-color: var(--error-color);
+    color: white;
+    border: none;
+    display: center;
+}
+
+.eliminaCuenta {
+    text-align: center;
+    margin-top: 20px;
+}
+
+        .tituloLogo {
+    color: white;
+    text-decoration: none;
+    font-size: 24px;
+    margin-left: 10px;
+}
+.tituloNAV {
+    color: white;
+    text-decoration: none;
+    font-size: 20px;
+    margin-left: 25px;
+}
+
     </style>
 </head>
 <body>
+    <div class="bg-gradient bg-gradient-1"></div>
+    <div class="bg-gradient bg-gradient-2"></div>
+    <div class="bg-gradient bg-gradient-3"></div>
     <!-- Cabecera -->
     <div class="header">
         <div class="logo">
             <img class = "imagi" src="https://images.vexels.com/media/users/3/150846/isolated/preview/a77bce5e752802277f78088150b16923-musica-de-icono-de-auriculares-de-audio.png" alt="rolas">
             <div class="logo-icon"></div>
-            <a href="/index">Rolas</a>
+            <a href="/feed" class="tituloLogo">Rolas</a>
         </div>
         
         <div class="nav-links">
-            <div class="nav-link">Home</div>
-            <div class="nav-link">Explorar</div>
-            <div class="nav-link">Notificaciones</div>
-            <div class="nav-link">Chats</div>
-            <div class="nav-link">Canciones</div>
+            <a class="nav-link tituloNAV" href="/feed">Home</a>
+            <a class="nav-link tituloNAV" href="/explorar">Explorar</a>
+            <a class="nav-link tituloNAV" href="/mostrarNotificaciones">Notificaciones</a>
+            <a class="nav-link tituloNAV" href="/chats">Chats</a>
+            <a class="nav-link tituloNAV" href="/colecciones">Colecciones</a>
         </div>
         
         <div class="user-menu">
-            <div class="nav-link">Cerrar Sesion</div>
-        </div>
+            <!-- Botón que abre el modal -->
+         <button type="button" class="btn btn-primary" onclick="abrirModal()">
+           Cerrar Sesión
+         </button>
+       </div>
     </div>
     
+    <div id="modalLogout" class="modal" style="display: none">
+        <div class="modal-content">
+          <p>¿Estás seguro de que deseas cerrar sesión?</p>
+          <div class="modal-buttons">
+            <form th:action="@{/logout}" method="post">
+              <button type="submit" class="btn btn-danger">Sí, salir</button>
+            </form>
+            <button
+              type="button"
+              class="btn btn-secondary"
+              onclick="cerrarModal()"
+            >
+              Cancelar
+            </button>
+          </div>
+        </div>
+      </div>
+    <div class="container">
+
+
     <div class="container">
         <form class="edit-profile-form" th:action="@{/subirCancion}" method="post" enctype="multipart/form-data">
             <div class="form-title">Subir Canción</div>
@@ -564,7 +682,7 @@
             </div>
         
             <div class="profile-controls">
-                <button class="btn btn-secondary" type="reset">Cancelar</button>
+                <a href="/colecciones" class="btn btn-secondary">Cancelar</a>
                 <button class="btn btn-primary" type="submit">Subir Canción</button>
             </div>
         </form>
@@ -619,7 +737,15 @@
         
             // Agregar el botón para agregar más artistas
             additionalArtistsDiv.appendChild(addMoreButton);
-        </script>
+
+            function abrirModal() {
+                document.getElementById("modalLogout").style.display = "block";
+            }
+
+            function cerrarModal() {
+            document.getElementById("modalLogout").style.display = "none";
+                }
+</script>
         
         
         

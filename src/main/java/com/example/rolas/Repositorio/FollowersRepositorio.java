@@ -15,5 +15,7 @@ public interface FollowersRepositorio extends JpaRepository<Followers, Integer> 
     List<Followers> findByFollowerId(Integer followerId);
     List<Followers> findByFollowing(User following);
     void deleteByFollowerAndFollowing(User follower, User following);
+    int countByFollower(User follower);
+    int countByFollowing(User following);
     
 }

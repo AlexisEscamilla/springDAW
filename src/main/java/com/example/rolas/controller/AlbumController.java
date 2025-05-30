@@ -43,8 +43,12 @@ public class AlbumController {
 
 
     @GetMapping("/subirAlbum")
-    public String subirAlbum() {
-        return "subirAlbum";  // El formulario HTML para subir el álbum
+    public String subirAlbum(@AuthenticationPrincipal UserDetails userDetails, Model model) {
+    	User usuario = userRepositorio.findByUsername(userDetails.getUsername()).orElse(null);
+        if (usuario == null || usuario.getArtista() == null) {
+            return "redirect:/colecciones";
+        }
+    	return "subirAlbum";  // El formulario HTML para subir el álbum
     }
 
     @Transactional

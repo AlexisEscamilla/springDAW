@@ -16,7 +16,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 @Controller
@@ -38,34 +41,32 @@ public class PostCommentsController {
                              @RequestParam String commentText,
                              @RequestParam(required = false) MultipartFile imageUrl,
                              HttpServletRequest request) throws IOException {
-        // Obtener el usuario autenticado
         User user = userRepository.findByUsername(userDetails.getUsername())
             .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-
-        // Obtener el post
         Post post = postRepository.findById(postId)
             .orElseThrow(() -> new RuntimeException("Post no encontrado"));
 
-        // Crear el comentario
         PostComments comment = new PostComments();
         comment.setUser(user);
         comment.setPost(post);
         comment.setCommentText(commentText);
 
-        // Manejar la imagen si se proporciona
         if (imageUrl != null && !imageUrl.isEmpty()) {
-            String imagePath = "/uploads/" + imageUrl.getOriginalFilename();
-            // Aquí puedes guardar la imagen en el servidor si es necesario
-            comment.setImagenAdjuntada(imagePath);
+            String uploadsDir = System.getProperty("user.dir") + File.separator + "uploads";
+            File uploadDir = new File(uploadsDir);
+            if (!uploadDir.exists()) {
+                uploadDir.mkdirs();
+            }
+            String fileName = System.currentTimeMillis() + "_" + imageUrl.getOriginalFilename();
+            Path filePath = Paths.get(uploadsDir, fileName);
+            imageUrl.transferTo(filePath.toFile());
+            comment.setImagenAdjuntada(fileName);
         }
 
-        // Incrementar el contador de comentarios del post
         post.setCommentCount(post.getCommentCount() + 1);
         postRepository.save(post);
-
         postCommentsRepository.save(comment);
 
-        // Redirigir a la página desde donde vino el usuario
         String referer = request.getHeader("Referer");
         return "redirect:" + (referer != null ? referer : "/feed");
     }

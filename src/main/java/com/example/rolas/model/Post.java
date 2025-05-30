@@ -100,4 +100,15 @@ public class Post {
     public void setComments(List<PostComments> comments) {
         this.comments = comments;
     }
+    
+    @Transient
+    private boolean likedByCurrentUser;
+
+    public boolean isLikedByCurrentUser() {
+        return likedByCurrentUser;
+    }
+
+    public void setLikedByCurrentUser(boolean likedByCurrentUser) {
+        this.likedByCurrentUser = likedByCurrentUser;
+    }
 }

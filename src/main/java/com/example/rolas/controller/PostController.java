@@ -1,5 +1,9 @@
 package com.example.rolas.controller;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +15,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.example.rolas.model.Post;
 import com.example.rolas.model.User;
@@ -30,12 +35,30 @@ public class PostController {
         return "feed";
     }
 
+    
     @PostMapping
-    public String createPost(@RequestParam String contenido, 
-                             @RequestParam(required = false) String imagenUrl,
+    public String createPost(@RequestParam String contenido,
+                             @RequestParam(value = "imageUrl", required = false) MultipartFile imageFile,
                              @AuthenticationPrincipal UserDetails userDetails) {
         User usuario = (User) userDetails;
-        postService.createPost(usuario.getId(), contenido, imagenUrl);
+        String imageUrl = null;
+
+        if (imageFile != null && !imageFile.isEmpty()) {
+            try {
+                String uploadsDir = "uploads/";
+                String realPathToUploads = new java.io.File(uploadsDir).getAbsolutePath();
+                Files.createDirectories(Paths.get(realPathToUploads));
+                String fileName = System.currentTimeMillis() + "_" + imageFile.getOriginalFilename();
+                Path filePath = Paths.get(realPathToUploads, fileName);
+                imageFile.transferTo(filePath);
+                imageUrl = fileName;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        postService.createPost(usuario.getId(), contenido, imageUrl);
         return "redirect:/posts";
     }
+    
 }

@@ -46,11 +46,10 @@ public class ColeccionesController {
     @Autowired
     private PlaylistSongsRepositorio playlistSongsRepositorio;
 	
-	@GetMapping("/colecciones")
+    @GetMapping("/colecciones")
     public String mostrarColecciones(@AuthenticationPrincipal UserDetails userDetails,
-                                      @RequestParam(value = "tipo", defaultValue = "canciones") String tipo,
-                                      Model model) {
-        // Obtener el usuario autenticado
+                                     @RequestParam(value = "tipo", defaultValue = "canciones") String tipo,
+                                     Model model) {
         Optional<User> usuarioOpt = userRepositorio.findByUsername(userDetails.getUsername());
 
         if (usuarioOpt.isPresent()) {
@@ -58,33 +57,38 @@ public class ColeccionesController {
             model.addAttribute("usuario", usuario);
 
             Artista artista = usuario.getArtista();
-            if (artista != null) {
+            boolean esArtista = (artista != null);
+            model.addAttribute("esArtista", esArtista);
+            //aassldk
+            if (esArtista) {
+                // Artista: puede ver canciones, albums y playlists
                 if (tipo.equals("canciones")) {
-                    // Obtener las canciones del artista
                     List<Songs> canciones = songsRepositorio.findByArtistaId(artista.getId());
                     model.addAttribute("canciones", canciones);
                 } else if (tipo.equals("albums")) {
-                    // Obtener los álbumes del artista
                     List<Albums> albums = albumsRepositorio.findByAlbumArtists_Artista(artista);
                     model.addAttribute("albums", albums);
                 } else if (tipo.equals("playlists")) {
-                   // Obtener las playlists del usuario con sus canciones
                     List<Playlists> playlists = playlistsRepositorio.findByUser(usuario);
                     playlists.forEach(playlist -> {
                         playlist.setPlaylistSongs(playlistSongsRepositorio.findByPlaylist(playlist));
                     });
                     model.addAttribute("playlists", playlists);
-                } 
+                }
             } else {
-                model.addAttribute("canciones", List.of());
-                model.addAttribute("albums", List.of());
-                model.addAttribute("playlists", List.of());
-            } 
+                // Oyente: solo puede ver y crear playlists
+                tipo = "playlists"; // fuerza la vista a playlists
+                List<Playlists> playlists = playlistsRepositorio.findByUser(usuario);
+                playlists.forEach(playlist -> {
+                    playlist.setPlaylistSongs(playlistSongsRepositorio.findByPlaylist(playlist));
+                });
+                model.addAttribute("playlists", playlists);
+            }
         } else {
             return "redirect:/feed";
         }
 
-        model.addAttribute("tipo", tipo); // Indicar el tipo seleccionado
+        model.addAttribute("tipo", tipo);
         return "colecciones";
     }
 	

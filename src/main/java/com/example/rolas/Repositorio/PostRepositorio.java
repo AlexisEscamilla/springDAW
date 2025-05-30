@@ -13,4 +13,5 @@ public interface PostRepositorio extends JpaRepository<Post, Integer> {
     // Obtener posts de los usuarios que sigue un usuario específico
 	int countByUserId(Integer userId);
     List<Post> findByUserIdInOrderByCreatedAtDesc(List<Integer> userIds);
+    List<Post> findByUserIdOrderByCreatedAtDesc(Integer userId);
 }

@@ -19,7 +19,7 @@
             alt="rolas"
           />
           <div class="logo-icon"></div>
-          <a href="/index">Rolas</a>
+          <a href="/feed">Rolas</a>
         </div>
 
         <div class="action-buttons">
@@ -119,7 +119,11 @@
         <!-- Main Feed -->
         <section class="feed">
           <div class="post-creator">
-            <form th:action="@{/feed/create}" method="post">
+            <form
+              th:action="@{/feed/create}"
+              method="post"
+              enctype="multipart/form-data"
+            >
               <div class="post-input-container">
                 <div class="creator-avatar">
                   <img
@@ -200,8 +204,20 @@
                 th:action="@{/posts/{postId}/likes(postId=${post.id})}"
                 method="post"
               >
-                <button type="submit" class="interaction">
-                  ❤️ <span th:text="${post.likeCount}">0</span>
+                <button
+                  type="submit"
+                  class="interaction"
+                  th:classappend="${post.likedByCurrentUser} ? ' liked' : ''"
+                  onclick="handleLikeClick(this, event)"
+                  th:onclick="|handleLikeClick(this, event); submitLike(${post.id});|"
+                >
+                  <span
+                    class="heart-icon"
+                    th:classappend="${post.likedByCurrentUser} ? ' filled' : ' outline'"
+                    th:text="${post.likedByCurrentUser} ? '❤️' : '🤍'"
+                    >🤍</span
+                  >
+                  <span th:text="${post.likeCount}">0</span>
                 </button>
               </form>
 
@@ -209,87 +225,114 @@
               <button
                 type="button"
                 class="interaction"
-                onclick="toggleComments('comments-${post.id}')"
+                th:onclick="|toggleComments('comments-' + ${post.id})|"
               >
                 💬
-                <span th:text="${#lists.size(comments.?[post.id == post.id])}"
-                  >0</span
-                >
+                <span th:text="${postCommentCounts[post.id]}">0</span>
               </button>
             </div>
 
             <!-- Comentarios -->
             <div
-              id="comments-${post.id}"
+              th:id="'comments-' + ${post.id}"
               class="comments-section"
               style="display: none"
             >
+              <!-- Lista de comentarios -->
+              <div class="comments-list">
+                <div
+                  th:each="comment : ${comments}"
+                  th:if="${comment != null and comment.post.id == post.id}"
+                  class="comment"
+                >
+                  <div class="comment-header">
+                    <div class="comment-avatar">
+                      <img
+                        th:if="${comment.user.profilePicture != null}"
+                        th:src="@{'/uploads/' + ${comment.user.profilePicture}}"
+                        alt="Avatar"
+                      />
+                      <div
+                        th:if="${comment.user.profilePicture == null}"
+                        th:text="${comment.user.nombre.substring(0,1)}"
+                        class="comment-avatar-placeholder"
+                      ></div>
+                    </div>
+                    <div class="comment-user-info">
+                      <div
+                        class="comment-user-name"
+                        th:text="${comment.user.nombre}"
+                      >
+                        Nombre
+                      </div>
+                      <div class="comment-username">
+                        <span th:text="'@' + ${comment.user.username}"
+                          >@usuario</span
+                        >
+                        <span class="separator">·</span>
+                        <span
+                          class="comment-time"
+                          th:text="${#temporals.format(comment.createdAt, 'HH:mm')}"
+                        >
+                          Hace 1h
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="comment-content">
+                    <p th:text="${comment.commentText}" class="comment-text">
+                      Texto del comentario
+                    </p>
+                    <div th:if="${!#strings.isEmpty(comment.imagenAdjuntada)}">
+                      <img
+                        th:src="@{'/uploads/' + ${comment.imagenAdjuntada}}"
+                        alt="Imagen del comentario"
+                        class="comment-image"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               <form
                 th:action="@{/posts/{postId}/comments(postId=${post.id})}"
                 method="post"
                 enctype="multipart/form-data"
+                class="comment-form"
               >
-                <textarea
-                  name="commentText"
-                  class="comment-input"
-                  placeholder="Escribe un comentario..."
-                  required
-                ></textarea>
-                <input type="file" name="imageUrl" class="attachment-btn" />
-                <button type="submit" class="btn btn-primary">Comentar</button>
-              </form>
+                <div class="comment-textarea-container">
+                  <textarea
+                    name="commentText"
+                    class="comment-input"
+                    placeholder="Escribe un comentario..."
+                    required
+                  ></textarea>
+                </div>
 
-              <div
-                th:each="comment : ${comments}"
-                th:if="${comment != null and comment.post.id == post.id}"
-                class="comment"
-              >
-                <div class="comment-header">
-                  <div class="creator-avatar">
-                    <img
-                      th:if="${comment.user.profilePicture != null}"
-                      th:src="@{'/uploads/' + ${comment.user.profilePicture}}"
-                      class="avatar-imgcreator"
-                      alt="Avatar"
+                <div class="comment-actions">
+                  <div>
+                    <input
+                      type="file"
+                      name="imageUrl"
+                      id="commentFileInput-${post.id}"
+                      class="comment-file-input"
+                      accept="image/*"
                     />
-                    <div
-                      th:if="${comment.user.profilePicture == null}"
-                      th:text="${comment.user.nombre.substring(0,1)}"
-                      class="avatar-placeholder"
-                    ></div>
-                  </div>
-                  <div class="comment-user-info">
-                    <div
-                      class="comment-user-name"
-                      th:text="${comment.user.nombre}"
+                    <label
+                      for="commentFileInput-${post.id}"
+                      class="comment-file-label"
                     >
-                      Nombre
-                    </div>
-                    <div class="comment-username">
-                      <span th:text="'@' + ${comment.user.username}"
-                        >@usuario</span
-                      >
-                      ·
-                      <span
-                        class="comment-time"
-                        th:text="${#temporals.format(comment.createdAt, 'HH:mm')}"
-                      >
-                        Hace 1h
-                      </span>
-                    </div>
+                      <span class="file-icon">📷</span>
+                      <span>Adjuntar imagen</span>
+                    </label>
                   </div>
+
+                  <button type="submit" class="comment-submit-btn">
+                    Comentar
+                  </button>
                 </div>
-                <div class="comment-content">
-                  <p th:text="${comment.commentText}">Texto del comentario</p>
-                  <div th:if="${!#strings.isEmpty(comment.imagenAdjuntada)}">
-                    <img
-                      th:src="@{'/uploads/' + ${comment.imagenAdjuntada}}"
-                      alt="Imagen del comentario"
-                      class="comment-image"
-                    />
-                  </div>
-                </div>
-              </div>
+              </form>
             </div>
           </div>
         </section>
@@ -309,64 +352,6 @@
             <div class="trending-title">#DeFiRevolution</div>
             <div class="trending-meta">3,872 posts</div>
           </div>
-
-          <h3 style="margin: 24px 0 16px">Who to Follow</h3>
-          <div class="who-to-follow">
-            <div class="who-to-follow-item">
-              <div
-                class="creator-avatar"
-                style="width: 40px; height: 40px; font-size: 14px"
-              >
-                V
-              </div>
-              <div class="follow-info">
-                <div class="follow-name">Vitalik Buterin</div>
-                <div class="follow-username">@vitalik</div>
-              </div>
-              <button
-                class="btn btn-outline"
-                style="padding: 6px 12px; font-size: 12px"
-              >
-                Follow
-              </button>
-            </div>
-            <div class="who-to-follow-item">
-              <div
-                class="creator-avatar"
-                style="width: 40px; height: 40px; font-size: 14px"
-              >
-                C
-              </div>
-              <div class="follow-info">
-                <div class="follow-name">Chainlink Official</div>
-                <div class="follow-username">@chainlink</div>
-              </div>
-              <button
-                class="btn btn-outline"
-                style="padding: 6px 12px; font-size: 12px"
-              >
-                Follow
-              </button>
-            </div>
-            <div class="who-to-follow-item">
-              <div
-                class="creator-avatar"
-                style="width: 40px; height: 40px; font-size: 14px"
-              >
-                S
-              </div>
-              <div class="follow-info">
-                <div class="follow-name">Solana Foundation</div>
-                <div class="follow-username">@solana</div>
-              </div>
-              <button
-                class="btn btn-outline"
-                style="padding: 6px 12px; font-size: 12px"
-              >
-                Follow
-              </button>
-            </div>
-          </div>
         </aside>
       </main>
     </div>
@@ -382,10 +367,93 @@
 
       function toggleComments(commentsId) {
         const commentsSection = document.getElementById(commentsId);
-        if (commentsSection.style.display === "none") {
+        if (
+          commentsSection.style.display === "none" ||
+          commentsSection.style.display === ""
+        ) {
           commentsSection.style.display = "block";
         } else {
           commentsSection.style.display = "none";
+        }
+      }
+
+      // Mejorar la experiencia del textarea
+      document.addEventListener("DOMContentLoaded", function () {
+        const textareas = document.querySelectorAll(".comment-input");
+
+        textareas.forEach((textarea) => {
+          textarea.addEventListener("input", function () {
+            this.style.height = "auto";
+            this.style.height = Math.min(this.scrollHeight, 150) + "px";
+          });
+        });
+      });
+
+      function handleLikeClick(button, event) {
+        // Crear efecto de ondas
+        createRipple(button, event);
+
+        const heartIcon = button.querySelector(".heart-icon");
+        const isLiked = button.classList.contains("liked");
+
+        if (!isLiked) {
+          // Dar like
+          button.classList.add("liked");
+          heartIcon.textContent = "❤️";
+          heartIcon.classList.remove("outline");
+          heartIcon.classList.add("filled");
+
+          // Crear partículas
+          createParticles(button);
+        } else {
+          // Quitar like
+          button.classList.remove("liked");
+          heartIcon.textContent = "🤍";
+          heartIcon.classList.remove("filled");
+          heartIcon.classList.add("outline");
+        }
+      }
+
+      function createRipple(button, e) {
+        const ripple = document.createElement("span");
+        const rect = button.getBoundingClientRect();
+        const size = Math.max(rect.width, rect.height);
+        const x = e.clientX - rect.left - size / 2;
+        const y = e.clientY - rect.top - size / 2;
+
+        ripple.classList.add("ripple");
+        ripple.style.width = ripple.style.height = size + "px";
+        ripple.style.left = x + "px";
+        ripple.style.top = y + "px";
+
+        button.appendChild(ripple);
+
+        setTimeout(() => {
+          ripple.remove();
+        }, 600);
+      }
+
+      function createParticles(button) {
+        const particles = ["❤️", "💖", "✨", "💕", "🌟"];
+
+        for (let i = 0; i < 6; i++) {
+          setTimeout(() => {
+            const particle = document.createElement("span");
+            particle.classList.add("particle");
+            particle.textContent =
+              particles[Math.floor(Math.random() * particles.length)];
+
+            const rect = button.getBoundingClientRect();
+            particle.style.left = rect.left + Math.random() * rect.width + "px";
+            particle.style.top = rect.top + "px";
+            particle.style.position = "fixed";
+
+            document.body.appendChild(particle);
+
+            setTimeout(() => {
+              particle.remove();
+            }, 1000);
+          }, i * 100);
         }
       }
     </script>

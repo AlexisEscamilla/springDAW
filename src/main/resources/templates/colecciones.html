@@ -93,6 +93,7 @@
             <a
               href="#"
               class="menu-item"
+              th:if="${esArtista}"
               th:classappend="${tipo == 'canciones'} ? 'active'"
               onclick="cambiarContenido('canciones')"
             >
@@ -101,6 +102,7 @@
             <a
               href="#"
               class="menu-item"
+              th:if="${esArtista}"
               th:classappend="${tipo == 'albums'} ? 'active'"
               onclick="cambiarContenido('albums')"
             >
@@ -122,7 +124,7 @@
           <!-- Contenedor dinámico -->
           <div id="contenido-dinamico">
             <!-- Mostrar canciones -->
-            <div th:if="${tipo == 'canciones'}">
+            <div th:if="${tipo == 'canciones'} and ${esArtista}">
               <div class="post-creator">
                 <div class="post-actions">
                   <a href="/subirCancion">
@@ -170,7 +172,7 @@
 
             <!-- Mostrar álbumes -->
 
-            <div th:if="${tipo == 'albums'}">
+            <div th:if="${tipo == 'albums'} and ${esArtista}">
               <div class="post-creator">
                 <div class="post-actions">
                   <a href="/subirAlbum">
@@ -575,6 +577,14 @@
           .then((response) => response.text())
           .then((message) => alert(message))
           .catch((error) => console.error("Error al dar like:", error));
+      }
+
+      function abrirModal() {
+        document.getElementById("modalLogout").style.display = "block";
+      }
+
+      function cerrarModal() {
+        document.getElementById("modalLogout").style.display = "none";
       }
     </script>
   </body>

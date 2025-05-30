@@ -48,7 +48,7 @@ public class User implements UserDetails {
 	}
     
     @Column(name = "num_posts", nullable = false)
-    private Integer numPosts;
+    private Integer numPosts = 0;
     
     
 

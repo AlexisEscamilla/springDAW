@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Perfil</title>
+    <title>Perfil de Usuario</title>
     <style>
       :root {
         --primary: #4f46e5;
@@ -27,99 +27,290 @@
         background-color: var(--dark);
         color: var(--light);
         overflow-x: hidden;
+        line-height: 1.6;
       }
 
       .container {
         max-width: 1200px;
         margin: 0 auto;
-        padding: 0 20px;
+        padding: 20px;
       }
 
-      /* Header */
-      header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 24px 0;
-        position: relative;
-        z-index: 10;
-      }
-
-      .logo {
-        font-size: 44px;
-        margin-left: 450px;
-        font-weight: 700;
-        background: linear-gradient(to right, var(--primary), var(--accent));
-        -webkit-background-clip: text;
-        background-clip: text;
-        -webkit-text-fill-color: transparent;
+      /* Header del perfil */
+      .profile-header {
         display: flex;
         align-items: center;
+        gap: 30px;
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 40px;
+        margin-bottom: 30px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
       }
 
-      .logo-icon {
-        width: 8px;
-        height: 35px;
-        margin-right: 12px;
-        margin-left: 12px;
-        background: linear-gradient(to right, var(--primary), var(--secondary));
-        border-radius: 8px;
+      .avatar {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        background: linear-gradient(45deg, #8b5cf6, #a855f7);
         display: flex;
         align-items: center;
         justify-content: center;
+        font-size: 48px;
+        font-weight: bold;
+        color: white;
+        box-shadow: 0 10px 30px rgba(139, 92, 246, 0.3);
       }
 
-      .imagi {
-        width: 70px;
-        height: 70px;
+      .profile-info {
+        flex: 1;
       }
 
-      nav ul {
+      .username {
+        font-size: 2.5rem;
+        font-weight: bold;
+        margin-bottom: 8px;
+      }
+
+      .handle {
+        color: #a0a0a0;
+        font-size: 1.1rem;
+        margin-bottom: 20px;
+      }
+
+      .stats {
         display: flex;
-        list-style: none;
-        gap: 32px;
+        gap: 40px;
+        margin-bottom: 20px;
       }
 
-      nav a {
-        color: var(--light);
-        text-decoration: none;
-        font-weight: 500;
-        transition: color 0.2s;
+      .stat {
+        text-align: center;
       }
 
-      nav a:hover {
-        color: var(--accent);
+      .stat-number {
+        font-size: 1.8rem;
+        font-weight: bold;
+        color: #8b5cf6;
       }
 
-      .action-buttons {
+      .stat-label {
+        font-size: 0.9rem;
+        color: #a0a0a0;
+        margin-top: 4px;
+      }
+
+      .profile-actions {
         display: flex;
-        gap: 16px;
+        gap: 15px;
       }
 
       .btn {
-        padding: 10px 20px;
-        border-radius: 8px;
-        font-weight: 500;
+        padding: 12px 24px;
+        border-radius: 25px;
+        border: none;
         cursor: pointer;
-        transition: all 0.2s;
+        font-weight: 600;
+        transition: all 0.3s ease;
       }
 
       .btn-primary {
-        background: linear-gradient(to right, var(--primary), var(--secondary));
+        background: linear-gradient(45deg, #8b5cf6, #a855f7);
         color: white;
-        border: none;
-        font-size: 15px;
       }
 
-      .btn-outline {
+      .btn-secondary {
         background: transparent;
-        color: var(--light);
-        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: white;
+        border: 2px solid rgba(255, 255, 255, 0.3);
       }
 
       .btn:hover {
         transform: translateY(-2px);
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+      }
+
+      /* Navegación de tabs */
+      .profile-tabs {
+        display: flex;
+        gap: 0;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 12px;
+        padding: 8px;
+        margin-bottom: 30px;
+        backdrop-filter: blur(10px);
+      }
+
+      .tab {
+        flex: 1;
+        padding: 15px 20px;
+        text-align: center;
+        background: transparent;
+        border: none;
+        color: #a0a0a0;
+        cursor: pointer;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        font-size: 1rem;
+        font-weight: 500;
+      }
+
+      .tab.active {
+        background: linear-gradient(45deg, #8b5cf6, #a855f7);
+        color: white;
+        transform: translateY(-2px);
+      }
+
+      /* Contenido de las tabs */
+      .tab-content {
+        display: none;
+      }
+
+      .tab-content.active {
+        display: block;
+      }
+
+      /* Grid para contenido */
+      .content-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+      }
+
+      .content-card {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(10px);
+        border-radius: 15px;
+        padding: 25px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        transition: all 0.3s ease;
+      }
+
+      .content-card:hover {
+        transform: translateY(-5px);
+        background: rgba(255, 255, 255, 0.08);
+      }
+
+      .content-cardDiminuto {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(10px);
+        border-radius: 15px;
+        padding: 25px;
+        height: 90px;
+        text-align: center;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        transition: all 0.3s ease;
+      }
+
+      .content-cardDiminuto:hover {
+        transform: translateY(-5px);
+        background: rgba(255, 255, 255, 0.08);
+      }
+
+      .card-title {
+        font-size: 1.3rem;
+        font-weight: 600;
+        margin-bottom: 15px;
+        color: #8b5cf6;
+      }
+
+      /* Estadísticas detalladas */
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+      }
+
+      .stat-card {
+        background: rgba(255, 255, 255, 0.05);
+        padding: 20px;
+        border-radius: 12px;
+        text-align: center;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .stat-icon {
+        font-size: 2rem;
+        margin-bottom: 10px;
+      }
+
+      /* Lista de elementos */
+      .item-list {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+      }
+
+      .item {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 15px;
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 10px;
+        transition: all 0.3s ease;
+      }
+
+      .item:hover {
+        background: rgba(255, 255, 255, 0.08);
+        transform: translateX(10px);
+      }
+
+      .item-image {
+        width: 50px;
+        height: 50px;
+        border-radius: 8px;
+        background: linear-gradient(45deg, #8b5cf6, #a855f7);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+      }
+
+      .item-info {
+        flex: 1;
+      }
+
+      .item-title {
+        font-weight: 600;
+        margin-bottom: 4px;
+      }
+
+      .item-subtitle {
+        color: #a0a0a0;
+        font-size: 0.9rem;
+      }
+
+      .watermark {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        color: rgba(255, 255, 255, 0.3);
+        font-size: 0.8rem;
+      }
+
+      /* Responsive */
+      @media (max-width: 768px) {
+        .profile-header {
+          flex-direction: column;
+          text-align: center;
+          gap: 20px;
+        }
+
+        .stats {
+          justify-content: center;
+        }
+
+        .profile-tabs {
+          flex-direction: column;
+          gap: 5px;
+        }
+
+        .content-grid {
+          grid-template-columns: 1fr;
+        }
       }
 
       /* Background effects */
@@ -171,441 +362,578 @@
         }
       }
 
-      /* Feed Layout */
-      .feed-container {
-        display: grid;
-        grid-template-columns: 1fr 2.5fr 1fr;
-        gap: 24px;
-        padding: 40px 0;
-        position: relative;
-        z-index: 2;
+      .modal {
+        position: fixed;
+        z-index: 9999;
+        left: 0;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.5);
+        display: none;
+        align-items: center;
+        justify-content: center;
       }
-
-      /* Sidebar */
-      .sidebar {
-        background: var(--card-bg);
-        border: 1px solid var(--border-color);
+      .modal-content {
+        background: #232442;
+        color: white;
         border-radius: 12px;
-        padding: 24px;
-        height: fit-content;
-        position: sticky;
-        top: 24px;
+        padding: 32px 24px;
+        max-width: 400px;
+        margin: auto;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
       }
-
-      .avatar-img {
-        width: 250px;
-        height: 250px;
-        border-radius: 50%;
-        object-fit: cover;
-      }
-
-      .avatar-imgcreator {
-        width: 70px;
-        height: 70px;
-        border-radius: 50%;
-        object-fit: cover;
-      }
-
-      .avatar-placeholder {
-        width: 100px;
-        height: 100px;
-        background-color: #ddd;
-        border-radius: 50%;
+      .modal-buttons {
         display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 36px;
-        color: #555;
-      }
-
-      .profile-card {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        margin-bottom: 24px;
-        padding-bottom: 24px;
-        border-bottom: 1px solid var(--border-color);
-      }
-
-      .profile-avatar {
-        width: 250px;
-        height: 250px;
-        border-radius: 50%;
-        background: linear-gradient(to right, var(--primary), var(--secondary));
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-size: 32px;
-        font-weight: bold;
-        margin-bottom: 16px;
-      }
-
-      .profile-name {
-        font-size: 18px;
-        font-weight: 600;
-        margin-bottom: 8px;
-      }
-
-      .profile-username {
-        color: rgba(255, 255, 255, 0.6);
-        margin-bottom: 16px;
-      }
-
-      .profile-stats {
-        display: flex;
-        justify-content: space-between;
-        width: 100%;
-      }
-
-      .stat {
-        text-align: center;
-      }
-
-      .stat-value {
-        font-weight: bold;
-        font-size: 18px;
-      }
-
-      .stat-label {
-        font-size: 12px;
-        color: rgba(255, 255, 255, 0.6);
-      }
-
-      .sidebar-menu h3 {
-        font-size: 16px;
-        margin-bottom: 16px;
-      }
-
-      .menu-item {
-        display: flex;
-        align-items: center;
-        padding: 12px 16px;
-        border-radius: 8px;
-        margin-bottom: 8px;
-        cursor: pointer;
-        transition: background 0.2s;
-        text-decoration: none; /* Elimina el subrayado de los enlaces */
-        color: inherit; /* Hereda el color del contenedor */
-      }
-
-      .menu-item:hover {
-        background: rgba(255, 255, 255, 0.05);
-      }
-
-      .menu-item.active {
-        background: rgba(79, 70, 229, 0.2);
-        border-left: 3px solid var(--primary);
-      }
-
-      .menu-text {
-        font-weight: 500;
-        color: inherit; /* Asegura que el texto herede el color del enlace */
-      }
-
-      /* Main feed */
-      .post-creator {
-        background: var(--card-bg);
-        border: 1px solid var(--border-color);
-        border-radius: 12px;
-        padding: 24px;
-        margin-bottom: 24px;
-      }
-
-      .post-input-container {
-        display: flex;
+        justify-content: flex-end;
         gap: 16px;
-        margin-bottom: 16px;
+        margin-top: 24px;
       }
 
-      .creator-avatar {
-        width: 48px;
-        height: 48px;
-        border-radius: 50%;
-        background: linear-gradient(to right, var(--primary), var(--secondary));
-        display: flex;
-        align-items: center;
-        justify-content: center;
+      .btn-danger {
+        background-color: var(--error-color);
         color: white;
-        font-weight: bold;
-        flex-shrink: 0;
-      }
-
-      .post-input {
-        flex-grow: 1;
-        background: rgba(15, 23, 42, 0.7);
-        border: 1px solid var(--border-color);
-        border-radius: 8px;
-        padding: 12px 16px;
-        color: white;
-        resize: none;
-        min-height: 60px;
-      }
-
-      .post-input:focus {
-        outline: none;
-        border-color: var(--primary);
-      }
-
-      .post-actions {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-      }
-
-      .post-attachments {
-        display: flex;
-        gap: 16px;
-      }
-
-      .attachment-btn {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        color: rgba(255, 255, 255, 0.7);
-        background: transparent;
         border: none;
-        cursor: pointer;
-        font-size: 14px;
-        padding: 8px 12px;
-        border-radius: 6px;
-        transition: background 0.2s;
+        display: center;
       }
 
-      .attachment-btn:hover {
-        background: rgba(255, 255, 255, 0.05);
+      .eliminaCuenta {
+        text-align: center;
+        margin-top: 20px;
+      }
+
+      .tituloLogo {
         color: white;
+        text-decoration: none;
+        font-size: 24px;
+        margin-left: 10px;
+      }
+      .tituloNAV {
+        color: white;
+        text-decoration: none;
+        font-size: 20px;
+        margin-left: 25px;
       }
 
-      .post {
-        background: var(--card-bg);
-        border: 1px solid var(--border-color);
-        border-radius: 12px;
-        padding: 24px;
-        margin-bottom: 24px;
-        transition: transform 0.2s;
-      }
-
-      .post:hover {
-        transform: translateY(-2px);
-      }
-
-      .post-header {
+      .nav-links {
         display: flex;
-        align-items: center;
-        margin-bottom: 16px;
       }
 
-      .post-user-info {
-        margin-left: 12px;
-      }
-
-      .post-user-name {
-        font-weight: 600;
-        font-size: 16px;
-      }
-
-      .post-username,
-      .post-time {
-        color: rgba(255, 255, 255, 0.6);
-        font-size: 14px;
-      }
-
-      .post-content {
-        margin-bottom: 16px;
-        line-height: 1.5;
-      }
-
-      .post-image {
-        width: 100%;
-        border-radius: 8px;
-        margin-bottom: 16px;
-        border: 1px solid var(--border-color);
-      }
-
-      .post-interactions {
-        display: flex;
-        justify-content: space-between;
-        padding-top: 16px;
-        border-top: 1px solid var(--border-color);
-      }
-
-      .interaction {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        color: rgba(255, 255, 255, 0.7);
+      .nav-link {
+        margin-left: 20px;
         cursor: pointer;
         transition: color 0.2s;
       }
 
-      .interaction:hover {
-        color: var(--accent);
+      .nav-link:hover {
+        color: var(--primary);
       }
-
-      /* Trending sidebar */
-      .trending-card {
-        padding: 16px;
-        background: rgba(15, 23, 42, 0.7);
-        border-radius: 8px;
-        margin-bottom: 16px;
-      }
-
-      .trending-title {
-        font-size: 16px;
-        font-weight: 600;
-        margin-bottom: 8px;
-      }
-
-      .trending-meta {
-        font-size: 12px;
-        color: rgba(255, 255, 255, 0.6);
-      }
-
-      .who-to-follow-item {
+      /* Cabecera */
+      .header {
         display: flex;
         align-items: center;
-        padding: 12px 0;
-        border-bottom: 1px solid var(--border-color);
+        justify-content: space-between;
+        padding: 10px 10px;
+        background-color: rgba(35, 36, 66, 0.8);
+        backdrop-filter: blur(10px);
+        position: sticky;
+        top: 0;
+        z-index: 100;
       }
 
-      .who-to-follow-item:last-child {
-        border-bottom: none;
+      .logo {
+        font-size: 44px;
+        margin-left: 450px;
+        font-weight: 700;
+        background: linear-gradient(to right, var(--primary), var(--accent));
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        display: flex;
+        align-items: center;
       }
 
-      .follow-info {
-        flex-grow: 1;
+      .logo-icon {
+        width: 8px;
+        height: 35px;
+        margin-right: 12px;
         margin-left: 12px;
+        background: linear-gradient(to right, var(--primary), var(--secondary));
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
       }
 
-      .follow-name {
+      .imagi {
+        width: 70px;
+        height: 70px;
+      }
+
+      .avatar-img {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        object-fit: cover;
+      }
+
+      .interaction {
+        position: relative;
+        background: none;
+        border: 2px solid #ddd;
+        border-radius: 50px;
+        padding: 12px 20px;
+        cursor: pointer;
+        font-size: 16px;
+        font-weight: 600;
+        color: #666;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        overflow: hidden;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .interaction:hover {
+        border-color: #ff4757;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(255, 71, 87, 0.3);
+      }
+
+      .heart-icon {
+        font-size: 20px;
+        transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        position: relative;
+        z-index: 2;
+      }
+
+      .heart-icon.outline {
+        color: #ddd;
+      }
+
+      .heart-icon.filled {
+        color: #ff4757;
+        transform: scale(1.3);
+        animation: heartBeat 0.6s ease-in-out;
+      }
+
+      .interaction.liked {
+        background: linear-gradient(135deg, #ff4757, #ff3742);
+        color: white;
+        border-color: #ff4757;
+        transform: scale(1.05);
+      }
+
+      /* Efecto de partículas */
+      .particle {
+        position: absolute;
+        pointer-events: none;
+        font-size: 12px;
+        color: #ff4757;
+        animation: float 1s ease-out forwards;
+        z-index: 10;
+      }
+
+      /* Efecto de ondas */
+      .ripple {
+        position: absolute;
+        border-radius: 50%;
+        background: rgba(255, 71, 87, 0.3);
+        transform: scale(0);
+        animation: ripple 0.6s linear;
+        pointer-events: none;
+      }
+
+      @keyframes heartBeat {
+        0% {
+          transform: scale(1);
+        }
+        25% {
+          transform: scale(1.4);
+        }
+        50% {
+          transform: scale(1.2);
+        }
+        75% {
+          transform: scale(1.35);
+        }
+        100% {
+          transform: scale(1.3);
+        }
+      }
+
+      @keyframes float {
+        0% {
+          transform: translateY(0) scale(1);
+          opacity: 1;
+        }
+        100% {
+          transform: translateY(-50px) scale(0.5);
+          opacity: 0;
+        }
+      }
+
+      @keyframes ripple {
+        to {
+          transform: scale(4);
+          opacity: 0;
+        }
+      }
+
+      /* Botón personalizado para subir fotos */
+      .photo-upload-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 20px;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        border: none;
+        border-radius: 25px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 600;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .photo-upload-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        background: linear-gradient(135deg, #5a67d8, #667eea);
+      }
+
+      .photo-upload-btn:active {
+        transform: translateY(0);
+      }
+
+      .photo-icon {
+        font-size: 18px;
+        transition: transform 0.3s ease;
+      }
+
+      .photo-upload-btn:hover .photo-icon {
+        transform: scale(1.2) rotate(5deg);
+      }
+
+      /* Efecto de shimmer */
+      .photo-upload-btn::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.3),
+          transparent
+        );
+        transition: left 0.5s;
+      }
+
+      .photo-upload-btn:hover::before {
+        left: 100%;
+      }
+
+      .comments-section {
+        padding: 20px;
+        background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+        border-radius: 12px;
+        margin-top: 15px;
+        border: 1px solid #374151;
+        display: none;
+      }
+
+      .comment-form {
+        margin-bottom: 20px;
+      }
+
+      .comment-textarea-container {
+        position: relative;
+        margin-bottom: 15px;
+      }
+
+      .comment-input {
+        width: 100%;
+        min-height: 80px;
+        padding: 12px 16px;
+        background: #0f172a;
+        border: 2px solid #374151;
+        border-radius: 12px;
+        color: #f1f5f9;
+        font-size: 14px;
+        resize: vertical;
+        transition: all 0.3s ease;
+        font-family: inherit;
+      }
+
+      .comment-input:focus {
+        border-color: #6366f1;
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        outline: none;
+      }
+
+      .comment-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .comment-file-label {
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        background: linear-gradient(135deg, #374151 0%, #4b5563 100%);
+        color: #f1f5f9;
+        border-radius: 20px;
+        border: 1px solid #6b7280;
+        font-size: 13px;
+        transition: all 0.3s ease;
+        text-decoration: none;
+      }
+
+      .comment-file-label:hover {
+        background: linear-gradient(135deg, #4b5563 0%, #6b7280 100%);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      }
+
+      .comment-file-input {
+        display: none;
+      }
+
+      .comment-submit-btn {
+        padding: 10px 20px;
+        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+        color: white;
+        border: none;
+        border-radius: 20px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-transform: none;
+      }
+
+      .comment-submit-btn:hover {
+        background: linear-gradient(135deg, #5855eb 0%, #7c3aed 100%);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+      }
+
+      .comments-list {
+        max-height: 400px;
+        overflow-y: auto;
+        padding-right: 8px;
+      }
+
+      .comment {
+        padding: 16px;
+        margin-bottom: 12px;
+        background: rgba(15, 23, 42, 0.6);
+        border: 1px solid #374151;
+        border-radius: 12px;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
+      }
+
+      .comment:hover {
+        background: rgba(15, 23, 42, 0.8);
+        border-color: #4b5563;
+      }
+
+      .comment-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 12px;
+      }
+
+      .comment-avatar {
+        flex-shrink: 0;
+      }
+
+      .comment-avatar img {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid #6366f1;
+      }
+
+      .comment-avatar-placeholder {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 16px;
+      }
+
+      .comment-user-info {
+        flex: 1;
+      }
+
+      .comment-user-name {
+        color: #f1f5f9;
         font-weight: 600;
         font-size: 14px;
       }
 
-      .follow-username {
+      .comment-username {
+        color: #94a3b8;
         font-size: 12px;
-        color: rgba(255, 255, 255, 0.6);
+        margin-top: 2px;
       }
 
-      /* Responsive */
-      @media (max-width: 1200px) {
-        .feed-container {
-          grid-template-columns: 1fr 3fr;
-        }
-
-        .trending-sidebar {
-          display: none;
-        }
+      .comment-username .separator {
+        margin: 0 6px;
       }
 
-      @media (max-width: 768px) {
-        .feed-container {
-          grid-template-columns: 1fr;
-        }
-
-        .sidebar {
-          display: none;
-        }
-
-        nav ul {
-          display: none;
-        }
+      .comment-content {
+        margin-left: 52px;
       }
 
-      .ajuste {
-        width: 25px;
-        height: 25px;
+      .comment-text {
+        color: #e2e8f0;
+        font-size: 14px;
+        line-height: 1.5;
+        margin: 0 0 12px 0;
+        word-wrap: break-word;
       }
 
-      .modal {
-        display: none;
-        position: fixed;
-        z-index: 1000;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
+      .comment-image {
+        max-width: 100%;
+        height: auto;
+        border-radius: 8px;
+        border: 1px solid #374151;
+        cursor: pointer;
+        transition: all 0.3s ease;
       }
 
-      .modal-content {
-        background: linear-gradient(to right, var(--primary), var(--secondary));
-        color: white;
-        border: none;
-        font-size: 15px;
-        margin: 15% auto;
-        padding: 20px;
-        border-radius: 10px;
-        width: 300px;
-        text-align: center;
-        font-weight: 500;
+      .comment-image:hover {
+        transform: scale(1.02);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
       }
 
-      .modal-buttons {
-        margin-top: 15px;
-        display: flex;
-        justify-content: space-around;
+      .file-icon {
+        font-size: 16px;
       }
 
-      .btn.btn-danger {
-        background-color: #e74c3c;
-        color: white;
-      }
-
-      .btn.btn-secondary {
-        background-color: #ccc;
-        color: #333;
-      }
-
-      .profile-header {
+      .posts-list {
         display: flex;
         flex-direction: column;
-        align-items: center;
-        padding: 20px;
-        background: var(--card-bg);
-        border-radius: 12px;
-        margin-bottom: 24px;
+        gap: 30px;
+      }
+      .post {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 15px;
+        padding: 25px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        margin-bottom: 0;
       }
     </style>
   </head>
   <body>
-    <div class="container">
-      <header>
-        <a href="/feed" class="btn btn-back">⬅ Volver</a>
-      </header>
+    <div class="bg-gradient bg-gradient-1"></div>
+    <div class="bg-gradient bg-gradient-2"></div>
+    <div class="bg-gradient bg-gradient-3"></div>
 
-      <main>
-        <div class="profile-header">
-          <div class="profile-avatar">
-            <img
-              th:src="@{'/uploads/' + ${usuario.profilePicture}}"
-              alt="Avatar"
-              class="avatar-img"
-            />
-          </div>
-          <h1 th:text="${usuario.nombre}">Nombre del Usuario</h1>
-          <p th:text="'@' + ${usuario.username}">@username</p>
-          <div class="profile-stats">
+    <div class="header">
+      <div class="logo">
+        <img
+          class="imagi"
+          src="https://images.vexels.com/media/users/3/150846/isolated/preview/a77bce5e752802277f78088150b16923-musica-de-icono-de-auriculares-de-audio.png"
+          alt="rolas"
+        />
+        <div class="logo-icon"></div>
+        <a href="/feed" class="tituloLogo">Rolas</a>
+      </div>
+
+      <div class="nav-links">
+        <a class="nav-link tituloNAV" href="/feed">Home</a>
+        <a class="nav-link tituloNAV" href="/explorar">Explorar</a>
+        <a class="nav-link tituloNAV" href="/mostrarNotificaciones"
+          >Notificaciones</a
+        >
+        <a class="nav-link tituloNAV" href="/chats">Chats</a>
+        <a class="nav-link tituloNAV" href="/colecciones">Colecciones</a>
+      </div>
+
+      <div class="user-menu">
+        <!-- Botón que abre el modal -->
+        <button type="button" class="btn btn-primary" onclick="abrirModal()">
+          Cerrar Sesión
+        </button>
+      </div>
+    </div>
+
+    <div class="modal" id="modalLogout">
+      <div class="modal-content">
+        <h2>¿Estás seguro de que quieres cerrar sesión?</h2>
+        <div class="modal-buttons">
+          <button class="btn btn-secondary" onclick="cerrarModal()">
+            Cancelar
+          </button>
+          <form th:action="@{/logout}" method="post">
+            <button type="submit" class="btn btn-danger">Cerrar Sesión</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+      <!-- Header del perfil -->
+      <div class="profile-header">
+        <div class="avatar">
+          <img
+            th:src="@{'/uploads/' + ${usuario.profilePicture}}"
+            alt="Avatar"
+            class="avatar-img"
+          />
+        </div>
+        <div class="profile-info">
+          <h1 class="username" th:text="${usuario.nombre}">Nombre</h1>
+          <p class="handle" th:text="'@' + ${usuario.username}">@username</p>
+          <div class="stats">
             <div class="stat">
-              <span th:text="${usuario.seguidores}">0</span> Seguidores
+              <div class="stat-number" th:text="${usuario.seguidores}">0</div>
+              <div class="stat-label">Seguidores</div>
             </div>
             <div class="stat">
-              <span th:text="${usuario.siguiendo}">0</span> Siguiendo
+              <div class="stat-number" th:text="${usuario.siguiendo}">0</div>
+              <div class="stat-label">Siguiendo</div>
+            </div>
+
+            <div class="stat">
+              <div class="stat-number">47</div>
+              <div class="stat-label">Canciones</div>
             </div>
           </div>
-          <div class="follow-actions">
+          <div class="profile-actions">
             <button
+              class="btn btn-primary"
               id="follow-btn"
-              class="btn btn-follow"
               th:if="${!isFollowing}"
               th:onclick="'followUser(' + ${usuario.id} + ')'"
             >
               Seguir
             </button>
             <button
+              class="btn btn-secondary"
               id="unfollow-btn"
-              class="btn btn-unfollow"
               th:if="${isFollowing}"
               th:onclick="'unfollowUser(' + ${usuario.id} + ')'"
             >
@@ -613,19 +941,338 @@
             </button>
           </div>
         </div>
+      </div>
 
-        <div class="profile-header">
-          <h2>Canciones</h2>
-          <div th:each="cancion : ${canciones}">
-            <a
-              th:href="@{/mostrarCancion/{id}(id=${cancion.id})}"
-              th:text="${cancion.title}"
-              >Título de la canción</a
+      <!-- Navegación de tabs -->
+      <div class="profile-tabs">
+        <button class="tab active" onclick="showTab('posts', event)">
+          Post
+        </button>
+        <button
+          class="tab"
+          onclick="showTab('canciones', event)"
+          th:if="${esArtista}"
+        >
+          Canciones
+        </button>
+        <button class="tab" onclick="showTab('playlists', event)">
+          Playlists
+        </button>
+        <button
+          class="tab"
+          onclick="showTab('albums', event)"
+          th:if="${esArtista}"
+        >
+          Álbumes
+        </button>
+      </div>
+
+      <!-- Contenido de Posts -->
+      <div id="posts" class="tab-content active">
+        <div class="posts-list">
+          <div class="post" th:each="post : ${posts}">
+            <!-- Información del post -->
+            <div
+              class="post-header"
+              style="display: flex; align-items: center; gap: 12px"
             >
+              <div class="creator-avatar">
+                <img
+                  th:if="${post.user.profilePicture != null}"
+                  th:src="@{'/uploads/' + ${post.user.profilePicture}}"
+                  class="avatar-imgcreator"
+                  alt="Avatar"
+                  style="width: 48px; height: 48px; border-radius: 50%"
+                />
+                <div
+                  th:if="${post.user.profilePicture == null}"
+                  th:text="${post.user.nombre.substring(0,1)}"
+                  class="avatar-placeholder"
+                  style="
+                    width: 48px;
+                    height: 48px;
+                    border-radius: 50%;
+                    background: #8b5cf6;
+                    color: white;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                  "
+                ></div>
+              </div>
+              <div class="post-user-info">
+                <div class="post-user-name" th:text="${post.user.nombre}">
+                  Nombre
+                </div>
+                <div class="post-username">
+                  <span th:text="'@' + ${post.user.username}">@usuario</span> ·
+                  <span
+                    class="post-time"
+                    th:text="${#temporals.format(post.createdAt, 'HH:mm')}"
+                    >Hace 2h</span
+                  >
+                </div>
+              </div>
+            </div>
+
+            <!-- Contenido del post -->
+            <div class="post-content">
+              <p th:text="${post.content}">Contenido del post</p>
+            </div>
+
+            <div th:if="${!#strings.isEmpty(post.imageUrl)}">
+              <img
+                th:src="@{'/uploads/' + ${post.imageUrl}}"
+                alt="Imagen del post"
+                class="post-image"
+                style="
+                  width: 100%;
+                  max-width: 400px;
+                  border-radius: 12px;
+                  margin-top: 10px;
+                "
+              />
+            </div>
+
+            <!-- Interacciones -->
+            <div class="post-interactions" style="margin-top: 10px">
+              <!-- Botón de Like -->
+              <form
+                th:action="@{/posts/{postId}/likes(postId=${post.id})}"
+                method="post"
+                style="display: inline"
+              >
+                <button
+                  type="submit"
+                  class="interaction"
+                  th:classappend="${post.likedByCurrentUser} ? ' liked' : ''"
+                  onclick="handleLikeClick(this, event)"
+                  th:onclick="|handleLikeClick(this, event); submitLike(${post.id});|"
+                >
+                  <span
+                    class="heart-icon"
+                    th:classappend="${post.likedByCurrentUser} ? ' filled' : ' outline'"
+                    th:text="${post.likedByCurrentUser} ? '❤️' : '🤍'"
+                    >🤍</span
+                  >
+                  <span th:text="${post.likeCount}">0</span>
+                </button>
+              </form>
+
+              <!-- Botón para mostrar comentarios -->
+              <button
+                type="button"
+                class="interaction"
+                th:onclick="|toggleComments('comments-' + ${post.id})|"
+              >
+                💬
+                <span th:text="${postCommentCounts[post.id]}">0</span>
+              </button>
+            </div>
+
+            <!-- Comentarios -->
+            <div
+              th:id="'comments-' + ${post.id}"
+              class="comments-section"
+              style="display: none; margin-top: 10px"
+            >
+              <!-- Lista de comentarios -->
+              <div class="comments-list">
+                <div
+                  th:each="comment : ${comments}"
+                  th:if="${comment != null and comment.post.id == post.id}"
+                  class="comment"
+                  style="margin-bottom: 10px"
+                >
+                  <div
+                    class="comment-header"
+                    style="display: flex; align-items: center; gap: 8px"
+                  >
+                    <div class="comment-avatar">
+                      <img
+                        th:if="${comment.user.profilePicture != null}"
+                        th:src="@{'/uploads/' + ${comment.user.profilePicture}}"
+                        alt="Avatar"
+                        style="width: 32px; height: 32px; border-radius: 50%"
+                      />
+                      <div
+                        th:if="${comment.user.profilePicture == null}"
+                        th:text="${comment.user.nombre.substring(0,1)}"
+                        class="comment-avatar-placeholder"
+                        style="
+                          width: 32px;
+                          height: 32px;
+                          border-radius: 50%;
+                          background: #8b5cf6;
+                          color: white;
+                          display: flex;
+                          align-items: center;
+                          justify-content: center;
+                        "
+                      ></div>
+                    </div>
+                    <div class="comment-user-info">
+                      <div
+                        class="comment-user-name"
+                        th:text="${comment.user.nombre}"
+                      >
+                        Nombre
+                      </div>
+                      <div class="comment-username">
+                        <span th:text="'@' + ${comment.user.username}"
+                          >@usuario</span
+                        >
+                        <span class="separator">·</span>
+                        <span
+                          class="comment-time"
+                          th:text="${#temporals.format(comment.createdAt, 'HH:mm')}"
+                          >Hace 1h</span
+                        >
+                      </div>
+                    </div>
+                  </div>
+                  <div class="comment-content">
+                    <p th:text="${comment.commentText}" class="comment-text">
+                      Texto del comentario
+                    </p>
+                    <div th:if="${!#strings.isEmpty(comment.imagenAdjuntada)}">
+                      <img
+                        th:src="@{'/uploads/' + ${comment.imagenAdjuntada}}"
+                        alt="Imagen del comentario"
+                        class="comment-image"
+                        style="width: 80px; border-radius: 8px; margin-top: 5px"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Formulario para agregar comentario -->
+              <form
+                th:action="@{/posts/{postId}/comments(postId=${post.id})}"
+                method="post"
+                enctype="multipart/form-data"
+                class="comment-form"
+              >
+                <div class="comment-textarea-container">
+                  <textarea
+                    name="commentText"
+                    class="comment-input"
+                    placeholder="Escribe un comentario..."
+                    required
+                  ></textarea>
+                </div>
+                <div class="comment-actions" style="margin-top: 8px">
+                  <div>
+                    <input
+                      type="file"
+                      name="imageUrl"
+                      id="commentFileInput-${post.id}"
+                      class="comment-file-input"
+                      accept="image/*"
+                    />
+                    <label
+                      for="commentFileInput-${post.id}"
+                      class="comment-file-label"
+                      style="cursor: pointer"
+                    >
+                      <span class="file-icon">📷</span>
+                      <span>Adjuntar imagen</span>
+                    </label>
+                  </div>
+                  <button type="submit" class="comment-submit-btn">
+                    Comentar
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
         </div>
-      </main>
+      </div>
+
+      <!-- Contenido de Canciones -->
+      <!-- Contenido de Canciones -->
+      <!-- Contenido de Canciones -->
+      <div id="canciones" class="tab-content" th:if="${esArtista}">
+        <div class="content-card">
+          <h3 class="card-title">Canciones Recientes</h3>
+          <div class="item-list">
+            <div class="item" th:each="cancion : ${canciones}">
+              <div class="item-image">
+                <img
+                  th:src="@{'/uploads/' + ${cancion.coverUrl}}"
+                  alt="Portada de la canción"
+                  style="width: 50px; height: 50px; border-radius: 8px"
+                />
+              </div>
+              <div class="item-info">
+                <div class="item-title" th:text="${cancion.title}">Titulo</div>
+                <div class="item-subtitle">
+                  <span th:text="${cancion.duration}">3:45</span>
+                  •
+                  <span th:text="${cancion.gender}">-</span>
+                  •
+                  <span
+                    th:text="${#dates.format(cancion.createdAt, 'dd/MM/yyyy')}"
+                    >-</span
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contenido de Playlists -->
+      <!-- Contenido de Playlists -->
+      <div id="playlists" class="tab-content">
+        <div class="content-card">
+          <h3 class="card-title">Playlists</h3>
+          <div class="item-list">
+            <div class="item" th:each="playlist : ${playlists}">
+              <div class="item-image">
+                <img
+                  th:if="${playlist.coverImage != null}"
+                  th:src="@{'/' + ${playlist.coverImage}}"
+                  alt="Portada Playlist"
+                  style="width: 50px; height: 50px; border-radius: 8px"
+                />
+              </div>
+              <div class="item-info">
+                <div class="item-title" th:text="${playlist.title}">Titulo</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contenido de Álbumes -->
+      <div id="albums" class="tab-content" th:if="${esArtista}">
+        <div class="content-card">
+          <h3 class="card-title">Álbumes</h3>
+          <div class="item-list">
+            <div class="item" th:each="album : ${albums}">
+              <div class="item-image">
+                <img
+                  th:if="${album.coverArt != null}"
+                  th:src="@{'/uploads/' + ${album.coverArt}}"
+                  alt="Portada Álbum"
+                  style="width: 50px; height: 50px; border-radius: 8px"
+                />
+              </div>
+              <div class="item-info">
+                <div class="item-title" th:text="${album.title}">Titulo</div>
+              </div>
+            </div>
+            <div th:if="${#lists.isEmpty(albums)}">
+              <span>No hay álbumes para mostrar.</span>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
+
+    <div class="watermark">Diseño para mostrarPerfil - Propuesta de mejora</div>
 
     <script>
       console.log("Follow button:", document.getElementById("follow-btn"));
@@ -662,6 +1309,142 @@
           .catch((error) =>
             console.error("Error al dejar de seguir al usuario:", error)
           );
+      }
+
+      function showTab(tabName) {
+        // Ocultar todos los contenidos
+        const contents = document.querySelectorAll(".tab-content");
+        contents.forEach((content) => {
+          content.classList.remove("active");
+        });
+
+        // Remover clase active de todos los tabs
+        const tabs = document.querySelectorAll(".tab");
+        tabs.forEach((tab) => {
+          tab.classList.remove("active");
+        });
+
+        // Activar el contenido seleccionado
+        document.getElementById(tabName).classList.add("active");
+
+        // Activar el tab correspondiente
+        event.target.classList.add("active");
+      }
+
+      // Agregar efectos de hover y animaciones
+      document.addEventListener("DOMContentLoaded", function () {
+        // Animación para las estadísticas
+        const statNumbers = document.querySelectorAll(".stat-number");
+        statNumbers.forEach((stat) => {
+          stat.addEventListener("mouseenter", function () {
+            this.style.transform = "scale(1.1)";
+            this.style.transition = "transform 0.3s ease";
+          });
+
+          stat.addEventListener("mouseleave", function () {
+            this.style.transform = "scale(1)";
+          });
+        });
+      });
+
+      function abrirModal() {
+        document.getElementById("modalLogout").style.display = "block";
+      }
+
+      function cerrarModal() {
+        document.getElementById("modalLogout").style.display = "none";
+      }
+
+      function toggleComments(commentsId) {
+        const commentsSection = document.getElementById(commentsId);
+        if (
+          commentsSection.style.display === "none" ||
+          commentsSection.style.display === ""
+        ) {
+          commentsSection.style.display = "block";
+        } else {
+          commentsSection.style.display = "none";
+        }
+      }
+
+      // Mejorar la experiencia del textarea
+      document.addEventListener("DOMContentLoaded", function () {
+        const textareas = document.querySelectorAll(".comment-input");
+
+        textareas.forEach((textarea) => {
+          textarea.addEventListener("input", function () {
+            this.style.height = "auto";
+            this.style.height = Math.min(this.scrollHeight, 150) + "px";
+          });
+        });
+      });
+
+      function handleLikeClick(button, event) {
+        // Crear efecto de ondas
+        createRipple(button, event);
+
+        const heartIcon = button.querySelector(".heart-icon");
+        const isLiked = button.classList.contains("liked");
+
+        if (!isLiked) {
+          // Dar like
+          button.classList.add("liked");
+          heartIcon.textContent = "❤️";
+          heartIcon.classList.remove("outline");
+          heartIcon.classList.add("filled");
+
+          // Crear partículas
+          createParticles(button);
+        } else {
+          // Quitar like
+          button.classList.remove("liked");
+          heartIcon.textContent = "🤍";
+          heartIcon.classList.remove("filled");
+          heartIcon.classList.add("outline");
+        }
+      }
+
+      function createRipple(button, e) {
+        const ripple = document.createElement("span");
+        const rect = button.getBoundingClientRect();
+        const size = Math.max(rect.width, rect.height);
+        const x = e.clientX - rect.left - size / 2;
+        const y = e.clientY - rect.top - size / 2;
+
+        ripple.classList.add("ripple");
+        ripple.style.width = ripple.style.height = size + "px";
+        ripple.style.left = x + "px";
+        ripple.style.top = y + "px";
+
+        button.appendChild(ripple);
+
+        setTimeout(() => {
+          ripple.remove();
+        }, 600);
+      }
+
+      function createParticles(button) {
+        const particles = ["❤️", "💖", "✨", "💕", "🌟"];
+
+        for (let i = 0; i < 6; i++) {
+          setTimeout(() => {
+            const particle = document.createElement("span");
+            particle.classList.add("particle");
+            particle.textContent =
+              particles[Math.floor(Math.random() * particles.length)];
+
+            const rect = button.getBoundingClientRect();
+            particle.style.left = rect.left + Math.random() * rect.width + "px";
+            particle.style.top = rect.top + "px";
+            particle.style.position = "fixed";
+
+            document.body.appendChild(particle);
+
+            setTimeout(() => {
+              particle.remove();
+            }, 1000);
+          }, i * 100);
+        }
       }
     </script>
   </body>

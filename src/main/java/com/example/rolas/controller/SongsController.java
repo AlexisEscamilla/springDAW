@@ -62,9 +62,13 @@ public class SongsController {
 
     @GetMapping("/subirCancion")
     public String subirCancionForm(@AuthenticationPrincipal UserDetails userDetails, Model model) {
-
+    	User user = userRepositorio.findByUsername(userDetails.getUsername()).orElse(null);
+    	if (user == null || user.getArtista() == null) {
+            // Redirige a colecciones o muestra error si NO es artista
+            return "redirect:/colecciones";
+        }
         // Obtener todos los álbumes del repositorio
-        List<Albums> albums = albumRepositorio.findAll(); // Cambiado para obtener todos los álbumes
+        List<Albums> albums = albumRepositorio.findByAlbumArtists_Artista(user.getArtista()); // Cambiado para obtener todos los álbumes
 
         // Poner los álbumes en el modelo para que estén disponibles en el formulario
         model.addAttribute("albums", albums);
@@ -84,18 +88,15 @@ public class SongsController {
 					            @AuthenticationPrincipal UserDetails userDetails,
 					            Model model) {
 	    	
-    	
+    	User user = userRepositorio.findByUsername(userDetails.getUsername()).orElse(null);
+        
     	// Validar que los archivos no estén vacíos
         if (audioFile.isEmpty() || coverFile.isEmpty()) {
             model.addAttribute("error", "Los archivos de audio y portada son obligatorios.");
             return "subirCancion";
         }
 
-        // Guardar los archivos en el sistema de archivos
-        String audioFileName = audioFile.getOriginalFilename();
-        String coverFileName = coverFile.getOriginalFilename();
-        Path audioPath = Path.of("uploads", audioFileName);
-        Path coverPath = Path.of(coverFileName);
+       
 
         try {
             // Crear la carpeta de uploads si no existe
@@ -104,68 +105,71 @@ public class SongsController {
                 uploadDir.mkdir();
             }
 
-            // Guardar los archivos
+            // Guardar archivo de audio
+            String audioFileName = System.currentTimeMillis() + "_" + audioFile.getOriginalFilename();
+            Path audioPath = Path.of("uploads", audioFileName);
             Files.copy(audioFile.getInputStream(), audioPath, StandardCopyOption.REPLACE_EXISTING);
+
+            // Guardar archivo de portada
+            String coverFileName = System.currentTimeMillis() + "_" + coverFile.getOriginalFilename();
+            Path coverPath = Path.of("uploads", coverFileName);
             Files.copy(coverFile.getInputStream(), coverPath, StandardCopyOption.REPLACE_EXISTING);
+            
+            
+            // Crear la canción
+            Songs song = new Songs();
+            song.setTitle(title);
+            song.setDuration(duration);
+            song.setFileUrl(audioFileName);      // Solo el nombre, no la ruta completa
+            song.setCoverUrl(coverFileName);     // Solo el nombre, no la ruta completa
+            song.setGender(genero);
+            
+         // Relacionar la canción con el álbum
+            Albums album = albumRepositorio.findById(albumId)
+                .orElseThrow(() -> new RuntimeException("Álbum no encontrado"));
+            song.setAlbum(album);
+
+            songRepositorio.save(song);
+
+            // Verificar si el usuario autenticado es un artista
+            Artista artistaPrincipal = user.getArtista();
+            if (artistaPrincipal == null) {
+                model.addAttribute("error", "El usuario autenticado no es un artista.");
+                return "subirCancion";
+            }
+
+            // Crear la relación en song_artists para el artista principal
+            SongArtists songArtistPrincipal = new SongArtists();
+            songArtistPrincipal.setSong(song);
+            songArtistPrincipal.setArtista(artistaPrincipal);
+            songArtistsRepositorio.save(songArtistPrincipal);
+
+            // Procesar los artistas adicionales ingresados
+            if (artistUsernames != null && !artistUsernames.isEmpty()) {
+                for (String username : artistUsernames) {
+                    // Buscar el usuario por username
+                    User additionalUser = userRepositorio.findByUsername(username)
+                        .orElseThrow(() -> new RuntimeException("Usuario no encontrado: " + username));
+
+                    // Verificar si el usuario es un artista
+                    Artista additionalArtista = additionalUser.getArtista();
+                    if (additionalArtista == null) {
+                        model.addAttribute("error", "El usuario " + username + " no es un artista.");
+                        return "subirCancion";
+                    }
+
+                    // Crear la relación en song_artists
+                    SongArtists songArtist = new SongArtists();
+                    songArtist.setSong(song);
+                    songArtist.setArtista(additionalArtista);
+                    songArtistsRepositorio.save(songArtist);
+                }
+            }
+
         } catch (IOException e) {
             e.printStackTrace();
             model.addAttribute("error", "Error al guardar los archivos.");
             return "subirCancion";
-        }
-
-        // Crear la canción
-        Songs song = new Songs();
-        song.setTitle(title);
-        song.setDuration(duration);
-        song.setFileUrl(audioPath.toString());
-        song.setCoverUrl(coverPath.toString());
-        song.setGender(genero);
-
-        // Relacionar la canción con el álbum
-        Albums album = albumRepositorio.findById(albumId)
-            .orElseThrow(() -> new RuntimeException("Álbum no encontrado"));
-        song.setAlbum(album);
-
-        songRepositorio.save(song);
-
-        
-     // Obtener el usuario autenticado
-        User user = userRepositorio.findByUsername(userDetails.getUsername())
-            .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-
-        // Verificar si el usuario autenticado es un artista
-        Artista artistaPrincipal = user.getArtista();
-        if (artistaPrincipal == null) {
-            model.addAttribute("error", "El usuario autenticado no es un artista.");
-            return "subirCancion";
-        }
-
-        // Crear la relación en song_artists para el artista principal
-        SongArtists songArtistPrincipal = new SongArtists();
-        songArtistPrincipal.setSong(song);
-        songArtistPrincipal.setArtista(artistaPrincipal);
-        songArtistsRepositorio.save(songArtistPrincipal);
-
-        // Procesar los artistas adicionales ingresados
-        if (artistUsernames != null && !artistUsernames.isEmpty()) {
-            for (String username : artistUsernames) {
-                // Buscar el usuario por username
-                User additionalUser = userRepositorio.findByUsername(username)
-                    .orElseThrow(() -> new RuntimeException("Usuario no encontrado: " + username));
-
-                // Verificar si el usuario es un artista
-                Artista additionalArtista = additionalUser.getArtista();
-                if (additionalArtista == null) {
-                    model.addAttribute("error", "El usuario " + username + " no es un artista.");
-                    return "subirCancion";
-                }
-
-                // Crear la relación en song_artists
-                SongArtists songArtist = new SongArtists();
-                songArtist.setSong(song);
-                songArtist.setArtista(additionalArtista);
-                songArtistsRepositorio.save(songArtist);
-            }
         }
 
         // Redirigir a la página de canciones o de confirmación

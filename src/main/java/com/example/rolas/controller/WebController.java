@@ -92,16 +92,21 @@ public class WebController {
         
         model.addAttribute("album", album);
         model.addAttribute("songs", cancionesDelAlbum);
-        model.addAttribute("artistas", artistasAlbum); // Enviar los artistas al modelo
+        model.addAttribute("artistas", artistasAlbum); // Enviar los artistas al modeloaaaaaa
         
         return "mostrarAlbum";
     }
     
     @GetMapping("/mostrarPlaylist/{id}")
-    public String mostrarPlaylist(@PathVariable Integer id, Model model) {
-        Playlists playlist = playlistsRepositorio.findById(id)
-            .orElseThrow(() -> new RuntimeException("Playlist no encontrada"));
+    public String mostrarPlaylist(@PathVariable Integer id, Model model, @AuthenticationPrincipal UserDetails userDetails) {
+    	Playlists playlist = playlistsRepositorio.findById(id)
+                .orElseThrow(() -> new RuntimeException("Playlist no encontrada"));
+    	User usuarioLogueado = userRepositorio.findByUsername(userDetails.getUsername()).orElse(null);
+    	boolean esCreador = playlist.getUser().getId().equals(usuarioLogueado.getId());
+    	
+    	model.addAttribute("esCreador", esCreador);
         model.addAttribute("playlist", playlist);
+        
         return "mostrarPlaylist";
     }
     

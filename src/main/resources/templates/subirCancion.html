@@ -548,6 +548,45 @@
     margin-left: 25px;
 }
 
+.search-results {
+    background-color: #333456;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    margin-top: 10px;
+    max-height: 200px;
+    overflow-y: auto;
+    padding: 10px;
+}
+
+.search-results div {
+    padding: 10px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.search-results div:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.selected-songs li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    background-color: rgba(30, 41, 59, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+
+.selected-songs li button {
+    background-color: var(--error-color);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 5px 10px;
+    cursor: pointer;
+}
     </style>
 </head>
 <body>
@@ -662,21 +701,24 @@
                     </select>
                 </div>
         
-                <!-- Pregunta sobre más de un artista -->
-                <div class="form-group">
-                    <label>¿Hay más de un artista?</label>
-                    <input type="radio" name="moreArtists" value="yes" id="moreArtistsYes"> Sí
-                    <input type="radio" name="moreArtists" value="no" id="moreArtistsNo" checked> No
-                </div>
-        
-                <!-- Campos adicionales para agregar más artistas -->
-                <div id="additionalArtists" style="display:none;">
+                <div class="form-section">
+                    <div class="form-section-title">Artistas</div>
+                    
+                    <!-- Buscador de artistas -->
                     <div class="form-group">
-                        <label class="form-label" for="artist2">Artista 2</label>
-                        <input type="text" name="artist2" id="artist2" class="form-input" placeholder="Username del artista">
+                        <label class="form-label" for="artistSearch">Buscar artistas</label>
+                        <input type="text" id="artistSearch" class="form-input" placeholder="Buscar por nombre de usuario">
+                        <div id="artistSearchResults" class="search-results"></div>
                     </div>
-        
-                    <div id="extraArtists"></div> <!-- Espacio para agregar más artistas si se desea -->
+                
+                    <!-- Listado de artistas seleccionados -->
+                    <div class="form-section">
+                        <div class="form-section-title">Artistas Seleccionados</div>
+                        <ul id="selectedArtists" class="selected-songs"></ul>
+                    </div>
+                
+                    <!-- Campo oculto para enviar los usernames de los artistas -->
+                    <input type="hidden" name="artists" id="artistIds">
                 </div>
         
             </div>
@@ -688,6 +730,66 @@
         </form>
         
         <script>
+
+const artistSearchInput = document.getElementById('artistSearch');
+const artistSearchResults = document.getElementById('artistSearchResults');
+const selectedArtists = document.getElementById('selectedArtists');
+const selectedArtistIds = new Set(); // Para evitar duplicados
+const artistIdsInput = document.getElementById('artistIds');
+
+// Buscar artistas en tiempo real
+artistSearchInput.addEventListener('input', function() {
+    const query = this.value.trim();
+    if (query.length > 0) {
+        fetch(`/api/buscarUsuarios?query=${query}`)
+            .then(response => response.json())
+            .then(data => {
+                artistSearchResults.innerHTML = '';
+                data.forEach(user => {
+                    const resultItem = document.createElement('div');
+                    resultItem.textContent = `${user.nombre} (@${user.username})`;
+                    resultItem.dataset.username = user.username;
+                    resultItem.addEventListener('click', () => addArtistToSong(user));
+                    artistSearchResults.appendChild(resultItem);
+                });
+            })
+            .catch(error => console.error('Error al buscar artistas:', error));
+    } else {
+        artistSearchResults.innerHTML = '';
+    }
+});
+
+// Agregar artista al listado de seleccionados
+function addArtistToSong(user) {
+    if (selectedArtistIds.has(user.username)) return; // Evitar duplicados
+
+    selectedArtistIds.add(user.username);
+    updateArtistIdsInput();
+
+    const listItem = document.createElement('li');
+    listItem.textContent = `${user.nombre} (@${user.username})`;
+    
+    const removeButton = document.createElement('button');
+    removeButton.textContent = 'Eliminar';
+    removeButton.addEventListener('click', () => {
+        selectedArtistIds.delete(user.username);
+        updateArtistIdsInput();
+        listItem.remove();
+    });
+    
+    listItem.appendChild(removeButton);
+    selectedArtists.appendChild(listItem);
+
+    // Limpiar búsqueda
+    artistSearchResults.innerHTML = '';
+    artistSearchInput.value = '';
+}
+
+// Actualizar el campo oculto con los usernames
+function updateArtistIdsInput() {
+    artistIdsInput.value = Array.from(selectedArtistIds).join(',');
+}
+
             // Mostrar el campo de más artistas si el usuario selecciona "Sí"
             const coverInput = document.getElementById('coverInput');
             const coverPreview = document.getElementById('coverPreview');
@@ -702,41 +804,9 @@
                     reader.readAsDataURL(file);
                 }
             });
-            const moreArtistsYes = document.getElementById('moreArtistsYes');
-            const moreArtistsNo = document.getElementById('moreArtistsNo');
-            const additionalArtistsDiv = document.getElementById('additionalArtists');
-            const extraArtistsDiv = document.getElementById('extraArtists');
-
-            moreArtistsYes.addEventListener('change', () => {
-                additionalArtistsDiv.style.display = 'block';
-            });
-        
-            moreArtistsNo.addEventListener('change', () => {
-                additionalArtistsDiv.style.display = 'none';
-            });
-        
-            // Agregar más campos para más artistas
-            let artistCount = 2; // Comenzamos con el segundo artista
-        
-            function addArtistField() {
-                const newArtistField = document.createElement('div');
-                newArtistField.classList.add('form-group');
-                newArtistField.innerHTML = `
-                    <label class="form-label" for="artist${artistCount}">Artista ${artistCount}</label>
-                    <input type="text" name="artist${artistCount}" id="artist${artistCount}" class="form-input" placeholder="Nombre del artista">
-                `;
-                extraArtistsDiv.appendChild(newArtistField);
-                artistCount++;
-            }
-            // Puedes añadir más artistas si el usuario lo desea
-            const addMoreButton = document.createElement('button');
-            addMoreButton.textContent = "Agregar otro artista";
-            addMoreButton.type = "button";
-            addMoreButton.classList.add('btn', 'btn-secondary');
-            addMoreButton.addEventListener('click', addArtistField);
-        
-            // Agregar el botón para agregar más artistas
-            additionalArtistsDiv.appendChild(addMoreButton);
+            
+            
+            
 
             function abrirModal() {
                 document.getElementById("modalLogout").style.display = "block";

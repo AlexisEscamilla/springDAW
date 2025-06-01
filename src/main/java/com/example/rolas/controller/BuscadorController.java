@@ -16,8 +16,10 @@ import com.example.rolas.Repositorio.SongsRepositorio;
 import com.example.rolas.Repositorio.UserRepositorio;
 import com.example.rolas.DTO.AlbumDTO;
 import com.example.rolas.DTO.CancionDTO;
+import com.example.rolas.DTO.PlaylistsDTO;
 import com.example.rolas.DTO.UserDTO;
 import com.example.rolas.Repositorio.AlbumsRepositorio;
+import com.example.rolas.Repositorio.PlaylistsRepositorio;
 
 @Controller
 public class BuscadorController {
@@ -31,7 +33,8 @@ public class BuscadorController {
     @Autowired
     private AlbumsRepositorio albumsRepositorio;
 
-    
+    @Autowired
+    private PlaylistsRepositorio playlistsRepositorio;
     
     @GetMapping("/api/buscar")
     @ResponseBody
@@ -53,7 +56,13 @@ public class BuscadorController {
             .map(AlbumDTO::new)
             .collect(Collectors.toList());
 
+        List<PlaylistsDTO> playlists =  playlistsRepositorio.findByTitleContainingIgnoreCase(query)
+        		.stream()
+                .map(PlaylistsDTO::new)
+                .collect(Collectors.toList());
+        
         resultados.put("canciones", canciones);
+        resultados.put("playlists", playlists);
         resultados.put("usuarios", usuarios);
         resultados.put("albums", albums);
         return resultados;

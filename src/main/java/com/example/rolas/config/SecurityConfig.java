@@ -35,7 +35,7 @@ public class SecurityConfig {
             .and()
             .logout(logout -> logout
                     .logoutUrl("/logout")
-                    .logoutSuccessUrl("/login?logout") // Redirige después de cerrar sesión
+                    .logoutSuccessUrl("/login?logout") // Redirige después de cerrar sesiónaaaa
                     .permitAll()
                 );
 

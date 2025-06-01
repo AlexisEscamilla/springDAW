@@ -15,6 +15,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -24,6 +25,7 @@ import com.example.rolas.model.User;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
 import com.example.rolas.model.AlbumArtists;
@@ -33,6 +35,7 @@ import com.example.rolas.model.SongArtists;
 import com.example.rolas.Repositorio.AlbumArtistsRepositorio;
 import com.example.rolas.Repositorio.AlbumsRepositorio;
 import com.example.rolas.Repositorio.ArtistaRepositorio;
+import com.example.rolas.Repositorio.PlaylistSongsRepositorio;
 import com.example.rolas.Repositorio.SongArtistsRepositorio;
 import com.example.rolas.Repositorio.SongsRepositorio;
 import com.example.rolas.Repositorio.UserRepositorio;
@@ -59,6 +62,9 @@ public class SongsController {
     
     @Autowired
     private SongArtistsRepositorio songArtistsRepositorio;
+    
+    @Autowired
+    private PlaylistSongsRepositorio  playlistSongsRepositorio;
 
     @GetMapping("/subirCancion")
     public String subirCancionForm(@AuthenticationPrincipal UserDetails userDetails, Model model) {
@@ -78,15 +84,19 @@ public class SongsController {
 
 
     @PostMapping("/subirCancion")
-    public String subirCancion(@RequestParam("title") String title,
-					            @RequestParam("duration") String duration,
-					            @RequestParam("audio") MultipartFile audioFile,  // Archivo de la canción
-					            @RequestParam("cover") MultipartFile coverFile,  // Archivo de la portada
-					            @RequestParam("genero") String genero,
-					            @RequestParam("album") Integer albumId,
-					            @RequestParam(value = "artist2", required = false) List<String> artistUsernames,  // Lista de usernames de artistas
-					            @AuthenticationPrincipal UserDetails userDetails,
-					            Model model) {
+    public String subirCancion(
+    	    @RequestParam("title") String title,
+    	    @RequestParam("duration") String duration,
+    	    @RequestParam("audio") MultipartFile audioFile,
+    	    @RequestParam("cover") MultipartFile coverFile,
+    	    @RequestParam("genero") String genero,
+    	    @RequestParam("album") Integer albumId,
+    	    @RequestParam(value = "artists", required = false) String artistsString, // <-- Cambia estoaaaaaaaaaaaaaaaaa
+    	    @AuthenticationPrincipal UserDetails userDetails,
+    	    Model model
+    	) {
+    	
+    	
 	    	
     	User user = userRepositorio.findByUsername(userDetails.getUsername()).orElse(null);
         
@@ -99,7 +109,7 @@ public class SongsController {
        
 
         try {
-            // Crear la carpeta de uploads si no existe
+            // Crear la carpeta de uploads si no existeaa
             File uploadDir = new File("uploads");
             if (!uploadDir.exists()) {
                 uploadDir.mkdir();
@@ -145,20 +155,21 @@ public class SongsController {
             songArtistsRepositorio.save(songArtistPrincipal);
 
             // Procesar los artistas adicionales ingresados
-            if (artistUsernames != null && !artistUsernames.isEmpty()) {
-                for (String username : artistUsernames) {
-                    // Buscar el usuario por username
-                    User additionalUser = userRepositorio.findByUsername(username)
-                        .orElseThrow(() -> new RuntimeException("Usuario no encontrado: " + username));
+            if (artistsString != null && !artistsString.isBlank()) {
+                String[] usernames = artistsString.split(",");
+                for (String username : usernames) {
+                    username = username.trim();
+                    if (username.isEmpty()) continue;
+                    // Evita duplicar al artista principal
+                    if (user.getUsername().equals(username)) continue;
 
-                    // Verificar si el usuario es un artista
+                    User additionalUser = userRepositorio.findByUsername(username)
+                        .orElseThrow(() -> new RuntimeException("Usuario no encontrado: "));
                     Artista additionalArtista = additionalUser.getArtista();
                     if (additionalArtista == null) {
                         model.addAttribute("error", "El usuario " + username + " no es un artista.");
                         return "subirCancion";
                     }
-
-                    // Crear la relación en song_artists
                     SongArtists songArtist = new SongArtists();
                     songArtist.setSong(song);
                     songArtist.setArtista(additionalArtista);
@@ -196,6 +207,36 @@ public class SongsController {
             resultados.add(resultado);
         }
         return resultados;
+    }
+    
+    @PostMapping("/cancion/eliminar/{id}")
+    public String eliminarCancion(@PathVariable Integer id) {
+        Songs cancion = songRepositorio.findById(id).orElseThrow();
+
+        // Elimina archivo de audio
+        if (cancion.getFileUrl() != null) {
+            try {
+                Files.deleteIfExists(Paths.get(cancion.getFileUrl()));
+            } catch (Exception e) {
+                // Log o manejo de error si lo deseas
+            }
+        }
+        // Elimina portada si aplica
+        if (cancion.getCoverUrl() != null) {
+            try {
+                Files.deleteIfExists(Paths.get("uploads/" + cancion.getCoverUrl()));
+            } catch (Exception e) {
+                // Log o manejo de error si lo deseas
+            }
+        }
+
+        // Elimina la canción de todas las playlists (si tienes tabla intermedia)aaaaa
+        playlistSongsRepositorio.deleteBySongId(id);
+
+        // Elimina la canción
+        songRepositorio.delete(cancion);
+
+        return "redirect:/colecciones?tipo=canciones";
     }
 
 }

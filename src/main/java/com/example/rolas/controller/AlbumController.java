@@ -1,12 +1,14 @@
 package com.example.rolas.controller;
 
 import com.example.rolas.model.Albums;
+import com.example.rolas.model.Songs;
 import com.example.rolas.model.AlbumArtists;
 import com.example.rolas.model.Artista;
 import com.example.rolas.model.User;
 import com.example.rolas.Repositorio.AlbumArtistsRepositorio;
 import com.example.rolas.Repositorio.AlbumsRepositorio;
 import com.example.rolas.Repositorio.ArtistaRepositorio;
+import com.example.rolas.Repositorio.SongsRepositorio;
 import com.example.rolas.Repositorio.UserRepositorio;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
@@ -21,8 +23,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -31,6 +36,9 @@ public class AlbumController {
 
     @Autowired
     private AlbumsRepositorio albumRepositorio;
+    
+    @Autowired
+    private SongsRepositorio songRepositorio;
 
     @Autowired
     private UserRepositorio userRepositorio;
@@ -122,6 +130,52 @@ public class AlbumController {
 
         // Redirigir a la página de colecciones después de guardar el álbum
         return "redirect:/colecciones";  // Redirige a colecciones.html después de guardar el álbum
+    }
+    
+    @PostMapping("/album/eliminar/{id}")
+    public String eliminarAlbum(@PathVariable Integer id) {
+        // 1. Busca el álbum
+        Albums album = albumRepositorio.findById(id).orElseThrow();
+
+        // 2. Busca todas las canciones de ese álbum
+        List<Songs> canciones = songRepositorio.findByAlbumId(id);
+
+        // 3. Elimina archivos de las canciones
+        for (Songs song : canciones) {
+            // Elimina archivo de audio
+            if (song.getFileUrl() != null) {
+                try {
+                    Files.deleteIfExists(Paths.get(song.getFileUrl()));
+                } catch (Exception e) {
+                    // Log o manejo de error si lo deseas
+                }
+            }
+            // Elimina portada de la canción si aplica
+            if (song.getCoverUrl() != null) {
+                try {
+                    Files.deleteIfExists(Paths.get("uploads/" + song.getCoverUrl()));
+                } catch (Exception e) {
+                    // Log o manejo de error si lo deseas
+                }
+            }
+        }
+
+        // 4. Elimina portada del álbum si aplica
+        if (album.getCoverArt() != null) {
+            try {
+                Files.deleteIfExists(Paths.get("uploads/" + album.getCoverArt()));
+            } catch (Exception e) {
+                // Log o manejo de error si lo deseas
+            }
+        }
+
+        // 5. Elimina las canciones
+        songRepositorio.deleteAll(canciones);
+
+        // 6. Elimina el álbum
+        albumRepositorio.delete(album);
+
+        return "redirect:/colecciones?tipo=albumes";
     }
 
 }

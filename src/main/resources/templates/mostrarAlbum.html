@@ -13,21 +13,48 @@
         --accent: #06b6d4;
         --card-bg: rgba(30, 41, 59, 0.5);
         --border-color: rgba(255, 255, 255, 0.1);
+        --error-color: #ef4444;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto,
+          Oxygen, Ubuntu, Cantarell, sans-serif;
       }
 
       body {
-        margin: 0;
-        padding: 0;
-        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
         background-color: var(--dark);
         color: var(--light);
         overflow-x: hidden;
+        line-height: 1.6;
       }
 
       .container {
         max-width: 1000px;
         margin: 40px auto;
         padding: 0 20px;
+      }
+
+      .btn {
+        padding: 12px 24px;
+        border-radius: 25px;
+        border: none;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.3s ease;
+      }
+
+      .btn-primary {
+        background: linear-gradient(45deg, #8b5cf6, #a855f7);
+        color: white;
+      }
+
+      .btn-secondary {
+        background: transparent;
+        color: white;
+        border: 2px solid rgba(255, 255, 255, 0.3);
       }
 
       .playlist-banner {
@@ -181,6 +208,71 @@
         }
       }
 
+      .modal {
+        position: fixed;
+        z-index: 9999;
+        left: 0;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.5);
+        display: none;
+        align-items: center;
+        justify-content: center;
+      }
+      .modal-content {
+        background: #232442;
+        color: white;
+        border-radius: 12px;
+        padding: 32px 24px;
+        max-width: 400px;
+        margin: auto;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      }
+      .modal-buttons {
+        display: flex;
+        justify-content: flex-end;
+        gap: 16px;
+        margin-top: 24px;
+      }
+
+      .btn-danger {
+        background-color: var(--error-color);
+        color: white;
+        border: none;
+        display: center;
+      }
+
+      .eliminaCuenta {
+        text-align: center;
+        margin-top: 20px;
+      }
+
+      .tituloLogo {
+        color: white;
+        text-decoration: none;
+        font-size: 24px;
+        margin-left: 10px;
+      }
+      .tituloNAV {
+        color: white;
+        text-decoration: none;
+        font-size: 20px;
+        margin-left: 25px;
+      }
+
+      .nav-links {
+        display: flex;
+      }
+
+      .nav-link {
+        margin-left: 20px;
+        cursor: pointer;
+        transition: color 0.2s;
+      }
+
       .imagi {
         width: 70px;
         height: 70px;
@@ -247,6 +339,174 @@
         border-radius: 8px;
         margin-bottom: 16px;
       }
+
+      /* Cabecera */
+      .header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 10px;
+        background-color: rgba(35, 36, 66, 0.8);
+        backdrop-filter: blur(10px);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+      }
+
+      .logo {
+        font-size: 44px;
+        margin-left: 450px;
+        font-weight: 700;
+        background: linear-gradient(to right, var(--primary), var(--accent));
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        display: flex;
+        align-items: center;
+      }
+
+      .logo-icon {
+        width: 8px;
+        height: 35px;
+        margin-right: 12px;
+        margin-left: 12px;
+        background: linear-gradient(to right, var(--primary), var(--secondary));
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .imagi {
+        width: 70px;
+        height: 70px;
+      }
+
+      .avatar-img {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        object-fit: cover;
+      }
+
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+      }
+
+      .stat-card {
+        background: rgba(255, 255, 255, 0.05);
+        padding: 20px;
+        border-radius: 12px;
+        text-align: center;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .stat-icon {
+        font-size: 2rem;
+        margin-bottom: 10px;
+      }
+
+      /* Lista de elementos */
+      .item-list {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+      }
+
+      .item {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 15px;
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 10px;
+        transition: all 0.3s ease;
+      }
+
+      .item:hover {
+        background: rgba(255, 255, 255, 0.08);
+        transform: translateX(10px);
+      }
+
+      .item-image {
+        width: 50px;
+        height: 50px;
+        border-radius: 8px;
+        background: linear-gradient(45deg, #8b5cf6, #a855f7);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+      }
+
+      .item-info {
+        flex: 1;
+      }
+
+      .item-title {
+        font-weight: 600;
+        margin-bottom: 4px;
+      }
+
+      .item-subtitle {
+        color: #a0a0a0;
+        font-size: 0.9rem;
+      }
+
+      .watermark {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        color: rgba(255, 255, 255, 0.3);
+        font-size: 0.8rem;
+      }
+
+      /* Responsive */
+      @media (max-width: 768px) {
+        .profile-header {
+          flex-direction: column;
+          text-align: center;
+          gap: 20px;
+        }
+
+        .stats {
+          justify-content: center;
+        }
+
+        .profile-tabs {
+          flex-direction: column;
+          gap: 5px;
+        }
+
+        .content-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .stats {
+        display: flex;
+        gap: 40px;
+        margin-bottom: 20px;
+      }
+
+      .stat {
+        text-align: center;
+      }
+
+      .stat-number {
+        font-size: 1.8rem;
+        font-weight: bold;
+        color: #8b5cf6;
+      }
+
+      .stat-label {
+        font-size: 0.9rem;
+        color: #a0a0a0;
+        margin-top: 4px;
+      }
     </style>
   </head>
   <body>
@@ -254,69 +514,201 @@
     <div class="bg-gradient bg-gradient-2"></div>
     <div class="bg-gradient bg-gradient-3"></div>
 
-    <div class="container">
-      <header>
-        <div class="logo">
-          <img
-            class="imagi"
-            src="https://images.vexels.com/media/users/3/150846/isolated/preview/a77bce5e752802277f78088150b16923-musica-de-icono-de-auriculares-de-audio.png"
-            alt="rolas"
-          />
-          <div class="logo-icon"></div>
-          <a href="/index">Rolas</a>
-        </div>
-        <a href="/colecciones" class="btn btn-back">⬅ Volver</a>
-      </header>
+    <div class="header">
+      <div class="logo">
+        <img
+          class="imagi"
+          src="https://images.vexels.com/media/users/3/150846/isolated/preview/a77bce5e752802277f78088150b16923-musica-de-icono-de-auriculares-de-audio.png"
+          alt="rolas"
+        />
+        <div class="logo-icon"></div>
+        <a href="/feed" class="tituloLogo">Rolas</a>
+      </div>
 
-      <main>
-        <div class="album-details">
-          <img
-            th:src="@{'/uploads/' + ${album.coverArt}}"
-            alt="Portada del álbum"
-            class="album-cover"
-          />
-          <div class="album info">
-            <h1 class="album-titulo" th:text="${album.title}">
-              Título del Álbum
-            </h1>
-            <p th:text="${album.releaseDate}">Fecha de lanzamiento</p>
+      <div class="nav-links">
+        <a class="nav-link tituloNAV" href="/feed">Home</a>
+        <a class="nav-link tituloNAV" href="/explorar">Explorar</a>
+        <a class="nav-link tituloNAV" href="/mostrarNotificaciones"
+          >Notificaciones</a
+        >
+        <a class="nav-link tituloNAV" href="/chats">Chats</a>
+        <a class="nav-link tituloNAV" href="/colecciones">Colecciones</a>
+      </div>
+
+      <div class="user-menu">
+        <!-- Botón que abre el modal -->
+        <button type="button" class="btn btn-primary" onclick="abrirModal()">
+          Cerrar Sesión
+        </button>
+      </div>
+    </div>
+
+    <div class="modal" id="modalLogout">
+      <div class="modal-content">
+        <h2>¿Estás seguro de que quieres cerrar sesión?</h2>
+        <div class="modal-buttons">
+          <button class="btn btn-secondary" onclick="cerrarModal()">
+            Cancelar
+          </button>
+          <form th:action="@{/logout}" method="post">
+            <button type="submit" class="btn btn-danger">Cerrar Sesión</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+      <!-- Detalles del álbum -->
+      <!-- Detalles del álbum -->
+      <div class="album-details">
+        <img
+          th:src="@{'/uploads/' + ${album.coverArt}}"
+          alt="Portada del álbum"
+          class="album-cover"
+          style="
+            width: 300px;
+            height: 300px;
+            border-radius: 12px;
+            margin-right: 24px;
+          "
+        />
+        <div class="album-info">
+          <h1 class="album-titulo" th:text="${album.title}">
+            Título del Álbum
+          </h1>
+          <div class="stats" style="display: flex; gap: 32px; margin: 18px 0">
+            <div class="stat">
+              <div class="stat-number" th:text="${album.releaseDate}">
+                Fecha
+              </div>
+              <div class="stat-label">Fecha de Lanzamiento</div>
+            </div>
+            <div class="stat">
+              <div class="stat-number">
+                <span th:each="aa, iterStat : ${album.albumArtists}">
+                  <span th:text="${aa.artista.user.nombre}">Artista</span
+                  ><span th:if="${!iterStat.last}">, </span>
+                </span>
+              </div>
+              <div class="stat-label">Artistas</div>
+            </div>
           </div>
         </div>
-        <h1>CANCIONES</h1>
-        <div class="album-songs album-details">
-          <ul>
-            <li class="cancion-cardLista" th:each="cancion : ${songs}">
+      </div>
+
+      <!-- Listado de canciones -->
+      <div class="content-card" style="margin-top: 32px">
+        <h1 class="card-title">Canciones</h1>
+        <div class="item-list">
+          <div
+            class="item"
+            th:each="cancion : ${songs}"
+            style="
+              display: flex;
+              align-items: center;
+              gap: 18px;
+              margin-bottom: 18px;
+              background: rgba(30, 41, 59, 0.5);
+              border-radius: 10px;
+              padding: 12px;
+            "
+          >
+            <div class="item-image">
               <img
                 th:src="@{'/uploads/' + ${cancion.coverUrl}}"
                 alt="Portada Cancion"
-                class="album-cover"
+                style="width: 60px; height: 60px; border-radius: 8px"
               />
+            </div>
+            <div class="item-info" style="flex: 1">
+              <div
+                class="item-title"
+                th:text="${cancion.title}"
+                style="font-weight: 600"
+              >
+                Título de la canción
+              </div>
+              <div
+                class="item-subtitle"
+                style="font-size: 14px; color: #cbd5e1"
+              >
+                <span th:each="sa, iterStat : ${cancion.songArtists}">
+                  <span th:text="${sa.artista.user.nombre}">Artista</span
+                  ><span th:if="${!iterStat.last}">, </span>
+                </span>
+                •
+                <span th:text="${cancion.duration}">Duración</span>
+                •
+                <span th:text="${cancion.gender}">Género</span>
+              </div>
+            </div>
+            <div>
               <a
                 th:href="@{/mostrarCancion/{id}(id=${cancion.id})}"
-                th:text="${cancion.title}"
-                >Título de la canción</a
+                class="btn btn-primary"
+                style="padding: 8px 16px; border-radius: 8px; font-size: 14px"
+                >Ver</a
               >
-            </li>
-          </ul>
+            </div>
+          </div>
+          <div th:if="${#lists.isEmpty(songs)}">
+            <span>No hay canciones en este álbum.</span>
+          </div>
         </div>
+      </div>
 
-        <h1>Artistas</h1>
-        <div class="album-songs album-details">
-          <ul>
-            <li class="cancion-cardLista" th:each="artista : ${artistas}">
-              <img
-                th:src="@{'/uploads/' + ${artista.profilePicture}}"
-                alt="Foto del Artista"
-                class="album-cover"
-              />
-              <div>
-                <h2 th:text="${artista.nombre}">Nombre del Artista</h2>
-                <p th:text="'@' + ${artista.username}">Username del Artista</p>
-              </div>
-            </li>
-          </ul>
+      <div class="eliminaCuenta" style="text-align: center; margin-top: 32px">
+        <button
+          type="button"
+          class="btn btn-danger"
+          onclick="abrirModalEliminarAlbum()"
+        >
+          Eliminar álbum
+        </button>
+      </div>
+
+      <!-- Modal de confirmación para eliminar álbum -->
+      <div id="modalEliminarAlbum" class="modal" style="display: none">
+        <div class="modal-content">
+          <p>
+            ¿Estás seguro de que deseas eliminar este álbum? Se eliminarán todas
+            sus canciones y archivos asociados. Esta acción no se puede
+            deshacer.
+          </p>
+          <div class="modal-buttons">
+            <form
+              th:action="@{/album/eliminar/{id}(id=${album.id})}"
+              method="post"
+            >
+              <button type="submit" class="btn btn-danger">Sí, eliminar</button>
+            </form>
+            <button
+              type="button"
+              class="btn btn-secondary"
+              onclick="cerrarModalEliminarAlbum()"
+            >
+              Cancelar
+            </button>
+          </div>
         </div>
-      </main>
+      </div>
     </div>
+
+    <script>
+      function abrirModal() {
+        document.getElementById("modalLogout").style.display = "block";
+      }
+
+      function cerrarModal() {
+        document.getElementById("modalLogout").style.display = "none";
+      }
+
+      function abrirModalEliminarAlbum() {
+        document.getElementById("modalEliminarAlbum").style.display = "block";
+      }
+      function cerrarModalEliminarAlbum() {
+        document.getElementById("modalEliminarAlbum").style.display = "none";
+      }
+    </script>
   </body>
 </html>

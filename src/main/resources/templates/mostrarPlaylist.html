@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Detalles de la Playlist</title>
     <style>
-      /* Estilo para mostrarPlaylist: diferente al perfil, con diseño moderno y atractivo */
       :root {
         --primary: #4f46e5;
         --secondary: #7c3aed;
@@ -14,22 +13,307 @@
         --accent: #06b6d4;
         --card-bg: rgba(30, 41, 59, 0.5);
         --border-color: rgba(255, 255, 255, 0.1);
+        --error-color: #ef4444;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto,
+          Oxygen, Ubuntu, Cantarell, sans-serif;
       }
 
       body {
-        margin: 0;
-        padding: 0;
-        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
         background-color: var(--dark);
         color: var(--light);
         overflow-x: hidden;
+        line-height: 1.6;
       }
 
       .container {
-        max-width: 1000px;
-        margin: 40px auto;
-        padding: 0 20px;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
       }
+
+      /* Header del perfil */
+      .profile-header {
+        display: flex;
+        align-items: center;
+        gap: 30px;
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 40px;
+        margin-bottom: 30px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .avatar {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        background: linear-gradient(45deg, #8b5cf6, #a855f7);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 48px;
+        font-weight: bold;
+        color: white;
+        box-shadow: 0 10px 30px rgba(139, 92, 246, 0.3);
+      }
+
+      .profile-info {
+        flex: 1;
+      }
+
+      .username {
+        font-size: 2.5rem;
+        font-weight: bold;
+        margin-bottom: 8px;
+      }
+
+      .handle {
+        color: #a0a0a0;
+        font-size: 1.1rem;
+        margin-bottom: 20px;
+      }
+
+      .stats {
+        display: flex;
+        gap: 40px;
+        margin-bottom: 20px;
+      }
+
+      .stat {
+        text-align: center;
+      }
+
+      .stat-number {
+        font-size: 1.8rem;
+        font-weight: bold;
+        color: #8b5cf6;
+      }
+
+      .stat-label {
+        font-size: 0.9rem;
+        color: #a0a0a0;
+        margin-top: 4px;
+      }
+
+      .profile-actions {
+        display: flex;
+        gap: 15px;
+      }
+
+      .btn {
+        padding: 12px 24px;
+        border-radius: 25px;
+        border: none;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.3s ease;
+      }
+
+      .btn-primary {
+        background: linear-gradient(45deg, #8b5cf6, #a855f7);
+        color: white;
+      }
+
+      .btn-secondary {
+        background: transparent;
+        color: white;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+      }
+
+      .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+      }
+
+      /* Navegación de tabs */
+      .profile-tabs {
+        display: flex;
+        gap: 0;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 12px;
+        padding: 8px;
+        margin-bottom: 30px;
+        backdrop-filter: blur(10px);
+      }
+
+      .tab {
+        flex: 1;
+        padding: 15px 20px;
+        text-align: center;
+        background: transparent;
+        border: none;
+        color: #a0a0a0;
+        cursor: pointer;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        font-size: 1rem;
+        font-weight: 500;
+      }
+
+      .tab.active {
+        background: linear-gradient(45deg, #8b5cf6, #a855f7);
+        color: white;
+        transform: translateY(-2px);
+      }
+
+      /* Contenido de las tabs */
+      .tab-content {
+        display: none;
+      }
+
+      .tab-content.active {
+        display: block;
+      }
+
+      /* Grid para contenido */
+      .content-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+      }
+
+      .content-card {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(10px);
+        border-radius: 15px;
+        padding: 25px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        transition: all 0.3s ease;
+      }
+
+      .content-card:hover {
+        transform: translateY(-5px);
+        background: rgba(255, 255, 255, 0.08);
+      }
+
+      .content-cardDiminuto {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(10px);
+        border-radius: 15px;
+        padding: 25px;
+        height: 90px;
+        text-align: center;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        transition: all 0.3s ease;
+      }
+
+      .content-cardDiminuto:hover {
+        transform: translateY(-5px);
+        background: rgba(255, 255, 255, 0.08);
+      }
+
+      .card-title {
+        font-size: 1.3rem;
+        font-weight: 600;
+        margin-bottom: 15px;
+        color: #8b5cf6;
+      }
+
+      /* Estadísticas detalladas */
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+      }
+
+      .stat-card {
+        background: rgba(255, 255, 255, 0.05);
+        padding: 20px;
+        border-radius: 12px;
+        text-align: center;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .stat-icon {
+        font-size: 2rem;
+        margin-bottom: 10px;
+      }
+
+      /* Lista de elementos */
+      .item-list {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+      }
+
+      .item {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 15px;
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 10px;
+        transition: all 0.3s ease;
+      }
+
+      .item:hover {
+        background: rgba(255, 255, 255, 0.08);
+        transform: translateX(10px);
+      }
+
+      .item-image {
+        width: 50px;
+        height: 50px;
+        border-radius: 8px;
+        background: linear-gradient(45deg, #8b5cf6, #a855f7);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+      }
+
+      .item-info {
+        flex: 1;
+      }
+
+      .item-title {
+        font-weight: 600;
+        margin-bottom: 4px;
+      }
+
+      .item-subtitle {
+        color: #a0a0a0;
+        font-size: 0.9rem;
+      }
+
+      .watermark {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        color: rgba(255, 255, 255, 0.3);
+        font-size: 0.8rem;
+      }
+
+      /* Responsive */
+      @media (max-width: 768px) {
+        .profile-header {
+          flex-direction: column;
+          text-align: center;
+          gap: 20px;
+        }
+
+        .stats {
+          justify-content: center;
+        }
+
+        .profile-tabs {
+          flex-direction: column;
+          gap: 5px;
+        }
+
+        .content-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
       /* Background effects */
       .bg-gradient {
         position: absolute;
@@ -78,112 +362,542 @@
           transform: translateY(0) translateX(0);
         }
       }
-      .playlist-banner {
-        position: relative;
-        border-radius: 16px;
-        overflow: hidden;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-      }
 
-      .playlist-banner img {
-        width: 100%;
-        height: 280px;
-        object-fit: cover;
-        display: block;
+      .modal {
+        position: fixed;
+        z-index: 9999;
+        left: 0;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.5);
+        display: none;
+        align-items: center;
+        justify-content: center;
       }
-
-      .banner-overlay {
-        position: absolute;
-        inset: 0;
-        background: linear-gradient(
-          to top,
-          rgba(0, 0, 0, 0.7),
-          rgba(0, 0, 0, 0.2)
-        );
-      }
-
-      .banner-info {
-        position: absolute;
-        bottom: 20px;
-        left: 30px;
+      .modal-content {
+        background: #232442;
         color: white;
-      }
-
-      .banner-info h1 {
-        margin: 0;
-        font-size: 36px;
-        font-weight: bold;
-      }
-
-      .banner-info p {
-        margin: 5px 0 0;
-        font-size: 16px;
-        color: var(--secondary-text);
-      }
-
-      .song-list {
-        margin-top: 30px;
-        background-color: var(--bg-card);
         border-radius: 12px;
-        padding: 20px;
+        padding: 32px 24px;
+        max-width: 400px;
+        margin: auto;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      }
+      .modal-buttons {
+        display: flex;
+        justify-content: flex-end;
+        gap: 16px;
+        margin-top: 24px;
       }
 
-      .song-list h2 {
-        margin-bottom: 20px;
+      .btn-danger {
+        background-color: var(--error-color);
+        color: white;
+        border: none;
+        display: center;
+      }
+
+      .eliminaCuenta {
+        text-align: center;
+        margin-top: 20px;
+      }
+
+      .tituloLogo {
+        color: white;
+        text-decoration: none;
         font-size: 24px;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        padding-bottom: 10px;
+        margin-left: 10px;
+      }
+      .tituloNAV {
+        color: white;
+        text-decoration: none;
+        font-size: 20px;
+        margin-left: 25px;
       }
 
-      .song-list ul {
-        list-style: none;
-        padding: 0;
-        margin: 0;
+      .nav-links {
+        display: flex;
       }
 
-      .song-list li {
-        padding: 12px 15px;
+      .nav-link {
+        margin-left: 20px;
+        cursor: pointer;
+        transition: color 0.2s;
+      }
+
+      .nav-link:hover {
+        color: var(--primary);
+      }
+      /* Cabecera */
+      .header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 10px;
+        background-color: rgba(35, 36, 66, 0.8);
+        backdrop-filter: blur(10px);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+      }
+
+      .logo {
+        font-size: 44px;
+        margin-left: 450px;
+        font-weight: 700;
+        background: linear-gradient(to right, var(--primary), var(--accent));
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        display: flex;
+        align-items: center;
+      }
+
+      .logo-icon {
+        width: 8px;
+        height: 35px;
+        margin-right: 12px;
+        margin-left: 12px;
+        background: linear-gradient(to right, var(--primary), var(--secondary));
         border-radius: 8px;
-        background-color: #2d2f4f;
-        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .imagi {
+        width: 70px;
+        height: 70px;
+      }
+
+      .avatar-img {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        object-fit: cover;
+      }
+
+      .interaction {
+        position: relative;
+        background: none;
+        border: 2px solid #ddd;
+        border-radius: 50px;
+        padding: 12px 20px;
+        cursor: pointer;
+        font-size: 16px;
+        font-weight: 600;
+        color: #666;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        overflow: hidden;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .interaction:hover {
+        border-color: #ff4757;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(255, 71, 87, 0.3);
+      }
+
+      .heart-icon {
+        font-size: 20px;
+        transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        position: relative;
+        z-index: 2;
+      }
+
+      .heart-icon.outline {
+        color: #ddd;
+      }
+
+      .heart-icon.filled {
+        color: #ff4757;
+        transform: scale(1.3);
+        animation: heartBeat 0.6s ease-in-out;
+      }
+
+      .interaction.liked {
+        background: linear-gradient(135deg, #ff4757, #ff3742);
+        color: white;
+        border-color: #ff4757;
+        transform: scale(1.05);
+      }
+
+      /* Efecto de partículas */
+      .particle {
+        position: absolute;
+        pointer-events: none;
+        font-size: 12px;
+        color: #ff4757;
+        animation: float 1s ease-out forwards;
+        z-index: 10;
+      }
+
+      /* Efecto de ondas */
+      .ripple {
+        position: absolute;
+        border-radius: 50%;
+        background: rgba(255, 71, 87, 0.3);
+        transform: scale(0);
+        animation: ripple 0.6s linear;
+        pointer-events: none;
+      }
+
+      @keyframes heartBeat {
+        0% {
+          transform: scale(1);
+        }
+        25% {
+          transform: scale(1.4);
+        }
+        50% {
+          transform: scale(1.2);
+        }
+        75% {
+          transform: scale(1.35);
+        }
+        100% {
+          transform: scale(1.3);
+        }
+      }
+
+      @keyframes float {
+        0% {
+          transform: translateY(0) scale(1);
+          opacity: 1;
+        }
+        100% {
+          transform: translateY(-50px) scale(0.5);
+          opacity: 0;
+        }
+      }
+
+      @keyframes ripple {
+        to {
+          transform: scale(4);
+          opacity: 0;
+        }
+      }
+
+      /* Botón personalizado para subir fotos */
+      .photo-upload-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 20px;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        border: none;
+        border-radius: 25px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 600;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .photo-upload-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        background: linear-gradient(135deg, #5a67d8, #667eea);
+      }
+
+      .photo-upload-btn:active {
+        transform: translateY(0);
+      }
+
+      .photo-icon {
+        font-size: 18px;
+        transition: transform 0.3s ease;
+      }
+
+      .photo-upload-btn:hover .photo-icon {
+        transform: scale(1.2) rotate(5deg);
+      }
+
+      /* Efecto de shimmer */
+      .photo-upload-btn::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.3),
+          transparent
+        );
+        transition: left 0.5s;
+      }
+
+      .photo-upload-btn:hover::before {
+        left: 100%;
+      }
+
+      .comments-section {
+        padding: 20px;
+        background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+        border-radius: 12px;
+        margin-top: 15px;
+        border: 1px solid #374151;
+        display: none;
+      }
+
+      .comment-form {
+        margin-bottom: 20px;
+      }
+
+      .comment-textarea-container {
+        position: relative;
+        margin-bottom: 15px;
+      }
+
+      .comment-input {
+        width: 100%;
+        min-height: 80px;
+        padding: 12px 16px;
+        background: #0f172a;
+        border: 2px solid #374151;
+        border-radius: 12px;
+        color: #f1f5f9;
+        font-size: 14px;
+        resize: vertical;
+        transition: all 0.3s ease;
+        font-family: inherit;
+      }
+
+      .comment-input:focus {
+        border-color: #6366f1;
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        outline: none;
+      }
+
+      .comment-actions {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        transition: background-color 0.2s ease;
+        gap: 12px;
       }
 
-      .song-list li:hover {
-        background-color: #383b60;
-      }
-
-      .song-title {
-        font-weight: 500;
-      }
-
-      .song-action a {
-        background-color: var(--accent-color);
-        padding: 6px 12px;
-        border-radius: 6px;
+      .comment-file-label {
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        background: linear-gradient(135deg, #374151 0%, #4b5563 100%);
+        color: #f1f5f9;
+        border-radius: 20px;
+        border: 1px solid #6b7280;
+        font-size: 13px;
+        transition: all 0.3s ease;
         text-decoration: none;
+      }
+
+      .comment-file-label:hover {
+        background: linear-gradient(135deg, #4b5563 0%, #6b7280 100%);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      }
+
+      .comment-file-input {
+        display: none;
+      }
+
+      .comment-submit-btn {
+        padding: 10px 20px;
+        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
         color: white;
+        border: none;
+        border-radius: 20px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-transform: none;
+      }
+
+      .comment-submit-btn:hover {
+        background: linear-gradient(135deg, #5855eb 0%, #7c3aed 100%);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+      }
+
+      .comments-list {
+        max-height: 400px;
+        overflow-y: auto;
+        padding-right: 8px;
+      }
+
+      .comment {
+        padding: 16px;
+        margin-bottom: 12px;
+        background: rgba(15, 23, 42, 0.6);
+        border: 1px solid #374151;
+        border-radius: 12px;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
+      }
+
+      .comment:hover {
+        background: rgba(15, 23, 42, 0.8);
+        border-color: #4b5563;
+      }
+
+      .comment-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 12px;
+      }
+
+      .comment-avatar {
+        flex-shrink: 0;
+      }
+
+      .comment-avatar img {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid #6366f1;
+      }
+
+      .comment-avatar-placeholder {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 16px;
+      }
+
+      .comment-user-info {
+        flex: 1;
+      }
+
+      .comment-user-name {
+        color: #f1f5f9;
+        font-weight: 600;
         font-size: 14px;
       }
 
-      .song-action a:hover {
-        opacity: 0.9;
+      .comment-username {
+        color: #94a3b8;
+        font-size: 12px;
+        margin-top: 2px;
+      }
+
+      .comment-username .separator {
+        margin: 0 6px;
+      }
+
+      .comment-content {
+        margin-left: 52px;
+      }
+
+      .comment-text {
+        color: #e2e8f0;
+        font-size: 14px;
+        line-height: 1.5;
+        margin: 0 0 12px 0;
+        word-wrap: break-word;
+      }
+
+      .comment-image {
+        max-width: 100%;
+        height: auto;
+        border-radius: 8px;
+        border: 1px solid #374151;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .comment-image:hover {
+        transform: scale(1.02);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+      }
+
+      .file-icon {
+        font-size: 16px;
+      }
+
+      .posts-list {
+        display: flex;
+        flex-direction: column;
+        gap: 30px;
+      }
+      .post {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 15px;
+        padding: 25px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        margin-bottom: 0;
       }
     </style>
   </head>
-  <body>
+  <body data-playlist-id="[[${playlist.id}]]">
     <div class="bg-gradient bg-gradient-1"></div>
     <div class="bg-gradient bg-gradient-2"></div>
-    <div class="bg-gradient bg-gradient-3"></div>
-    <div class="container">
-      <header>
-        <a href="/colecciones" class="btn btn-back">⬅ Volver</a>
-      </header>
+    <div class="bg-gradient bg-gradient-1"></div>
 
+    <div class="header">
+      <div class="logo">
+        <img
+          class="imagi"
+          src="https://images.vexels.com/media/users/3/150846/isolated/preview/a77bce5e752802277f78088150b16923-musica-de-icono-de-auriculares-de-audio.png"
+          alt="rolas"
+        />
+        <div class="logo-icon"></div>
+        <a href="/feed" class="tituloLogo">Rolas</a>
+      </div>
+
+      <div class="nav-links">
+        <a class="nav-link tituloNAV" href="/feed">Home</a>
+        <a class="nav-link tituloNAV" href="/explorar">Explorar</a>
+        <a class="nav-link tituloNAV" href="/mostrarNotificaciones"
+          >Notificaciones</a
+        >
+        <a class="nav-link tituloNAV" href="/chats">Chats</a>
+        <a class="nav-link tituloNAV" href="/colecciones">Colecciones</a>
+      </div>
+
+      <div class="user-menu">
+        <!-- Botón que abre el modal -->
+        <button type="button" class="btn btn-primary" onclick="abrirModal()">
+          Cerrar Sesión
+        </button>
+      </div>
+    </div>
+
+    <div class="modal" id="modalLogout">
+      <div class="modal-content">
+        <h2>¿Estás seguro de que quieres cerrar sesión?</h2>
+        <div class="modal-buttons">
+          <button class="btn btn-secondary" onclick="cerrarModal()">
+            Cancelar
+          </button>
+          <form th:action="@{/logout}" method="post">
+            <button type="submit" class="btn btn-danger">Cerrar Sesión</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
       <main>
+        <!-- Cabecera de la Playlist llamativa -->
         <div class="profile-header">
           <!-- Portada estilo banner -->
           <div class="cover-container">
@@ -191,72 +905,374 @@
               th:src="@{'/' + ${playlist.coverImage}}"
               alt="Cover"
               class="cover-photo"
+              style="
+                width: 220px;
+                height: 220px;
+                border-radius: 16px;
+                object-fit: cover;
+                box-shadow: 0 8px 32px rgba(139, 92, 246, 0.2);
+              "
             />
             <div class="cover-overlay"></div>
           </div>
 
           <div class="profile-info">
-            <div class="profile-avatar-container">
-              <div class="profile-avatar">
-                <div class="change-avatar">Playlist</div>
-              </div>
-            </div>
-            <div class="profile-details">
-              <h1 class="profile-name" th:text="${playlist.title}">
-                Título Playlist
-              </h1>
-              <div
-                class="profile-handle"
-                th:text="'Creada el ' + ${playlist.createdAt}"
+            <h1
+              class="username"
+              th:text="${playlist.title}"
+              style="font-size: 2.5rem; font-weight: bold; margin-bottom: 8px"
+            >
+              Título Playlist
+            </h1>
+            <div
+              class="handle"
+              style="color: #a0a0a0; font-size: 1.1rem; margin-bottom: 20px"
+            >
+              Creada por
+              <span
+                style="color: #8b5cf6; font-weight: 600"
+                th:text="${playlist.user.nombre}"
+                >Usuario</span
               >
-                Fecha
-              </div>
-              <div class="profile-stats">
-                <div class="stat-item">
-                  <div
-                    class="stat-value"
-                    th:text="${#lists.size(playlist.playlistSongs)}"
-                  >
-                    0
-                  </div>
-                  <div class="stat-label">Canciones</div>
+            </div>
+            <div
+              class="stats"
+              style="display: flex; gap: 40px; margin-bottom: 20px"
+            >
+              <div class="stat">
+                <div
+                  class="stat-number"
+                  th:text="${#temporals.format(playlist.createdAt, 'dd/MM/yyyy')}"
+                >
+                  Fecha
                 </div>
-                <!-- Puedes agregar más stats si gustas -->
+                <div class="stat-label">Fecha de creación</div>
+              </div>
+              <div class="stat">
+                <div
+                  class="stat-number"
+                  th:text="${#lists.size(playlist.playlistSongs)}"
+                >
+                  0
+                </div>
+                <div class="stat-label">Canciones</div>
               </div>
             </div>
           </div>
         </div>
 
         <!-- Sección de canciones -->
-        <div class="edit-profile-form">
-          <div class="form-title">Canciones en la playlist</div>
-          <ul style="list-style: none; padding: 0">
-            <li
+        <!-- Sección de canciones -->
+        <div class="content-card" style="margin-top: 32px">
+          <h2 class="card-title">Canciones en la playlist</h2>
+          <div class="item-list">
+            <div
+              class="item"
               th:each="cancion : ${playlist.playlistSongs}"
               style="
-                background-color: #2b2c4a;
-                margin-bottom: 10px;
-                padding: 12px 18px;
-                border-radius: 10px;
                 display: flex;
-                justify-content: space-between;
                 align-items: center;
+                gap: 18px;
+                margin-bottom: 18px;
+                background: rgba(30, 41, 59, 0.5);
+                border-radius: 10px;
+                padding: 12px;
               "
             >
-              <span
-                th:text="${cancion.song.title}"
-                style="font-weight: 500"
-              ></span>
-              <a
-                th:href="@{/mostrarCancion/{id}(id=${cancion.song.id})}"
-                class="btn btn-secondary"
-                style="padding: 6px 14px"
-                >Ver</a
-              >
-            </li>
-          </ul>
+              <div class="item-image">
+                <img
+                  th:src="@{'/uploads/' + ${cancion.song.coverUrl}}"
+                  alt="Portada Canción"
+                  style="width: 60px; height: 60px; border-radius: 8px"
+                />
+              </div>
+              <div class="item-info" style="flex: 1">
+                <div
+                  class="item-title"
+                  th:text="${cancion.song.title}"
+                  style="font-weight: 600"
+                >
+                  Título de la canción
+                </div>
+                <div
+                  class="item-subtitle"
+                  style="font-size: 14px; color: #cbd5e1"
+                >
+                  <span th:each="sa, iterStat : ${cancion.song.songArtists}">
+                    <span th:text="${sa.artista.user.nombre}">Artista</span
+                    ><span th:if="${!iterStat.last}">, </span>
+                  </span>
+                  •
+                  <span th:text="${cancion.song.duration}">Duración</span>
+                  •
+                  <span th:text="${cancion.song.gender}">Género</span>
+                </div>
+              </div>
+
+              <div>
+                <a
+                  th:href="@{/mostrarCancion/{id}(id=${cancion.song.id})}"
+                  class="btn btn-secondary"
+                  style="padding: 8px 16px; border-radius: 8px; font-size: 14px"
+                  >Ver</a
+                >
+
+                <form
+                  th:if="${esCreador}"
+                  th:action="@{/playlist/{playlistId}/eliminarCancion/{songId}(playlistId=${playlist.id},songId=${cancion.song.id})}"
+                  method="post"
+                  style="display: inline"
+                >
+                  <button
+                    type="submit"
+                    class="btn btn-danger"
+                    style="
+                      margin-left: 8px;
+                      padding: 8px 16px;
+                      border-radius: 8px;
+                      font-size: 14px;
+                    "
+                  >
+                    Eliminar
+                  </button>
+                </form>
+              </div>
+            </div>
+            <div th:if="${#lists.isEmpty(playlist.playlistSongs)}">
+              <span>No hay canciones en esta playlist.</span>
+            </div>
+          </div>
         </div>
       </main>
+
+      <button
+        th:if="${esCreador}"
+        class="btn btn-primary"
+        style="
+          position: fixed;
+          bottom: 40px;
+          right: 40px;
+          z-index: 1000;
+          border-radius: 50%;
+          width: 60px;
+          height: 60px;
+          font-size: 32px;
+          font-family: auto;
+          box-shadow: 0 4px 16px rgba(139, 92, 246, 0.2);
+          background: linear-gradient(45deg, #8b5cf6, #a855f7);
+        "
+        onclick="abrirModalAgregarCancion()"
+        title="Agregar canciones"
+      >
+        +
+      </button>
     </div>
+
+    <div th:if="${esCreador}" style="margin-top: 40px; text-align: center">
+      <form
+        th:action="@{/playlist/{id}/eliminar(id=${playlist.id})}"
+        method="post"
+      >
+        <button type="submit" class="btn btn-danger">Eliminar Playlist</button>
+      </form>
+    </div>
+
+    <!-- Modal para agregar canciones a la playlist -->
+    <div class="modal" id="modalAgregarCancion" style="display: none">
+      <div class="modal-content" style="max-width: 600px">
+        <h2>Agregar canciones a la playlist</h2>
+        <input
+          type="text"
+          id="buscadorCanciones"
+          placeholder="Buscar canciones..."
+          style="
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 16px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+          "
+          oninput="buscarCanciones()"
+          autocomplete="off"
+        />
+        <form
+          id="formAgregarCanciones"
+          th:action="@{/playlist/{id}/agregarCanciones(id=${playlist.id})}"
+          method="post"
+        >
+          <div
+            id="resultadosCanciones"
+            style="max-height: 220px; overflow-y: auto; margin-bottom: 16px"
+          >
+            <!-- Aquí se mostrarán las canciones con checkboxes -->
+          </div>
+          <div style="margin-bottom: 16px">
+            <strong>Canciones seleccionadas:</strong>
+            <div
+              id="seleccionadas"
+              style="
+                min-height: 32px;
+                margin-top: 8px;
+                display: flex;
+                flex-wrap: wrap;
+                gap: 8px;
+              "
+            ></div>
+          </div>
+          <div class="modal-buttons">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              onclick="cerrarModalAgregarCancion()"
+            >
+              Cancelar
+            </button>
+            <button type="submit" class="btn btn-primary">
+              Agregar seleccionadas
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      let cancionesSeleccionadas = {};
+
+      function buscarCanciones() {
+        const query = document.getElementById("buscadorCanciones").value.trim();
+        const contenedor = document.getElementById("resultadosCanciones");
+        if (query.length === 0) {
+          contenedor.innerHTML = "";
+          return;
+        }
+        fetch("/api/canciones?query=" + encodeURIComponent(query))
+          .then((r) => r.json())
+          .then((canciones) => {
+            contenedor.innerHTML = "";
+            canciones.forEach((c) => {
+              const div = document.createElement("div");
+              div.style.display = "flex";
+              div.style.alignItems = "center";
+              div.style.gap = "10px";
+              div.style.marginBottom = "8px";
+              div.innerHTML = `
+          <input type="checkbox" name="songIds" value="${c.id}" id="cancion-${
+                c.id
+              }" ${cancionesSeleccionadas[c.id] ? "checked" : ""}>
+          <label for="cancion-${c.id}">
+            <img src="/uploads/${
+              c.coverUrl
+            }" alt="" style="width:32px;height:32px;border-radius:6px;vertical-align:middle;margin-right:8px;">
+            <strong>${c.title}</strong> <span style="color:#aaa;">${
+                c.artists
+              }</span>
+          </label>
+        `;
+              div
+                .querySelector("input")
+                .addEventListener("change", function (e) {
+                  if (e.target.checked) {
+                    cancionesSeleccionadas[c.id] = c;
+                  } else {
+                    delete cancionesSeleccionadas[c.id];
+                  }
+                  renderSeleccionadas();
+                });
+              contenedor.appendChild(div);
+            });
+            renderSeleccionadas();
+          });
+      }
+
+      function renderSeleccionadas() {
+        const seleccionadasDiv = document.getElementById("seleccionadas");
+        seleccionadasDiv.innerHTML = "";
+        Object.values(cancionesSeleccionadas).forEach((c) => {
+          const tag = document.createElement("span");
+          tag.style.background = "#8b5cf6";
+          tag.style.color = "white";
+          tag.style.padding = "4px 10px";
+          tag.style.borderRadius = "12px";
+          tag.style.display = "inline-flex";
+          tag.style.alignItems = "center";
+          tag.style.gap = "6px";
+          tag.innerHTML = `
+      <img src="/uploads/${c.coverUrl}" style="width:18px;height:18px;border-radius:4px;vertical-align:middle;">
+      ${c.title}
+      <button type="button" style="background:none;border:none;color:white;font-weight:bold;cursor:pointer;font-size:14px;" onclick="deseleccionarCancion(${c.id})">&times;</button>
+    `;
+          seleccionadasDiv.appendChild(tag);
+        });
+        // Sincroniza los checkboxes
+        document
+          .querySelectorAll("#resultadosCanciones input[type=checkbox]")
+          .forEach((cb) => {
+            cb.checked = !!cancionesSeleccionadas[cb.value];
+          });
+      }
+
+      function deseleccionarCancion(id) {
+        delete cancionesSeleccionadas[id];
+        renderSeleccionadas();
+      }
+
+      // Al enviar el formulario, solo envía los seleccionados
+      document
+        .getElementById("formAgregarCanciones")
+        .addEventListener("submit", function (e) {
+          // Elimina todos los checkboxes no seleccionados antes de enviar
+          document
+            .querySelectorAll("#resultadosCanciones input[type=checkbox]")
+            .forEach((cb) => {
+              if (!cb.checked) cb.parentNode.removeChild(cb);
+            });
+        });
+
+      function abrirModalEliminarCancion(songId) {
+        const modal = document.getElementById("modalEliminarCancion");
+        const form = document.getElementById("formEliminarCancion");
+        const playlistId = document.body.getAttribute("data-playlist-id");
+        // Agrega el contexto de la aplicación (si existe)
+        const contextPath = window.location.pathname.split("/")[1]; // Obtiene el contexto de la URL
+        form.action = `/${contextPath}/playlist/${playlistId}/eliminarCancion/${songId}`;
+        modal.style.display = "flex";
+      }
+
+      function cerrarModalEliminarCancion() {
+        document.getElementById("modalEliminarCancion").style.display = "none";
+      }
+
+      function abrirModalAgregarCancion() {
+        document.getElementById("modalAgregarCancion").style.display = "flex";
+        buscarCanciones(); // Carga todas las canciones al abrir
+      }
+      function cerrarModalAgregarCancion() {
+        document.getElementById("modalAgregarCancion").style.display = "none";
+      }
+      async function buscarCanciones() {
+        const query = document.getElementById("buscadorCanciones").value;
+        const response = await fetch(
+          "/api/canciones?query=" + encodeURIComponent(query)
+        );
+        const canciones = await response.json();
+        const contenedor = document.getElementById("resultadosCanciones");
+        contenedor.innerHTML = "";
+        canciones.forEach((c) => {
+          const div = document.createElement("div");
+          div.style.display = "flex";
+          div.style.alignItems = "center";
+          div.style.gap = "10px";
+          div.style.marginBottom = "8px";
+          div.innerHTML = `
+            <input type="checkbox" name="songIds" value="${c.id}" id="cancion-${c.id}">
+            <label for="cancion-${c.id}">
+              <img src="/uploads/${c.coverUrl}" alt="" style="width:32px;height:32px;border-radius:6px;vertical-align:middle;margin-right:8px;">
+              <strong>${c.title}</strong> <span style="color:#aaa;">${c.artists}</span>
+            </label>
+          `;
+          contenedor.appendChild(div);
+        });
+      }
+    </script>
   </body>
 </html>

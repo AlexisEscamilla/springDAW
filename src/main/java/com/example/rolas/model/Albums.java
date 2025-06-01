@@ -22,7 +22,7 @@ public class Albums {
     @Column(name = "release_date")
     private LocalDate releaseDate;
 
-    // Relación uno a muchos con la tabla intermedia `AlbumArtists`
+    // Relación uno a muchos con la tabla intermedia `AlbumArtists`aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
     @OneToMany(mappedBy = "album", cascade = CascadeType.ALL)
     private Set<AlbumArtists> albumArtists = new HashSet<>();  // Lista de relaciones entre álbumes y artistas
 

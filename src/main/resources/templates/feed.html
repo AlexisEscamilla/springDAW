@@ -62,19 +62,24 @@
           <div class="profile-card">
             <div class="profile-avatar">
               <!-- Si el usuario tiene imagen de perfil -->
-              <img
-                th:if="${usuario.profilePicture != null}"
-                th:src="@{'/uploads/' + ${usuario.profilePicture}}"
-                class="avatar-img"
-                alt="Avatar"
-              />
+              <a
+                th:href="@{'/mostrarPerfil/' + ${usuario.id}}"
+                class="avatar-link"
+              >
+                <img
+                  th:if="${usuario.profilePicture != null}"
+                  th:src="@{'/uploads/' + ${usuario.profilePicture}}"
+                  class="avatar-img"
+                  alt="Avatar"
+                />
 
-              <!-- Si no tiene imagen, muestra inicial -->
-              <div
-                th:if="${usuario.profilePicture == null}"
-                th:text="${usuario.nombre.substring(0,1)}"
-                class="avatar-placeholder"
-              ></div>
+                <!-- Si no tiene imagen, muestra inicial -->
+                <div
+                  th:if="${usuario.profilePicture == null}"
+                  th:text="${usuario.nombre.substring(0,1)}"
+                  class="avatar-placeholder"
+                ></div>
+              </a>
             </div>
 
             <h2 th:text="${usuario.nombre}">Nombre</h2>
@@ -126,17 +131,22 @@
             >
               <div class="post-input-container">
                 <div class="creator-avatar">
-                  <img
-                    th:if="${usuario.profilePicture != null}"
-                    th:src="@{'/uploads/' + ${usuario.profilePicture}}"
-                    class="avatar-imgcreator"
-                    alt="Avatar"
-                  />
-                  <div
-                    th:if="${usuario.profilePicture == null}"
-                    th:text="${usuario.nombre.substring(0,1)}"
-                    class="avatar-placeholder"
-                  ></div>
+                  <a
+                    th:href="@{'/mostrarPerfil/' + ${usuario.id}}"
+                    class="avatar-link"
+                  >
+                    <img
+                      th:if="${usuario.profilePicture != null}"
+                      th:src="@{'/uploads/' + ${usuario.profilePicture}}"
+                      class="avatar-imgcreator"
+                      alt="Avatar"
+                    />
+                    <div
+                      th:if="${usuario.profilePicture == null}"
+                      th:text="${usuario.nombre.substring(0,1)}"
+                      class="avatar-placeholder"
+                    ></div>
+                  </a>
                 </div>
                 <textarea
                   name="content"
@@ -156,17 +166,22 @@
             <!-- Información del post -->
             <div class="post-header">
               <div class="creator-avatar">
-                <img
-                  th:if="${post.user.profilePicture != null}"
-                  th:src="@{'/uploads/' + ${post.user.profilePicture}}"
-                  class="avatar-imgcreator"
-                  alt="Avatar"
-                />
-                <div
-                  th:if="${post.user.profilePicture == null}"
-                  th:text="${post.user.nombre.substring(0,1)}"
-                  class="avatar-placeholder"
-                ></div>
+                <a
+                  th:href="@{'/mostrarPerfil/' + ${post.user.id}}"
+                  class="avatar-link"
+                >
+                  <img
+                    th:if="${post.user.profilePicture != null}"
+                    th:src="@{'/uploads/' + ${post.user.profilePicture}}"
+                    class="avatar-imgcreator"
+                    alt="Avatar"
+                  />
+                  <div
+                    th:if="${post.user.profilePicture == null}"
+                    th:text="${post.user.nombre.substring(0,1)}"
+                    class="avatar-placeholder"
+                  ></div>
+                </a>
               </div>
               <div class="post-user-info">
                 <div class="post-user-name" th:text="${post.user.nombre}">

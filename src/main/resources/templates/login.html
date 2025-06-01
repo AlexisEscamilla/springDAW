@@ -1,46 +1,47 @@
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Iniciar Sesión</title>
-    <link rel="stylesheet" href="/css/stylesLogin.css">
-</head>
-<body>
-    
+    <link rel="stylesheet" href="/css/stylesLogin.css" />
+  </head>
+  <body>
     <div class="container">
-        <header>
-            <div class="logo">
-                <img class = "imagi" src="https://images.vexels.com/media/users/3/150846/isolated/preview/a77bce5e752802277f78088150b16923-musica-de-icono-de-auriculares-de-audio.png" alt="rolas">
-                <div class="logo-icon"></div>
-                <a href="/index">Rolas</a>
-            </div>
-          </header>
-        <div class="form-container">
-            <h1>Iniciar Sesión</h1>
-            <div class="message-area" id="messageArea"></div>
-            
-            <form action="/login" method="post">
-                <div class="form-group">
-                    <label for="username">Nombre de usuario</label>
-                    <input type="text" id="username" name="username" required>
-                </div>
-            
-                <div class="form-group">
-                    <label for="password">Contraseña</label>
-                    <input type="password" id="password" name="password" required>
-                </div>
-            
-                <div class="form-group">
-                    <button type="submit" class="btn">Iniciar Sesión</button>
-                </div>
-            </form>
-            
-            <div class="links">
-                <p>¿No tienes una cuenta? <a href="/register">Regístrate</a></p>
-            </div>
+      <header>
+        <div class="logo">
+          <img
+            class="imagi"
+            src="https://images.vexels.com/media/users/3/150846/isolated/preview/a77bce5e752802277f78088150b16923-musica-de-icono-de-auriculares-de-audio.png"
+            alt="rolas"
+          />
+          <div class="logo-icon"></div>
+          <a href="/index">Rolas</a>
         </div>
+      </header>
+      <div class="form-container">
+        <h1>Iniciar Sesión</h1>
+        <div class="message-area" id="messageArea"></div>
+
+        <form action="/login" method="post">
+          <div class="form-group">
+            <label for="username">Nombre de usuario</label>
+            <input type="text" id="username" name="username" required />
+          </div>
+
+          <div class="form-group">
+            <label for="password">Contraseña</label>
+            <input type="password" id="password" name="password" required />
+          </div>
+
+          <div class="form-group">
+            <button type="submit" class="btn">Iniciar Sesión</button>
+          </div>
+        </form>
+
+        <div class="links">
+          <p>¿No tienes una cuenta? <a href="/register">Regístrate</a></p>
+        </div>
+      </div>
     </div>
-
-
-</body>
+  </body>
 </html>

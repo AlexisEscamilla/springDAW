@@ -108,6 +108,9 @@
 
       .container {
         align-content: center;
+        max-width: 1000px;
+        margin: 20px auto;
+        padding: 0 20px;
       }
 
       .search {
@@ -378,15 +381,20 @@
           margin-bottom: 15px !important;
         }
       }
+
+      /* Cabecera */
       .header {
         display: flex;
         align-items: center;
         justify-content: space-between;
         padding: 15px 20px;
+        background-color: rgba(35, 36, 66, 0.8);
+        backdrop-filter: blur(10px);
         position: sticky;
         top: 0;
         z-index: 100;
       }
+
       .logo {
         display: flex;
         align-items: center;
@@ -397,6 +405,33 @@
         color: inherit; /* Hereda el color del contenedor */
       }
 
+      .logo-icon {
+        margin-right: 10px;
+        color: var(--primary);
+      }
+
+      /* Responsive */
+      @media (max-width: 768px) {
+        .profile-info {
+          flex-direction: column;
+          align-items: center;
+          text-align: center;
+        }
+
+        .profile-avatar-container {
+          margin-top: -60px;
+          margin-right: 0;
+          margin-bottom: 15px;
+        }
+
+        .profile-stats {
+          justify-content: center;
+        }
+
+        .nav-links {
+          display: none;
+        }
+      }
       .logo-icon {
         margin-right: 10px;
         color: var(--primary-color);
@@ -518,11 +553,99 @@
         color: white;
       }
 
+      .modal {
+        position: fixed;
+        z-index: 9999;
+        left: 0;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.5);
+        display: none;
+        align-items: center;
+        justify-content: center;
+      }
+      .modal-content {
+        background: #232442;
+        color: white;
+        border-radius: 12px;
+        padding: 32px 24px;
+        max-width: 400px;
+        margin: auto;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      }
+      .modal-buttons {
+        display: flex;
+        justify-content: flex-end;
+        gap: 16px;
+        margin-top: 24px;
+      }
+
+      .btn-danger {
+        background-color: var(--error-color);
+        color: white;
+        border: none;
+        display: center;
+      }
+
+      .eliminaCuenta {
+        text-align: center;
+        margin-top: 20px;
+      }
+
       .tituloLogo {
         color: white;
         text-decoration: none;
         font-size: 24px;
         margin-left: 10px;
+      }
+      .tituloNAV {
+        color: white;
+        text-decoration: none;
+        font-size: 20px;
+        margin-left: 25px;
+      }
+
+      .nav-links {
+        display: flex;
+      }
+
+      .nav-link {
+        margin-left: 20px;
+        cursor: pointer;
+        transition: color 0.2s;
+      }
+
+      .nav-link:hover {
+        color: var(--primary);
+      }
+
+      .user-menu {
+        display: flex;
+        align-items: center;
+      }
+
+      .user-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: var(--primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        font-weight: bold;
+        margin-left: 15px;
+        cursor: pointer;
+      }
+      #sendBtn:active {
+        background-color: #218838 !important;
+        transform: scale(0.97);
+      }
+      #sendBtn:focus {
+        outline: 2px solid #4f46e5;
       }
     </style>
   </head>
@@ -531,6 +654,7 @@
     <div class="bg-gradient bg-gradient-2"></div>
     <div class="bg-gradient bg-gradient-3"></div>
 
+    <!-- Cabecera igual a subirCancion -->
     <div class="header">
       <div class="logo">
         <img
@@ -541,7 +665,41 @@
         <div class="logo-icon"></div>
         <a href="/feed" class="tituloLogo">Rolas</a>
       </div>
+      <div class="nav-links">
+        <a class="nav-link tituloNAV" href="/feed">Home</a>
+        <a class="nav-link tituloNAV" href="/explorar">Explorar</a>
+        <a class="nav-link tituloNAV" href="/mostrarNotificaciones"
+          >Notificaciones</a
+        >
+        <a class="nav-link tituloNAV" href="/chats">Chats</a>
+        <a class="nav-link tituloNAV" href="/colecciones">Colecciones</a>
+      </div>
+      <div class="user-menu">
+        <!-- Botón que abre el modal -->
+        <button type="button" class="btn btn-primary" onclick="abrirModal()">
+          Cerrar Sesión
+        </button>
+      </div>
     </div>
+
+    <div id="modalLogout" class="modal" style="display: none">
+      <div class="modal-content">
+        <p>¿Estás seguro de que deseas cerrar sesión?</p>
+        <div class="modal-buttons">
+          <form th:action="@{/logout}" method="post">
+            <button type="submit" class="btn btn-danger">Sí, salir</button>
+          </form>
+          <button
+            type="button"
+            class="btn btn-secondary"
+            onclick="cerrarModal()"
+          >
+            Cancelar
+          </button>
+        </div>
+      </div>
+    </div>
+
     <div class="container-fluid h-100">
       <div class="row justify-content-center h-100">
         <div class="col-md-4 col-xl-3 chat">
@@ -569,8 +727,10 @@
                     th:attr="data-chat-id=${chat.id},
               data-is-group=${chat.isGroup},
               data-group-name=${chat.groupName},
+              data-created-by=${chat.createdBy.username},
               data-group-photo=${chat.groupPhoto != null ? '/uploads/' + chat.groupPhoto : 'https://via.placeholder.com/50'},
               data-partner-name=${oneToOnePartners[chat.id]?.nombre},
+              data-partner-id=${oneToOnePartners[chat.id]?.id},
               data-partner-photo=${oneToOnePartners[chat.id]?.profilePicture != null ? '/uploads/' + oneToOnePartners[chat.id]?.profilePicture : 'https://static.turbosquid.com/Preview/001292/481/WV/_D.jpg'}"
                     onclick="selectChat(this)"
                   >
@@ -619,11 +779,8 @@
                 ><i class="fas fa-ellipsis-v"></i
               ></span>
               <div class="action_menu" id="actionMenu">
-                <ul>
-                  <li><i class="fas fa-user-circle"></i> View profile</li>
-                  <li><i class="fas fa-users"></i> Add to close friends</li>
-                  <li><i class="fas fa-plus"></i> Add to group</li>
-                  <li><i class="fas fa-ban"></i> Block</li>
+                <ul id="actionMenuList">
+                  <!-- El contenido se llena dinámicamente con JS según el chat seleccionado -->
                 </ul>
               </div>
             </div>
@@ -649,6 +806,8 @@
                     <img
                       th:src="${'/uploads/' + msg.senderPhoto}"
                       class="rounded-circle user_img_msg"
+                      data-user-id="..."
+                      onclick="goToProfile(this)"
                     />
                   </div>
                   <div
@@ -672,26 +831,32 @@
               </div>
             </div>
             <div class="card-footer">
-              <div class="input-group">
-                <div class="input-group-append">
-                  <span class="input-group-text attach_btn"
-                    ><i class="fas fa-paperclip"></i
-                  ></span>
+              <form id="sendMessageForm" onsubmit="sendMessage(event)">
+                <div class="input-group">
+                  <textarea
+                    id="messageText"
+                    class="form-control type_msg"
+                    placeholder="Type your message..."
+                    style="resize: none"
+                  ></textarea>
+                  <div class="input-group-append">
+                    <button
+                      type="submit"
+                      id="sendBtn"
+                      class="btn btn-success"
+                      style="
+                        margin-left: 10px;
+                        font-size: 22px;
+                        font-weight: bold;
+                        padding: 0 22px;
+                        transition: background 0.2s;
+                      "
+                    >
+                      <i class="fas fa-location-arrow"></i> Enviar
+                    </button>
+                  </div>
                 </div>
-                <textarea
-                  name=""
-                  id="messageText"
-                  class="form-control type_msg"
-                  placeholder="Type your message..."
-                ></textarea>
-                <div class="input-group-append">
-                  <span
-                    class="input-group-text send_btn"
-                    onclick="sendMessage(event)"
-                    ><i class="fas fa-location-arrow"></i
-                  ></span>
-                </div>
-              </div>
+              </form>
             </div>
           </div>
         </div>
@@ -813,6 +978,42 @@
         </form>
       </div>
     </div>
+
+    <!-- Modal para agregar a grupo -->
+    <!-- Modal para agregar a grupo -->
+    <!-- Modal para agregar a grupo -->
+    <!-- Modal para agregar a grupo -->
+    <!-- Modal para agregar a grupo -->
+    <div id="addToGroupModal" class="modal">
+      <div class="modal-content">
+        <span
+          class="close"
+          onclick="document.getElementById('addToGroupModal').style.display='none'"
+          >&times;</span
+        >
+        <h3>Agregar a grupo</h3>
+        <form id="addToGroupForm" onsubmit="addToGroup(event)">
+          <label for="groupSelect">Selecciona un grupo:</label>
+          <select id="groupSelect" class="form-control" required>
+            <option value="" disabled selected>Selecciona un grupo</option>
+            <!-- Renderiza los grupos del usuario -->
+            <option
+              th:each="grupo : ${gruposPropios}"
+              th:value="${grupo.id}"
+              th:text="${grupo.groupName}"
+            ></option>
+          </select>
+          <button
+            type="submit"
+            class="btn btn-primary"
+            style="margin-top: 16px"
+          >
+            Agregar
+          </button>
+        </form>
+        <div id="addToGroupMsg" style="color: green; margin-top: 10px"></div>
+      </div>
+    </div>
   </body>
 
   <script src="https://cdn.jsdelivr.net/npm/sockjs-client/dist/sockjs.min.js"></script>
@@ -822,15 +1023,21 @@
   <script>
     let stompClient = null;
     let selectedChatId = null;
+    let chatSubscription = null;
+    var input = document.getElementById("messageText");
+    var boton = document.getElementById("sendBtn");
 
+    input.addEventListener("keydown", function (event) {
+      if (event.keyCode === 13) {
+        boton.click(); // Simula el clic en el botón
+      }
+    });
     function connect() {
       const socket = new SockJS("/ws");
       stompClient = Stomp.over(socket);
       stompClient.connect({}, function () {
         console.log("Conectado a WebSocket");
-        stompClient.subscribe("/topic/messages", function (message) {
-          showMessage(JSON.parse(message.body));
-        });
+        // No te suscribas aquí globalmente
       });
     }
     connect();
@@ -877,14 +1084,14 @@
       const messageElement = document.createElement("div");
       messageElement.className = "d-flex justify-content-end mb-4";
       messageElement.innerHTML = `
-    <div class="msg_cotainer_send">
-      ${messageText}
-      <span class="msg_time_send">${new Date().toLocaleTimeString()}</span>
-    </div>
-    <div class="img_cont_msg">
-      <img src="/uploads/${fotoUsuario}" class="rounded-circle user_img_msg" />
-    </div>
-  `;
+      <div class="msg_cotainer_send">
+        ${messageText}
+        <span class="msg_time_send">${new Date().toLocaleTimeString()}</span>
+      </div>
+      <div class="img_cont_msg">
+        <img src="/uploads/${fotoUsuario}" class="rounded-circle user_img_msg" />
+      </div>
+    `;
       messagesContainer.appendChild(messageElement);
 
       // Auto scroll al final
@@ -893,11 +1100,9 @@
       // Limpia el campo de texto
       document.getElementById("messageText").value = "";
     }
-
     function createChat(event) {
       event.preventDefault();
 
-      // Asegúrate de que haya un usuario seleccionado
       if (!validateUserSelection()) return;
 
       const selectedUsers = Array.from(selectedUserIds);
@@ -920,23 +1125,18 @@
           return response.json();
         })
         .then((chat) => {
-          const chatList = document.getElementById("chatList");
-          const li = document.createElement("li");
-          li.innerHTML = `<a href="#" onclick="loadMessages(${chat.id});">${
-            chat.groupName || "Chat"
-          }</a>`;
-          chatList.appendChild(li);
+          // Cierra el modal correcto
           document.getElementById("createChatModal").style.display = "none";
+          // Muestra feedback visual
+          alert("¡Chat creado correctamente!");
+          // Opcional: recarga la página para mostrar el nuevo chat
+          window.location.reload();
         })
-        .then(() => {
-          window.location.href = "/chats"; // redirección manual
-        })
-
         .catch((error) => {
-          console.error("Error al crear el grupo:", error);
-          // Mostrar el mensaje de error si hubo un error al hacer la solicitud
+          console.error("Error al crear el chat:", error);
+          // Mostrar el mensaje de error en el modal correcto
           const errorMessage = document.getElementById("groupCreationError");
-          errorMessage.textContent = "Hubo un problema al crear el grupo.";
+          errorMessage.textContent = "Hubo un problema al crear el chat.";
           errorMessage.style.display = "block";
         });
     }
@@ -973,8 +1173,11 @@
           }
           return response.json();
         })
-        .then(() => {
-          window.location.href = "/chats";
+        .then((chat) => {
+          document.getElementById("createChatGrupoModal").style.display =
+            "none";
+          alert("¡Grupo creado correctamente!");
+          window.location.reload();
         })
         .catch((error) => {
           console.error("Error al crear el grupo:", error);
@@ -1029,25 +1232,25 @@
             if (msg.isMine) {
               messageElement.className = "d-flex justify-content-end mb-4";
               messageElement.innerHTML = `
-            <div class="msg_cotainer_send">
-              ${msg.texto}
-              <span class="msg_time_send">${formattedDate}</span>
-            </div>
-            <div class="img_cont_msg">
-              <img src="/uploads/${msg.senderPhoto}" class="rounded-circle user_img_msg" />
-            </div>
-          `;
+              <div class="msg_cotainer_send">
+                ${msg.texto}
+                <span class="msg_time_send">${formattedDate}</span>
+              </div>
+              <div class="img_cont_msg">
+                <img src="/uploads/${msg.senderPhoto}" class="rounded-circle user_img_msg" />
+              </div>
+            `;
             } else {
               messageElement.className = "d-flex justify-content-start mb-4";
               messageElement.innerHTML = `
-            <div class="img_cont_msg">
-              <img src="/uploads/${msg.senderPhoto}" class="rounded-circle user_img_msg" />
-            </div>
-            <div class="msg_cotainer">
-              ${msg.texto}
-              <span class="msg_time">${formattedDate}</span>
-            </div>
-          `;
+              <div class="img_cont_msg">
+                <img src="/uploads/${msg.senderPhoto}" class="rounded-circle user_img_msg" />
+              </div>
+              <div class="msg_cotainer">
+                ${msg.texto}
+                <span class="msg_time">${formattedDate}</span>
+              </div>
+            `;
             }
 
             messagesContainer.appendChild(messageElement);
@@ -1064,16 +1267,73 @@
     function selectChat(chatElement) {
       const chatId = chatElement.getAttribute("data-chat-id");
       const isGroup = chatElement.getAttribute("data-is-group") === "true";
+      const partnerId =
+        chatElement.getAttribute("data-user-id") ||
+        chatElement.getAttribute("data-partner-id");
+
       const groupName = chatElement.getAttribute("data-group-name");
       const groupPhoto = chatElement.getAttribute("data-group-photo");
       const partnerName = chatElement.getAttribute("data-partner-name");
       const partnerPhoto = chatElement.getAttribute("data-partner-photo");
+      const createdBy = chatElement.getAttribute("data-created-by");
+      const currentUser = document
+        .getElementById("currentUsername")
+        .textContent.trim();
+      // Actualiza el menú de acciones
+      const actionMenuList = document.getElementById("actionMenuList");
+      actionMenuList.innerHTML = ""; // Limpia el menú
+      if (chatSubscription) {
+        chatSubscription.unsubscribe();
+      }
 
       if (!chatId) {
         console.error("El ID del chat no es válido");
         return;
       }
 
+      chatSubscription = stompClient.subscribe(
+        "/topic/messages/" + chatId,
+        function (message) {
+          showMessage(JSON.parse(message.body));
+        }
+      );
+
+      if (!isGroup) {
+        actionMenuList.innerHTML += `
+        <li onclick="goToProfileFromMenu()">
+          <i class="fas fa-user-circle"></i> View profile
+        </li>
+        <li onclick="openAddToGroupModal()">
+          <i class="fas fa-plus"></i> Add to group
+        </li>
+      `;
+        // Guarda el id del usuario para usarlo en viewProfile/openAddToGroupModal
+        document
+          .getElementById("actionMenu")
+          .setAttribute("data-user-id", partnerId);
+        if (createdBy === currentUser) {
+          actionMenuList.innerHTML += `
+      <li onclick="deleteChat()">
+        <i class="fas fa-trash"></i> Eliminar chat
+      </li>
+    `;
+        }
+      } else {
+        if (createdBy === currentUser) {
+          actionMenuList.innerHTML += `
+      <li onclick="deleteChat()">
+        <i class="fas fa-trash"></i> Eliminar chat
+      </li>
+    `;
+        } else {
+          actionMenuList.innerHTML += `
+      <li onclick="leaveGroup()">
+        <i class="fas fa-sign-out-alt"></i> Salir del grupo
+      </li>
+    `;
+        }
+        document.getElementById("actionMenu").removeAttribute("data-user-id");
+      }
       // Actualiza la variable global `selectedChatId`
       selectedChatId = chatId;
 
@@ -1123,6 +1383,42 @@
       });
 
       // Auto scroll al final
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+
+    function showMessage(msg) {
+      // msg.conversation.id o msg.conversationId según tu DTO
+      if (!selectedChatId || msg.conversation.id != selectedChatId) return;
+
+      const messagesContainer = document.querySelector(".msg_card_body");
+      const formattedDate = new Date(msg.createdAt).toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+      const isMine =
+        msg.sender &&
+        msg.sender.username ===
+          document.getElementById("currentUsername").textContent.trim();
+
+      const messageElement = document.createElement("div");
+      messageElement.className = isMine
+        ? "d-flex justify-content-end mb-4"
+        : "d-flex justify-content-start mb-4";
+      messageElement.innerHTML = isMine
+        ? `<div class="msg_cotainer_send">${
+            msg.mensajeText || msg.texto
+          }<span class="msg_time_send">${formattedDate}</span></div>
+         <div class="img_cont_msg"><img src="/uploads/${
+           msg.senderPhoto || (msg.sender && msg.sender.profilePicture) || ""
+         }" class="rounded-circle user_img_msg" /></div>`
+        : `<div class="img_cont_msg"><img src="/uploads/${
+            msg.senderPhoto || (msg.sender && msg.sender.profilePicture) || ""
+          }" class="rounded-circle user_img_msg" /></div>
+         <div class="msg_cotainer">${
+           msg.mensajeText || msg.texto
+         }<span class="msg_time">${formattedDate}</span></div>`;
+
+      messagesContainer.appendChild(messageElement);
       messagesContainer.scrollTop = messagesContainer.scrollHeight;
     }
 
@@ -1190,6 +1486,117 @@
       document.getElementById("selectedUsers").value =
         Array.from(selectedUserIds).join(",");
       return true;
+    }
+
+    function abrirModal() {
+      document.getElementById("modalLogout").style.display = "block";
+    }
+
+    function cerrarModal() {
+      document.getElementById("modalLogout").style.display = "none";
+    }
+
+    function viewProfile() {
+      // Solo para chat individual
+      const chatElement = document.querySelector(".contacts .active");
+      if (!chatElement) return;
+      const isGroup = chatElement.getAttribute("data-is-group") === "true";
+      if (isGroup) return;
+
+      // Obtén el id del usuario con quien hablas
+      const userId =
+        chatElement.getAttribute("data-user-id") ||
+        chatElement.getAttribute("data-partner-id");
+      if (userId) {
+        window.location.href = "/mostrarPerfil/" + userId;
+      }
+    }
+    document.querySelector("#actionMenu ul li:nth-child(1)").onclick =
+      viewProfile;
+
+    function openAddToGroupModal() {
+      // Lee el userId del menú de acciones
+      const userId = document
+        .getElementById("actionMenu")
+        .getAttribute("data-user-id");
+      if (!userId) return;
+      window.userToAddId = userId;
+      document.getElementById("addToGroupModal").style.display = "block";
+    }
+    document.querySelector("#actionMenu ul li:nth-child(2)").onclick =
+      openAddToGroupModal;
+
+    function addToGroup(event) {
+      event.preventDefault();
+      const groupId = document.getElementById("groupSelect").value;
+      const userId = window.userToAddId;
+      fetch(`/chats/${groupId}/agregarUsuario`, {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: `userId=${userId}`,
+      })
+        .then((res) => (res.ok ? res.text() : Promise.reject("Error")))
+        .then((msg) => {
+          document.getElementById("addToGroupMsg").textContent =
+            "Usuario agregado al grupo correctamente.";
+          setTimeout(() => {
+            document.getElementById("addToGroupModal").style.display = "none";
+            document.getElementById("addToGroupMsg").textContent = "";
+          }, 1500);
+        })
+        .catch(() => {
+          document.getElementById("addToGroupMsg").textContent =
+            "Error al agregar usuario.";
+        });
+    }
+
+    function leaveGroup() {
+      if (!selectedChatId) return;
+      if (
+        !confirm(
+          "¿Seguro que quieres salir de este grupo? Seguirás viendo el chat si eres agregado de nuevo."
+        )
+      )
+        return;
+      fetch(`/chats/${selectedChatId}/salir`, { method: "POST" })
+        .then((res) => {
+          if (res.ok) {
+            window.location.reload();
+          } else {
+            return res.text().then((msg) => {
+              alert(msg || "No se pudo salir del grupo");
+            });
+          }
+        })
+        .catch(() => {
+          alert("No se pudo salir del grupo");
+        });
+    }
+
+    function goToProfileFromMenu() {
+      // Lee el userId del menú de acciones
+      const userId = document
+        .getElementById("actionMenu")
+        .getAttribute("data-user-id");
+      if (userId) {
+        window.location.href = "/mostrarPerfil/" + userId;
+      }
+    }
+
+    function deleteChat() {
+      if (!selectedChatId) return;
+      if (
+        !confirm(
+          "¿Seguro que quieres eliminar este chat? Esta acción no se puede deshacer."
+        )
+      )
+        return;
+      fetch(`/chats/${selectedChatId}/eliminar`, { method: "POST" }).then(
+        (res) => {
+          if (res.ok) window.location.reload();
+          else alert("No se pudo eliminar el chat");
+        }
+      );
     }
   </script>
 </html>

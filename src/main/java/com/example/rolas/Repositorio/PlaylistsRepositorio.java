@@ -10,4 +10,5 @@ import java.util.List;
 @Repository
 public interface PlaylistsRepositorio extends JpaRepository<Playlists, Integer> {
     List<Playlists> findByUser(User user);
+    List<Playlists> findByTitleContainingIgnoreCase(String title);
 }

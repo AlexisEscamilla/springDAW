@@ -14,6 +14,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
@@ -124,5 +125,61 @@ public class PlaylistsController {
         return "redirect:/colecciones?tipo=playlists";
     }
     
+    @PostMapping("/playlist/{id}/agregarCanciones")
+    public String agregarCancionesAPlaylist(
+            @PathVariable Integer id,
+            @RequestParam(value = "songIds", required = false) List<Integer> songIds,
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
+        Optional<Playlists> playlistOpt = playlistsRepositorio.findById(id);
+        if (playlistOpt.isEmpty() || songIds == null || songIds.isEmpty()) {
+            return "redirect:/mostrarPlaylist/" + id;
+        }
+        Playlists playlist = playlistOpt.get();
+
+        int posicion = playlist.getPlaylistSongs() != null ? playlist.getPlaylistSongs().size() + 1 : 1;
+        for (Integer songId : songIds) {
+            Optional<Songs> optionalSong = songRepositorio.findById(songId);
+            if (optionalSong.isPresent()) {
+                Songs song = optionalSong.get();
+                // Elimina cualquier relación previa entre esta playlist y esta canción
+                playlistSongsRepositorio.deleteByPlaylistIdAndSongId(id, songId);
+
+                // Ahora sí, crea la nueva relación
+                PlaylistSongs playlistSong = new PlaylistSongs();
+                playlistSong.setPlaylist(playlist);
+                playlistSong.setSong(song);
+                playlistSong.setAddedAt(LocalDate.now());
+                playlistSong.setPosicion(String.valueOf(posicion));
+                posicion++;
+                playlistSongsRepositorio.save(playlistSong);
+            }
+        }
+        return "redirect:/mostrarPlaylist/" + id;
+    }
+
+    // Eliminar una canción de la playlistaaaaaaaaaaaaa
+    @PostMapping("/playlist/{playlistId}/eliminarCancion/{songId}")
+    public String eliminarCancionDePlaylist(
+            @PathVariable Integer playlistId,
+            @PathVariable Integer songId,
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
+    	playlistSongsRepositorio.deleteByPlaylistIdAndSongId(playlistId, songId);
+        return "redirect:/mostrarPlaylist/" + playlistId;
+    }
+
+    // Eliminar la playlist completaaaaaaaaa
+    @PostMapping("/playlist/{id}/eliminar")
+    public String eliminarPlaylist(
+            @PathVariable Integer id,
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
+        Optional<Playlists> playlistOpt = playlistsRepositorio.findById(id);
+        if (playlistOpt.isPresent()) {
+            playlistsRepositorio.deleteById(id);
+        }
+        return "redirect:/colecciones?tipo=playlists";
+    }
     
 }

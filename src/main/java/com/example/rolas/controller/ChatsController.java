@@ -16,6 +16,7 @@ import com.example.rolas.Repositorio.MessagesRepositorio;
 import com.example.rolas.Repositorio.UserRepositorio;
 import com.example.rolas.DTO.ChatDetailsDTO;
 import com.example.rolas.DTO.ConversationDTO;
+import com.example.rolas.DTO.ConversationSimpleDTO;
 import com.example.rolas.DTO.MessageDTO;
 import com.example.rolas.Repositorio.ConversationParticipantsRepositorio;
 import com.example.rolas.model.Conversations;
@@ -78,7 +79,7 @@ public class ChatsController {
 
         List<ConversationParticipants> participaciones = conversationParticipantsRepositorio.findByConversationIdIn(conversationIds);
 
-        // Obtener todos los mensajes de las conversaciones del usuario
+        // Obtener todos los mensajes de las conversaciones del usuarioaaaaaaaaa
         List<Messages> mensajes = messagesRepositorio.findByConversationIdInOrderByCreatedAtAsc(conversationIds);
         
         Map<Integer, User> oneToOnePartners = chatService.getOneToOnePartners(user, conversaciones);
@@ -103,6 +104,13 @@ public class ChatsController {
             .map(Followers::getFollowing)
             .collect(Collectors.toList());
         
+     // Obtén solo los grupos donde el usuario participa
+        List<Conversations> gruposPropios = conversaciones.stream()
+            .filter(Conversations::isGroup)
+            .collect(Collectors.toList());
+
+        model.addAttribute("gruposPropios", gruposPropios);
+        	
         // 8. Agregar al modelo
         model.addAttribute("user", user);
         model.addAttribute("conversations", conversaciones);
@@ -155,10 +163,10 @@ public class ChatsController {
     
     @PostMapping("/create")
     @ResponseBody
-    public Conversations createChat(@RequestParam(required = false) String groupName, 
-                                    @AuthenticationPrincipal UserDetails userDetails, 
-                                    @RequestParam("userId") Integer agrega) {
-        
+    public ResponseEntity<?> createChat(
+            @RequestParam(required = false) String groupName,
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestParam("userId") Integer agrega) {
 
         // Obtener el usuario autenticado
         User creator = userRepositorio.findByUsername(userDetails.getUsername())
@@ -168,6 +176,31 @@ public class ChatsController {
         User agregado = userRepositorio.findById(agrega)
             .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
+     // Buscar si ya existe un chat individual entre estos dos usuarios
+        List<ConversationParticipants> creatorParticipations = conversationParticipantsRepositorio.findByUserId(creator.getId());
+        List<ConversationParticipants> agregadoParticipations = conversationParticipantsRepositorio.findByUserId(agregado.getId());
+        
+     // Obtener los IDs de las conversaciones individuales de cada usuario
+        List<Integer> creatorChats = creatorParticipations.stream()
+            .map(cp -> cp.getConversation())
+            .filter(conv -> !conv.isGroup())
+            .map(Conversations::getId)
+            .collect(Collectors.toList());
+
+        List<Integer> agregadoChats = agregadoParticipations.stream()
+            .map(cp -> cp.getConversation())
+            .filter(conv -> !conv.isGroup())
+            .map(Conversations::getId)
+            .collect(Collectors.toList());
+
+        // Buscar intersección: si hay un chat individual compartido, ya existe
+        creatorChats.retainAll(agregadoChats);
+        if (!creatorChats.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body("Ya existe un chat individual entre estos usuarios.");
+        }
+
+        
         // Crear la conversación
         Conversations conversation = new Conversations();
         conversation.setGroupName(groupName);
@@ -198,28 +231,27 @@ public class ChatsController {
         participant2.setJoinedAt(LocalDateTime.now());
         conversationParticipantsRepositorio.save(participant2);
 
-        return conversation;
+        // Retornar DTO
+        ConversationSimpleDTO dto = new ConversationSimpleDTO();
+        dto.setId(conversation.getId());
+        dto.setGroupName(conversation.getGroupName());
+        dto.setIsGroup(conversation.isGroup());
+        dto.setGroupPhoto(conversation.getGroupPhoto());
+        return ResponseEntity.ok(dto);
     }
-    
+    	
     @PostMapping("/createGroup")
-    public ResponseEntity<?> createGroup(
+    @ResponseBody
+    public ConversationSimpleDTO createGroup(
             @RequestParam("groupName") String groupName,
             @RequestParam(value = "groupPhoto", required = false) MultipartFile groupPhoto,
             @RequestParam("userIds") List<Integer> userIds,
             @AuthenticationPrincipal UserDetails userDetails
     ) {
-        if (groupName == null || groupName.trim().isEmpty()) {
-            return ResponseEntity.badRequest().body("El nombre del grupo es obligatorio.");
-        }
-
-        if (userIds == null || userIds.size() < 2) {
-            return ResponseEntity.badRequest().body("Debes seleccionar al menos 2 usuarios.");
-        }
-
         User creator = userRepositorio.findByUsername(userDetails.getUsername())
             .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-        
-        String grupoFoto = groupPhoto.getOriginalFilename();
+
+        String grupoFoto = groupPhoto != null ? groupPhoto.getOriginalFilename() : null;
         Conversations conversation = new Conversations();
         conversation.setGroupName(groupName);
         conversation.setCreatedBy(creator);
@@ -227,10 +259,9 @@ public class ChatsController {
         conversation.setGroup(true);
         conversation.setCreatedAt(LocalDateTime.now());
 
-
         conversation = conversationsRepositorio.save(conversation);
 
-        userIds.add(creator.getId()); // Agregar también al creador
+        userIds.add(creator.getId()); // Agregar también al creadoraaa
 
         for (Integer id : userIds) {
             User user = userRepositorio.findById(id)
@@ -248,7 +279,13 @@ public class ChatsController {
             conversationParticipantsRepositorio.save(participant);
         }
 
-        return ResponseEntity.ok(conversation);
+        // Retornar DTO
+        ConversationSimpleDTO dto = new ConversationSimpleDTO();
+        dto.setId(conversation.getId());
+        dto.setGroupName(conversation.getGroupName());
+        dto.setIsGroup(conversation.isGroup());
+        dto.setGroupPhoto(conversation.getGroupPhoto());
+        return dto;
     }
 
     
@@ -280,5 +317,105 @@ public class ChatsController {
         }
 
         return ResponseEntity.ok(chatDetails);
+    }
+    
+    
+    @PostMapping("/{groupId}/agregarUsuario")
+    @ResponseBody
+    public ResponseEntity<?> agregarUsuarioAGrupo(
+            @PathVariable Integer groupId,
+            @RequestParam("userId") Integer userId,
+            @AuthenticationPrincipal UserDetails userDetails) {
+
+        // 1. Verifica que la conversación existe y es grupoaaaa
+        Conversations grupo = conversationsRepositorio.findById(groupId)
+            .orElseThrow(() -> new RuntimeException("Grupo no encontrado"));
+        if (!grupo.isGroup()) {
+            return ResponseEntity.badRequest().body("La conversación no es un grupo.");
+        }
+
+        // 2. Verifica que el usuario existe
+        User usuario = userRepositorio.findById(userId)
+            .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        // 3. Verifica si ya es participante
+        ConversationParticipantsId cpId = new ConversationParticipantsId();
+        cpId.setConversationId(groupId);
+        cpId.setUserId(userId);
+
+        boolean yaEsParticipante = conversationParticipantsRepositorio.existsById(cpId);
+        if (yaEsParticipante) {
+            return ResponseEntity.badRequest().body("El usuario ya es participante del grupo.");
+        }
+
+        // 4. Agrega el participante
+        ConversationParticipants participante = new ConversationParticipants();
+        participante.setId(cpId);
+        participante.setConversation(grupo);
+        participante.setUser(usuario);
+        participante.setJoinedAt(LocalDateTime.now());
+        conversationParticipantsRepositorio.save(participante);
+
+        return ResponseEntity.ok("Usuario agregado al grupo correctamente.");
+    }
+    
+    
+    @PostMapping("/{chatId}/eliminar")
+    @ResponseBody
+    public ResponseEntity<?> eliminarChat(
+            @PathVariable Integer chatId,
+            @AuthenticationPrincipal UserDetails userDetails) {
+
+        User user = userRepositorio.findByUsername(userDetails.getUsername())
+            .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        Conversations chat = conversationsRepositorio.findById(chatId)
+            .orElseThrow(() -> new RuntimeException("Chat no encontrado"));
+
+        if (!chat.getCreatedBy().getId().equals(user.getId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Solo el creador puede eliminar el chat.");
+        }
+
+        // Elimina la conversación y sus participantes (por cascada)
+        conversationsRepositorio.delete(chat);
+
+        return ResponseEntity.ok("Chat eliminado correctamente.");
+    }
+    
+    @PostMapping("/{chatId}/salir")
+    @ResponseBody
+    public ResponseEntity<?> salirDeGrupo(
+            @PathVariable Integer chatId,
+            @AuthenticationPrincipal UserDetails userDetails) {
+
+        User user = userRepositorio.findByUsername(userDetails.getUsername())
+            .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        Conversations chat = conversationsRepositorio.findById(chatId)
+            .orElseThrow(() -> new RuntimeException("Chat no encontrado"));
+
+        // Solo aplica para grupos
+        if (!chat.isGroup()) {
+            return ResponseEntity.badRequest().body("Solo puedes salir de grupos.");
+        }
+
+        // No permitir que el creador salga (puede eliminar el grupo, pero no salir)aaaaaaa
+        if (chat.getCreatedBy().getId().equals(user.getId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body("El creador no puede salir del grupo, solo eliminarlo.");
+        }
+
+        // Elimina al usuario de los participantes
+        ConversationParticipantsId cpId = new ConversationParticipantsId();
+        cpId.setConversationId(chatId);
+        cpId.setUserId(user.getId());
+
+        if (!conversationParticipantsRepositorio.existsById(cpId)) {
+            return ResponseEntity.badRequest().body("No eres participante de este grupo.");
+        }
+
+        conversationParticipantsRepositorio.deleteById(cpId);
+
+        return ResponseEntity.ok("Has salido del grupo correctamente.");
     }
 }

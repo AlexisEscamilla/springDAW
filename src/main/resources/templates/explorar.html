@@ -233,6 +233,38 @@
             contenedor.appendChild(link);
           });
         }
+
+                // Playlists
+        if (data.playlists && data.playlists.length > 0) {
+          const h3 = document.createElement("h3");
+          h3.textContent = "Playlists";
+          contenedor.appendChild(h3);
+
+          data.playlists.forEach((p) => {
+            const link = document.createElement("a");
+            link.href = `/mostrarPlaylist/${p.id}`;
+            link.classList.add("resultado-item");
+
+            const wrapper = document.createElement("div");
+            wrapper.classList.add("resultado-contenido");
+
+            const img = document.createElement("img");
+            img.src = p.coverImage;
+            img.alt = p.title;
+            img.classList.add("resultado-img");
+
+            const texto = document.createElement("div");
+            texto.innerHTML = `
+              <strong>📋 ${p.title}</strong><br>
+              <small>Por: ${p.userNombre || p.user?.nombre || "Usuario"}</small>
+            `;
+
+            wrapper.appendChild(img);
+            wrapper.appendChild(texto);
+            link.appendChild(wrapper);
+            contenedor.appendChild(link);
+          });
+        }
       }
 
       // Función para mostrar duración en formato mm:ss

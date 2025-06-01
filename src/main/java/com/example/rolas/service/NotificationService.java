@@ -20,7 +20,6 @@ public class NotificationService {
         notification.setType(type);
         notification.setSourceUser(sourceUser);
         notification.setContentId(contentId);
-        notification.setIsRead(false); // Notificación no leída por defecto
         return notificationRepository.save(notification);
     }
 
@@ -28,9 +27,4 @@ public class NotificationService {
         return notificationRepository.findByUserIdOrderByCreatedAtDesc(userId);
     }
 
-    public void markNotificationsAsRead(Integer userId) {
-        List<Notification> notifications = notificationRepository.findByUserIdOrderByCreatedAtDesc(userId);
-        notifications.forEach(notification -> notification.setIsRead(true));
-        notificationRepository.saveAll(notifications);
-    }
 }

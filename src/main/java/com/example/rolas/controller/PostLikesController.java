@@ -3,6 +3,7 @@ package com.example.rolas.controller;
 import com.example.rolas.model.Post;
 import com.example.rolas.model.PostLikes;
 import com.example.rolas.model.User;
+import com.example.rolas.service.NotificationService;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -28,6 +29,9 @@ public class PostLikesController {
     @Autowired
     private UserRepositorio userRepository;
 
+    @Autowired
+    private NotificationService notificationService;
+    
     @PostMapping("/{postId}/likes")
     public String toggleLike(@PathVariable Integer postId, 
                              @AuthenticationPrincipal UserDetails userDetails,
@@ -49,7 +53,14 @@ public class PostLikesController {
             post.setLikeCount(post.getLikeCount() + 1);
             postLikesRepository.save(like);
         }
-
+        
+     // Supón que tienes: user (quien recibe el like), sourceUser (quien da el like), songId o postId
+        notificationService.createNotification(
+            post.getUser(),                // usuario que recibe la notificación (dueño de la canción/post)
+            "like",              // tipo
+            user,          // usuario que da el like
+            post.getId()               // id de la canción o post
+        );
         postRepository.save(post);
 
         // Redirige a la página desde donde vino el usuario

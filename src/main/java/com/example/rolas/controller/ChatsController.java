@@ -376,7 +376,7 @@ public class ChatsController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Solo el creador puede eliminar el chat.");
         }
 
-        // Elimina la conversación y sus participantes (por cascada)
+        // Elimina la conversación y sus participantes (por cascada)aa
         conversationsRepositorio.delete(chat);
 
         return ResponseEntity.ok("Chat eliminado correctamente.");

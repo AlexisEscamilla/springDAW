@@ -23,21 +23,10 @@ public class Notification {
     private User sourceUser; // Usuario que genera la notificación
 
     @Column(nullable = false)
-    private String type; // Tipo de notificación (like, comment, new_follower)
-    
-    @Column(name = "is_read")
-    private boolean isRead; // Tipo de notificación (like, comment, new_follower)
-
-    public boolean getIsRead() {
-		return isRead;
-	}
-
-	public void setIsRead(boolean isRead) {
-		this.isRead = isRead;
-	}
+    private String type; // Tipo de notificación (like, comment, new_follower)aaaa
 
 	@Column(name = "content_id")
-    private Integer contentId; // ID del contenido relacionado (canción, comentario, etc.)
+    private Integer contentId; // ID del contenido relacionado (canción, comentario, etc.)<<<aaaaaa
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();

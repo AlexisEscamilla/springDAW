@@ -65,7 +65,7 @@ public class SongLikesController {
                     song.getId()      // ID de la canción
                 );
             });
-
+            
             return "liked";
         }
     }

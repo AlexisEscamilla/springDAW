@@ -1,10 +1,12 @@
 package com.example.rolas.controller;
 
+import com.example.rolas.DTO.NotificationDTO;
 import com.example.rolas.model.Notification;
 import com.example.rolas.model.User;
 import com.example.rolas.service.NotificationService;
 import com.example.rolas.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
@@ -44,4 +46,30 @@ public class NotificationController {
         User sourceUser = sourceUserId != null ? userService.findById(sourceUserId) : null;
         return notificationService.createNotification(user, type, sourceUser, contentId);
     }
+    
+    @GetMapping("/data")
+    @ResponseBody
+    public List<NotificationDTO> getNotificationsData(@AuthenticationPrincipal UserDetails userDetails) {
+        User user = userService.findByUsername(userDetails.getUsername());
+        List<Notification> notifications = notificationService.getNotificationsForUser(user.getId());
+
+        return notifications.stream().map(notification -> {
+            NotificationDTO dto = new NotificationDTO();
+            dto.setId(notification.getId());
+            dto.setType(notification.getType());
+           
+            dto.setCreatedAt(notification.getCreatedAt());
+            dto.setContentId(notification.getContentId());
+
+            NotificationDTO.SourceUserDTO sourceUserDTO = new NotificationDTO.SourceUserDTO();
+            if (notification.getSourceUser() != null) {
+                sourceUserDTO.setId(notification.getSourceUser().getId());
+                sourceUserDTO.setUsername(notification.getSourceUser().getUsername());
+            }
+            dto.setSourceUser(sourceUserDTO);
+
+            return dto;
+        }).toList();
+    }
+    
 }

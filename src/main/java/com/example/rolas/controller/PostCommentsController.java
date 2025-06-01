@@ -3,6 +3,7 @@ package com.example.rolas.controller;
 import com.example.rolas.model.Post;
 import com.example.rolas.model.PostComments;
 import com.example.rolas.model.User;
+import com.example.rolas.service.NotificationService;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -35,6 +36,9 @@ public class PostCommentsController {
     @Autowired
     private UserRepositorio userRepository;
 
+    @Autowired
+    private NotificationService notificationService;
+    
     @PostMapping("/{postId}/comments")
     public String addComment(@PathVariable Integer postId,
                              @AuthenticationPrincipal UserDetails userDetails,
@@ -66,7 +70,14 @@ public class PostCommentsController {
         post.setCommentCount(post.getCommentCount() + 1);
         postRepository.save(post);
         postCommentsRepository.save(comment);
-
+        
+        notificationService.createNotification(
+        	    post.getUser(),           // usuario que recibe la notificación (dueño de la canción/post)
+        	    "comment",           // tipo
+        	    user,       // usuario que comenta
+        	    post.getId()               // id de la canción o post
+        	);
+        
         String referer = request.getHeader("Referer");
         return "redirect:" + (referer != null ? referer : "/feed");
     }

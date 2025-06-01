@@ -2,7 +2,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Notificaciones</title>
+    <title>Notificaciones - Música App</title>
     <style>
       :root {
         --primary: #4f46e5;
@@ -13,7 +13,6 @@
         --card-bg: rgba(30, 41, 59, 0.5);
         --border-color: rgba(255, 255, 255, 0.1);
       }
-
       * {
         margin: 0;
         padding: 0;
@@ -26,101 +25,28 @@
         background-color: var(--dark);
         color: var(--light);
         overflow-x: hidden;
+        line-height: 1.6;
       }
 
       .container {
         max-width: 1200px;
         margin: 0 auto;
-        padding: 0 20px;
+        padding: 20px;
       }
 
-      /* Header */
-      header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 24px 0;
-        position: relative;
-        z-index: 10;
-      }
-
-      .logo {
-        font-size: 44px;
-        margin-left: 450px;
-        font-weight: 700;
-        background: linear-gradient(to right, var(--primary), var(--accent));
-        -webkit-background-clip: text;
-        background-clip: text;
-        -webkit-text-fill-color: transparent;
-        display: flex;
-        align-items: center;
-      }
-
-      .logo-icon {
-        width: 8px;
-        height: 35px;
-        margin-right: 12px;
-        margin-left: 12px;
-        background: linear-gradient(to right, var(--primary), var(--secondary));
-        border-radius: 8px;
+      .avatar {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        background: linear-gradient(45deg, #8b5cf6, #a855f7);
         display: flex;
         align-items: center;
         justify-content: center;
-      }
-
-      .imagi {
-        width: 70px;
-        height: 70px;
-      }
-
-      nav ul {
-        display: flex;
-        list-style: none;
-        gap: 32px;
-      }
-
-      nav a {
-        color: var(--light);
-        text-decoration: none;
-        font-weight: 500;
-        transition: color 0.2s;
-      }
-
-      nav a:hover {
-        color: var(--accent);
-      }
-
-      .action-buttons {
-        display: flex;
-        gap: 16px;
-      }
-
-      .btn {
-        padding: 10px 20px;
-        border-radius: 8px;
-        font-weight: 500;
-        cursor: pointer;
-        transition: all 0.2s;
-      }
-
-      .btn-primary {
-        background: linear-gradient(to right, var(--primary), var(--secondary));
+        font-size: 48px;
+        font-weight: bold;
         color: white;
-        border: none;
-        font-size: 15px;
+        box-shadow: 0 10px 30px rgba(139, 92, 246, 0.3);
       }
-
-      .btn-outline {
-        background: transparent;
-        color: var(--light);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-      }
-
-      .btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-      }
-
       /* Background effects */
       .bg-gradient {
         position: absolute;
@@ -170,392 +96,6 @@
         }
       }
 
-      /* Feed Layout */
-      .feed-container {
-        display: grid;
-        grid-template-columns: 1fr 2.5fr 1fr;
-        gap: 24px;
-        padding: 40px 0;
-        position: relative;
-        z-index: 2;
-      }
-
-      /* Sidebar */
-      .sidebar {
-        background: var(--card-bg);
-        border: 1px solid var(--border-color);
-        border-radius: 12px;
-        padding: 24px;
-        height: fit-content;
-        position: sticky;
-        top: 24px;
-      }
-
-      .avatar-img {
-        width: 100px;
-        height: 100px;
-        border-radius: 50%;
-        object-fit: cover;
-      }
-
-      .avatar-imgcreator {
-        width: 170px;
-        height: 170px;
-        object-fit: cover;
-      }
-
-      .avatar-placeholder {
-        width: 100px;
-        height: 100px;
-        background-color: #ddd;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 36px;
-        color: #555;
-      }
-
-      .profile-card {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        margin-bottom: 24px;
-        padding-bottom: 24px;
-        border-bottom: 1px solid var(--border-color);
-      }
-
-      .profile-avatar {
-        width: 80px;
-        height: 80px;
-        border-radius: 50%;
-        background: linear-gradient(to right, var(--primary), var(--secondary));
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-size: 32px;
-        font-weight: bold;
-        margin-bottom: 16px;
-      }
-
-      .profile-song {
-        width: 250px;
-        height: 250px;
-        background: linear-gradient(to right, var(--primary), var(--secondary));
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-size: 32px;
-        font-weight: bold;
-        margin-bottom: 16px;
-      }
-
-      .profile-songlist {
-        width: 50px;
-        height: 50px;
-        background: linear-gradient(to right, var(--primary), var(--secondary));
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-size: 32px;
-        font-weight: bold;
-        margin-bottom: 16px;
-        flex-shrink: 0;
-        margin-right: 16px;
-      }
-
-      .avatar-imgcreator {
-        width: 250px;
-        height: 250px;
-        object-fit: cover;
-      }
-
-      .avatar-imgcreatorlist {
-        width: 60px;
-        height: 60px;
-        object-fit: cover;
-      }
-
-      .profile-name {
-        font-size: 18px;
-        font-weight: 600;
-        margin-bottom: 8px;
-      }
-
-      .profile-username {
-        color: rgba(255, 255, 255, 0.6);
-        margin-bottom: 16px;
-      }
-
-      .profile-stats {
-        display: flex;
-        justify-content: space-between;
-        width: 100%;
-      }
-
-      .stat {
-        text-align: center;
-      }
-
-      .stat-value {
-        font-weight: bold;
-        font-size: 18px;
-      }
-
-      .stat-label {
-        font-size: 12px;
-        color: rgba(255, 255, 255, 0.6);
-      }
-
-      .sidebar-menu h3 {
-        font-size: 16px;
-        margin-bottom: 16px;
-      }
-
-      .menu-item {
-        display: flex;
-        align-items: center;
-        padding: 12px 16px;
-        border-radius: 8px;
-        margin-bottom: 8px;
-        cursor: pointer;
-        transition: background 0.2s;
-        text-decoration: none; /* Elimina el subrayado de los enlaces */
-        color: inherit; /* Hereda el color del contenedor */
-      }
-
-      .menu-item:hover {
-        background: rgba(255, 255, 255, 0.05);
-      }
-
-      .menu-item.active {
-        background: rgba(79, 70, 229, 0.2);
-        border-left: 3px solid var(--primary);
-      }
-
-      .menu-text {
-        font-weight: 500;
-        color: inherit; /* Asegura que el texto herede el color del enlace */
-      }
-
-      /* Main feed */
-      .post-creator {
-        background: var(--card-bg);
-        border: 1px solid var(--border-color);
-        border-radius: 12px;
-        padding: 24px;
-        place-items: center;
-        margin-bottom: 24px;
-      }
-
-      .post-input-container {
-        display: flex;
-        gap: 16px;
-        margin-bottom: 16px;
-      }
-
-      .creator-avatar {
-        width: 48px;
-        height: 48px;
-        border-radius: 50%;
-        background: linear-gradient(to right, var(--primary), var(--secondary));
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-weight: bold;
-        flex-shrink: 0;
-      }
-
-      .post-input {
-        flex-grow: 1;
-        background: rgba(15, 23, 42, 0.7);
-        border: 1px solid var(--border-color);
-        border-radius: 8px;
-        padding: 12px 16px;
-        color: white;
-        resize: none;
-        min-height: 60px;
-      }
-
-      .post-input:focus {
-        outline: none;
-        border-color: var(--primary);
-      }
-
-      .post-actions {
-        display: flex;
-        align-items: center;
-      }
-
-      .post-attachments {
-        display: flex;
-        gap: 16px;
-      }
-
-      .attachment-btn {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        color: rgba(255, 255, 255, 0.7);
-        background: transparent;
-        border: none;
-        cursor: pointer;
-        font-size: 14px;
-        padding: 8px 12px;
-        border-radius: 6px;
-        transition: background 0.2s;
-      }
-
-      .attachment-btn:hover {
-        background: rgba(255, 255, 255, 0.05);
-        color: white;
-      }
-
-      .post {
-        background: var(--card-bg);
-        border: 1px solid var(--border-color);
-        border-radius: 12px;
-        padding: 24px;
-        margin-bottom: 24px;
-        transition: transform 0.2s;
-      }
-
-      .post:hover {
-        transform: translateY(-2px);
-      }
-
-      .post-header {
-        display: flex;
-        align-items: center;
-        margin-bottom: 16px;
-      }
-
-      .post-user-info {
-        margin-left: 12px;
-      }
-
-      .post-user-name {
-        font-weight: 600;
-        font-size: 16px;
-      }
-
-      .post-username,
-      .post-time {
-        color: rgba(255, 255, 255, 0.6);
-        font-size: 14px;
-      }
-
-      .post-content {
-        margin-bottom: 16px;
-        line-height: 1.5;
-      }
-
-      .post-image {
-        width: 100%;
-        border-radius: 8px;
-        margin-bottom: 16px;
-        border: 1px solid var(--border-color);
-      }
-
-      .post-interactions {
-        display: flex;
-        justify-content: space-between;
-        padding-top: 16px;
-        border-top: 1px solid var(--border-color);
-      }
-
-      .interaction {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        color: rgba(255, 255, 255, 0.7);
-        cursor: pointer;
-        transition: color 0.2s;
-      }
-
-      .interaction:hover {
-        color: var(--accent);
-      }
-
-      /* Trending sidebar */
-      .trending-card {
-        padding: 16px;
-        background: rgba(15, 23, 42, 0.7);
-        border-radius: 8px;
-        margin-bottom: 16px;
-      }
-
-      .trending-cardLista {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 16px;
-        background: rgba(15, 23, 42, 0.7);
-        border-radius: 8px;
-        margin-bottom: 16px;
-      }
-      .trending-title {
-        font-size: 16px;
-        font-weight: 600;
-        margin-bottom: 12px;
-      }
-
-      .trending-meta {
-        font-size: 12px;
-        color: rgba(255, 255, 255, 0.6);
-        margin-bottom: 9px;
-      }
-
-      .btn-play {
-        background: var(--primary);
-        color: white;
-        border: none;
-        border-radius: 50%;
-        width: 40px;
-        height: 40px;
-        font-size: 18px;
-        margin-left: 340px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        transition: background 0.2s;
-      }
-
-      .btn-play:hover {
-        background: var(--secondary);
-      }
-
-      .who-to-follow-item {
-        display: flex;
-        align-items: center;
-        padding: 12px 0;
-        border-bottom: 1px solid var(--border-color);
-      }
-
-      .who-to-follow-item:last-child {
-        border-bottom: none;
-      }
-
-      .follow-info {
-        flex-grow: 1;
-        margin-left: 12px;
-      }
-
-      .follow-name {
-        font-weight: 600;
-        font-size: 14px;
-      }
-
-      .follow-username {
-        font-size: 12px;
-        color: rgba(255, 255, 255, 0.6);
-      }
-
       /* Responsive */
       @media (max-width: 1200px) {
         .feed-container {
@@ -579,11 +119,6 @@
         nav ul {
           display: none;
         }
-      }
-
-      .ajuste {
-        width: 25px;
-        height: 25px;
       }
 
       .modal {
@@ -643,85 +178,828 @@
         max-height: 300px; /* Ajusta según la cantidad de canciones esperadas */
         opacity: 1;
       }
+      /* Cabecera */
+      .header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 10px;
+        background-color: rgba(35, 36, 66, 0.8);
+        backdrop-filter: blur(10px);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+      }
+
+      .logo {
+        font-size: 44px;
+        margin-left: 450px;
+        font-weight: 700;
+        background: linear-gradient(to right, var(--primary), var(--accent));
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        display: flex;
+        align-items: center;
+      }
+
+      .logo-icon {
+        width: 8px;
+        height: 35px;
+        margin-right: 12px;
+        margin-left: 12px;
+        background: linear-gradient(to right, var(--primary), var(--secondary));
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .imagi {
+        width: 70px;
+        height: 70px;
+      }
+
+      .eliminaCuenta {
+        text-align: center;
+        margin-top: 20px;
+      }
+
+      .tituloLogo {
+        color: white;
+        text-decoration: none;
+        font-size: 24px;
+        margin-left: 10px;
+      }
+      .tituloNAV {
+        color: white;
+        text-decoration: none;
+        font-size: 20px;
+        margin-left: 25px;
+      }
+
+      .nav-links {
+        display: flex;
+      }
+
+      .nav-link {
+        margin-left: 20px;
+        cursor: pointer;
+        transition: color 0.2s;
+      }
+
+      .nav-link:hover {
+        color: var(--primary);
+      }
+      nav ul {
+        display: flex;
+        list-style: none;
+        gap: 32px;
+      }
+
+      nav a {
+        color: var(--light);
+        text-decoration: none;
+        font-weight: 500;
+        transition: color 0.2s;
+      }
+
+      nav a:hover {
+        color: var(--accent);
+      }
+
+      .action-buttons {
+        display: flex;
+        gap: 16px;
+      }
+
+      /* Header */
+      .notifications-header {
+        background: rgba(255, 255, 255, 0.08);
+        backdrop-filter: blur(15px);
+        border-radius: 20px;
+        padding: 30px;
+        margin-bottom: 25px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .header-title {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+      }
+
+      .notification-icon {
+        width: 50px;
+        height: 50px;
+        background: linear-gradient(45deg, #8b5cf6, #a855f7);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        box-shadow: 0 8px 25px rgba(139, 92, 246, 0.3);
+      }
+
+      .title-text h1 {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 5px;
+      }
+
+      .title-text p {
+        color: #a0a0a0;
+        font-size: 0.95rem;
+      }
+
+      .header-actions {
+        display: flex;
+        gap: 10px;
+      }
+
+      .btn {
+        padding: 10px 20px;
+        border-radius: 20px;
+        border: none;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        font-size: 0.9rem;
+      }
+
+      .btn-primary {
+        background: linear-gradient(45deg, #8b5cf6, #a855f7);
+        color: white;
+      }
+
+      .btn-secondary {
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+
+      .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+      }
+
+      /* Filtros */
+      .notification-filters {
+        display: flex;
+        gap: 10px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 15px;
+        padding: 8px;
+        margin-bottom: 25px;
+        backdrop-filter: blur(10px);
+        flex-wrap: wrap;
+      }
+
+      .filter-btn {
+        flex: 1;
+        min-width: 120px;
+        padding: 12px 16px;
+        background: transparent;
+        border: none;
+        color: #a0a0a0;
+        cursor: pointer;
+        border-radius: 10px;
+        transition: all 0.3s ease;
+        font-size: 0.9rem;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+      }
+
+      .filter-btn.active {
+        background: linear-gradient(45deg, #8b5cf6, #a855f7);
+        color: white;
+        transform: translateY(-2px);
+      }
+
+      .filter-count {
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 12px;
+        padding: 2px 8px;
+        font-size: 0.8rem;
+        font-weight: 600;
+      }
+
+      /* Lista de notificaciones */
+      .notifications-list {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+      }
+
+      .notification-item {
+        background: rgba(255, 255, 255, 0.06);
+        backdrop-filter: blur(10px);
+        border-radius: 16px;
+        padding: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .notification-item:hover {
+        background: rgba(255, 255, 255, 0.1);
+        transform: translateY(-3px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      }
+
+      .notification-content {
+        display: flex;
+        align-items: flex-start;
+        gap: 15px;
+      }
+
+      .notification-avatar {
+        width: 50px;
+        height: 50px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        font-weight: 600;
+        flex-shrink: 0;
+      }
+
+      .avatar-follow {
+        background: linear-gradient(45deg, #10b981, #059669);
+      }
+      .avatar-like {
+        background: linear-gradient(45deg, #ef4444, #dc2626);
+      }
+      .avatar-comment {
+        background: linear-gradient(45deg, #3b82f6, #2563eb);
+      }
+      .avatar-playlist {
+        background: linear-gradient(45deg, #f59e0b, #d97706);
+      }
+      .avatar-release {
+        background: linear-gradient(45deg, #8b5cf6, #7c3aed);
+      }
+      .avatar-system {
+        background: linear-gradient(45deg, #6b7280, #4b5563);
+      }
+
+      .notification-info {
+        flex: 1;
+      }
+
+      .notification-title {
+        font-size: 1.05rem;
+        font-weight: 600;
+        margin-bottom: 6px;
+        line-height: 1.4;
+      }
+
+      .notification-description {
+        color: #a0a0a0;
+        font-size: 0.9rem;
+        line-height: 1.5;
+        margin-bottom: 8px;
+      }
+
+      .notification-meta {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: 12px;
+      }
+
+      .notification-time {
+        color: #6b7280;
+        font-size: 0.85rem;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      }
+
+      .notification-actions {
+        display: flex;
+        gap: 8px;
+      }
+
+      .action-btn {
+        padding: 6px 12px;
+        border: none;
+        border-radius: 15px;
+        cursor: pointer;
+        font-size: 0.8rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+      }
+
+      .action-accept {
+        background: linear-gradient(45deg, #10b981, #059669);
+        color: white;
+      }
+
+      .action-decline {
+        background: rgba(239, 68, 68, 0.2);
+        color: #ef4444;
+        border: 1px solid rgba(239, 68, 68, 0.3);
+      }
+
+      .action-view {
+        background: rgba(59, 130, 246, 0.2);
+        color: #3b82f6;
+        border: 1px solid rgba(59, 130, 246, 0.3);
+      }
+
+      .action-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+      }
+
+      /* Sección vacía */
+      .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 16px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .empty-icon {
+        font-size: 4rem;
+        margin-bottom: 20px;
+        opacity: 0.5;
+      }
+
+      .empty-title {
+        font-size: 1.3rem;
+        font-weight: 600;
+        margin-bottom: 10px;
+      }
+
+      .empty-description {
+        color: #a0a0a0;
+        font-size: 0.95rem;
+      }
+
+      /* Paginación */
+      .pagination {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+        margin-top: 30px;
+        padding: 20px;
+      }
+
+      .page-btn {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        border: none;
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .page-btn.active {
+        background: linear-gradient(45deg, #8b5cf6, #a855f7);
+      }
+
+      .page-btn:hover:not(.active) {
+        background: rgba(255, 255, 255, 0.15);
+      }
+
+      /* Responsive */
+      @media (max-width: 768px) {
+        .notifications-header {
+          flex-direction: column;
+          gap: 20px;
+          text-align: center;
+        }
+
+        .notification-filters {
+          flex-direction: column;
+        }
+
+        .filter-btn {
+          min-width: auto;
+        }
+
+        .notification-content {
+          flex-direction: column;
+          gap: 10px;
+        }
+
+        .notification-meta {
+          flex-direction: column;
+          gap: 10px;
+          align-items: flex-start;
+        }
+      }
+
+      .watermark {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        color: rgba(255, 255, 255, 0.3);
+        font-size: 0.8rem;
+      }
     </style>
   </head>
   <body>
-    <div class="bg-gradient bg-gradient-1"></div>
-    <div class="bg-gradient bg-gradient-2"></div>
-    <div class="bg-gradient bg-gradient-3"></div>
+    <div class="header">
+      <div class="logo">
+        <img
+          class="imagi"
+          src="https://images.vexels.com/media/users/3/150846/isolated/preview/a77bce5e752802277f78088150b16923-musica-de-icono-de-auriculares-de-audio.png"
+          alt="rolas"
+        />
+        <div class="logo-icon"></div>
+        <a href="/feed" class="tituloLogo">Rolas</a>
+      </div>
+
+      <div class="nav-links">
+        <a class="nav-link tituloNAV" href="/feed">Home</a>
+        <a class="nav-link tituloNAV" href="/explorar">Explorar</a>
+        <a class="nav-link tituloNAV" href="/mostrarNotificaciones"
+          >Notificaciones</a
+        >
+        <a class="nav-link tituloNAV" href="/chats">Chats</a>
+        <a class="nav-link tituloNAV" href="/colecciones">Colecciones</a>
+      </div>
+
+      <div class="user-menu">
+        <!-- Botón que abre el modal -->
+        <button type="button" class="btn btn-primary" onclick="abrirModal()">
+          Cerrar Sesión
+        </button>
+      </div>
+    </div>
     <div class="container">
-      <header>
-        <div class="logo">
-          <img
-            class="imagi"
-            src="https://images.vexels.com/media/users/3/150846/isolated/preview/a77bce5e752802277f78088150b16923-musica-de-icono-de-auriculares-de-audio.png"
-            alt="rolas"
-          />
-          <div class="logo-icon"></div>
-          <a href="/feed">Rolas</a>
+      <!-- VERDADERO Header -->
+
+      <div class="modal" id="modalLogout">
+        <div class="modal-content">
+          <h2>¿Estás seguro de que quieres cerrar sesión?</h2>
+          <div class="modal-buttons">
+            <button class="btn btn-secondary" onclick="cerrarModal()">
+              Cancelar
+            </button>
+            <form th:action="@{/logout}" method="post">
+              <button type="submit" class="btn btn-danger">
+                Cerrar Sesión
+              </button>
+            </form>
+          </div>
         </div>
+      </div>
+      <!-- Header FALSO-->
+      <div class="notifications-header">
+        <div class="header-title">
+          <div class="notification-icon">
+            <img
+              style="width: 40px; height: 40px"
+              src="https://cdn-icons-png.flaticon.com/512/10099/10099006.png"
+              alt="rolas"
+            />
+          </div>
+          <div class="title-text">
+            <h1>Notificaciones</h1>
+            <p>Mantente al día con toda tu actividad musical</p>
+          </div>
+        </div>
+      </div>
 
-        <a href="/colecciones" class="btn btn-back">⬅ Volver</a>
-      </header>
+      <!-- Filtros -->
+      <div class="notification-filters">
+        <button class="filter-btn active" onclick="filterNotifications('all')">
+          Todas <span class="filter-count">12</span>
+        </button>
+        <button
+          class="filter-btn"
+          onclick="filterNotifications('new_follower')"
+        >
+          Seguidores <span class="filter-count">3</span>
+        </button>
+        <button class="filter-btn" onclick="filterNotifications('like')">
+          Me gusta <span class="filter-count">5</span>
+        </button>
+        <button class="filter-btn" onclick="filterNotifications('comment')">
+          Comentarios <span class="filter-count">2</span>
+        </button>
+      </div>
 
-      <main>
-        <h1>Notificaciones</h1>
-        <ul id="notificationsList" class="notifications-list">
-          <li th:each="notification : ${notificaciones}">
-            <span th:switch="${notification.type}">
-              <span th:case="'new_follower'">
-                👤
-                <span th:text="${notification.sourceUser.username}"></span>
-                comenzó a seguirte.
-              </span>
-              <span th:case="'like'">
-                ❤️
-                <span th:text="${notification.sourceUser.username}"></span> le
-                dio like a tu canción.
-              </span>
-              <span th:case="'comment'">
-                💬
-                <span th:text="${notification.sourceUser.username}"></span>
-                comentó en tu adwsfefgegfcanción.
-              </span>
-              <span th:case="*">🔔 Notificación desconocida</span>
-            </span>
-          </li>
-        </ul>
-      </main>
+      <!-- Lista de notificaciones -->
+      <div class="notifications-list" id="notificationsList">
+        <!-- Aquí se insertarán las notificaciones dinámicamente -->
+      </div>
+
+      <!-- Paginación -->
+      <div class="pagination"></div>
     </div>
 
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <div class="watermark">Diseño mostrarNotificaciones - Sistema completo</div>
+
     <script>
+      // ...existing code...
+
+      let allNotifications = [];
+      let filteredNotifications = [];
+      let currentPage = 1;
+      const pageSize = 6;
+      let currentFilter = "all";
+
+      function renderNotificationsPage(page) {
+        const notificationsList = document.getElementById("notificationsList");
+        notificationsList.innerHTML = "";
+
+        const start = (page - 1) * pageSize;
+        const end = start + pageSize;
+        const pageNotifications = filteredNotifications.slice(start, end);
+
+        if (pageNotifications.length === 0) {
+          showEmptyState(currentFilter);
+          return;
+        }
+
+        pageNotifications.forEach((notification) => {
+          let avatarClass = "";
+          let avatarImg = "";
+          let title = "";
+          let description = "";
+          let actionBtn = "";
+
+          switch (notification.type) {
+            case "new_follower":
+              avatarClass = "avatar-follow";
+              avatarImg =
+                "https://cdn-icons-png.flaticon.com/512/983/983886.png";
+              title = "¡Nuevo seguidor!";
+              description = `<strong>@${notification.sourceUser.username}</strong> comenzó a seguirte.`;
+              actionBtn = `<button class="action-btn action-view" onclick="window.location.href='/mostrarPerfil/${notification.sourceUser.id}'">Ver perfil</button>`;
+              break;
+            case "like":
+              avatarClass = "avatar-like";
+              avatarImg =
+                "https://cdn-icons-png.flaticon.com/512/12484/12484083.png";
+              title = "Le gustó tu canción";
+              description = `A <strong>@${notification.sourceUser.username}</strong> le gustó tu canción.`;
+              actionBtn = `<button class="action-btn action-view" onclick="window.location.href='/cancion/${notification.contentId}'">Ver canción</button>`;
+              break;
+            case "comment":
+              avatarClass = "avatar-comment";
+              avatarImg =
+                "https://cdn-icons-png.flaticon.com/512/1380/1380338.png";
+              title = "Nuevo comentario";
+              description = `<strong>@${notification.sourceUser.username}</strong> comentó en tu canción.`;
+              actionBtn = `<button class="action-btn action-view" onclick="window.location.href='/cancion/${notification.contentId}'">Ver comentario</button>`;
+              break;
+            case "playlist":
+              avatarClass = "avatar-playlist";
+              avatarImg =
+                "https://cdn-icons-png.freepik.com/512/6680/6680955.png";
+              title = "Agregado a playlist";
+              description = `Tu canción fue agregada a una playlist por <strong>@${notification.sourceUser.username}</strong>.`;
+              actionBtn = `<button class="action-btn action-view" onclick="window.location.href='/playlist/${notification.contentId}'">Ver playlist</button>`;
+              break;
+            default:
+              avatarClass = "avatar-system";
+              avatarImg =
+                "https://cdn-icons-png.flaticon.com/512/10099/10099006.png";
+              title = "Notificación";
+              description = "Tienes una nueva notificación.";
+              actionBtn = "";
+          }
+
+          const createdAt = new Date(notification.createdAt);
+          const now = new Date();
+          const diffMs = now - createdAt;
+          let timeAgo = "Hace unos segundos";
+          if (diffMs > 60000) {
+            const mins = Math.floor(diffMs / 60000);
+            timeAgo = `Hace ${mins} minuto${mins > 1 ? "s" : ""}`;
+          }
+          if (diffMs > 3600000) {
+            const hours = Math.floor(diffMs / 3600000);
+            timeAgo = `Hace ${hours} hora${hours > 1 ? "s" : ""}`;
+          }
+
+          const notificationHTML = `
+      <div class="notification-item" data-type="${notification.type}" data-id="${notification.id}">
+        <div class="notification-content">
+          <div class="notification-avatar ${avatarClass}">
+            <img style="width: 40px; height: 40px" src="${avatarImg}" alt="rolas" />
+          </div>
+          <div class="notification-info">
+            <div class="notification-title">${title}</div>
+            <div class="notification-description">${description}</div>
+            <div class="notification-meta">
+              <div class="notification-time">${timeAgo}</div>
+              <div class="notification-actions">
+                ${actionBtn}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+          notificationsList.innerHTML += notificationHTML;
+        });
+
+        renderPagination();
+      }
+
+      function renderPagination() {
+        const pagination = document.querySelector(".pagination");
+        const totalPages = Math.ceil(filteredNotifications.length / pageSize);
+        let html = "";
+
+        html += `<button class="page-btn" ${
+          currentPage === 1 ? "disabled" : ""
+        } onclick="goToPage(${currentPage - 1})">‹</button>`;
+        for (let i = 1; i <= totalPages; i++) {
+          html += `<button class="page-btn${
+            i === currentPage ? " active" : ""
+          }" onclick="goToPage(${i})">${i}</button>`;
+        }
+        html += `<button class="page-btn" ${
+          currentPage === totalPages ? "disabled" : ""
+        } onclick="goToPage(${currentPage + 1})">›</button>`;
+
+        pagination.innerHTML = html;
+      }
+
+      function goToPage(page) {
+        const totalPages = Math.ceil(filteredNotifications.length / pageSize);
+        if (page < 1 || page > totalPages) return;
+        currentPage = page;
+        renderNotificationsPage(currentPage);
+      }
+
+      function filterNotifications(type) {
+        // Actualizar botones activos
+        document.querySelectorAll(".filter-btn").forEach((btn) => {
+          btn.classList.remove("active");
+        });
+        event.target.classList.add("active");
+
+        // Oculta el estado vacío anterior si existe
+        hideEmptyState();
+
+        currentFilter = type;
+        if (type === "all") {
+          filteredNotifications = allNotifications;
+        } else {
+          filteredNotifications = allNotifications.filter(
+            (notification) => notification.type === type
+          );
+        }
+        currentPage = 1;
+        renderNotificationsPage(currentPage);
+      }
+
       function loadNotifications() {
-        fetch("/mostrarNotificaciones")
+        fetch("/mostrarNotificaciones/data")
           .then((response) => {
-            if (!response.ok) {
+            if (!response.ok)
               throw new Error("Error al cargar las notificaciones");
-            }
             return response.json();
           })
           .then((notifications) => {
-            const notificationsList =
-              document.getElementById("notificationsList");
-            notificationsList.innerHTML = ""; // Limpia las notificaciones previas
-
-            notifications.forEach((notification) => {
-              const li = document.createElement("li");
-              if (notification.type === "new_follower") {
-                li.textContent = `👤 ${notification.sourceUser.username} comenzó a seguirte.`;
-              } else if (notification.type === "like") {
-                li.textContent = `❤️ ${notification.sourceUser.username} le dio like a tu canción.`;
-              } else if (notification.type === "comment") {
-                li.textContent = `💬 ${notification.sourceUser.username} comentó en tu canción.`;
-              }
-              notificationsList.appendChild(li);
-            });
+            allNotifications = notifications;
+            filteredNotifications = notifications;
+            currentPage = 1;
+            currentFilter = "all";
+            renderNotificationsPage(currentPage);
           })
           .catch((error) => {
             console.error("Error al cargar las notificaciones:", error);
           });
+      }
+
+      document.addEventListener("DOMContentLoaded", loadNotifications);
+
+      function filterNotifications(type) {
+        // Actualizar botones activos
+        document.querySelectorAll(".filter-btn").forEach((btn) => {
+          btn.classList.remove("active");
+        });
+        event.target.classList.add("active");
+
+        // Oculta el estado vacío anterior si existe
+        hideEmptyState();
+
+        // Filtrar notificaciones
+        const notifications = document.querySelectorAll(".notification-item");
+        let visibleCount = 0;
+        notifications.forEach((notification) => {
+          if (type === "all") {
+            notification.style.display = "block";
+            visibleCount++;
+          } else {
+            const notificationType = notification.getAttribute("data-type");
+            if (notificationType === type) {
+              notification.style.display = "block";
+              visibleCount++;
+            } else {
+              notification.style.display = "none";
+            }
+          }
+        });
+
+        // Mostrar estado vacío si no hay notificaciones visibles
+        setTimeout(() => {
+          if (visibleCount === 0 && type !== "all") {
+            showEmptyState(type);
+          } else {
+            hideEmptyState();
+          }
+        }, 100);
+      }
+
+      function showEmptyState(type) {
+        const existing = document.querySelector(".empty-state");
+        if (existing) return;
+
+        const emptyState = document.createElement("div");
+        emptyState.className = "empty-state";
+
+        const typeMessages = {
+          new_follower: {
+            icon: "👥",
+            title: "Sin notificaciones de seguidores",
+            desc: "Cuando alguien te siga, aparecerá aquí",
+          },
+          like: {
+            icon: "❤️",
+            title: "Sin me gusta recientes",
+            desc: "Los likes a tu música aparecerán aquí",
+          },
+          comment: {
+            icon: "💬",
+            title: "Sin comentarios nuevos",
+            desc: "Los comentarios en tu música aparecerán aquí",
+          },
+          playlist: {
+            icon: "🎵",
+            title: "Sin agregados a playlist",
+            desc: "Cuando agreguen tus canciones a playlists aparecerá aquí",
+          },
+        };
+
+        const message = typeMessages[type] || {
+          icon: "🔔",
+          title: "Sin notificaciones",
+          desc: "No hay notificaciones en esta categoría",
+        };
+
+        emptyState.innerHTML = `
+                <div class="empty-icon">${message.icon}</div>
+                <div class="empty-title">${message.title}</div>
+                <div class="empty-description">${message.desc}</div>
+            `;
+
+        document.querySelector(".notifications-list").appendChild(emptyState);
+      }
+
+      function hideEmptyState() {
+        const emptyState = document.querySelector(".empty-state");
+        if (emptyState) {
+          emptyState.remove();
+        }
+      }
+
+      // Animación de entrada para notificaciones
+      document.addEventListener("DOMContentLoaded", function () {
+        const notifications = document.querySelectorAll(".notification-item");
+        notifications.forEach((notification, index) => {
+          notification.style.opacity = "0";
+          notification.style.transform = "translateY(20px)";
+
+          setTimeout(() => {
+            notification.style.transition = "all 0.5s ease";
+            notification.style.opacity = "1";
+            notification.style.transform = "translateY(0)";
+          }, index * 100);
+        });
+      });
+
+      function abrirModal() {
+        document.getElementById("modalLogout").style.display = "block";
+      }
+
+      function cerrarModal() {
+        document.getElementById("modalLogout").style.display = "none";
       }
     </script>
   </body>

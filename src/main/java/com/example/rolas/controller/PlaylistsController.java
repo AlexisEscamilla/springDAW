@@ -8,6 +8,8 @@ import com.example.rolas.model.PlaylistSongs;
 import com.example.rolas.model.Playlists;
 import com.example.rolas.model.Songs;
 import com.example.rolas.model.User;
+import com.example.rolas.service.NotificationService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -44,6 +46,9 @@ public class PlaylistsController {
     @Autowired
     private SongsRepositorio songRepositorio;
 
+    @Autowired
+    private NotificationService notificationService;
+    
     @GetMapping("/subirPlaylist")
     public String mostrarFormularioSubirPlaylist() {
         return "subirPlaylist";
@@ -102,6 +107,7 @@ public class PlaylistsController {
         playlistsRepositorio.save(playlist);
 
         // Asociar las canciones seleccionadas a la playlist
+     // ...existing code...
         if (songIds != null && !songIds.isEmpty()) {
             int posicion = 1;
             for (Integer songId : songIds) {
@@ -114,10 +120,19 @@ public class PlaylistsController {
                     playlistSong.setAddedAt(LocalDate.now());
                     playlistSong.setPosicion(String.valueOf(posicion));
                     posicion++;
-                    //xdjhdjsdhasasaaaaaaaaaaaaaaaaaa
                     playlistSongsRepositorio.save(playlistSong);
-                }
 
+                    // --- Notificación al dueño de la canción ---
+                 // Notificar a todos los artistas de la canción
+                    song.getSongArtists().forEach(artist -> {
+                        notificationService.createNotification(
+                            artist.getArtista().getUser(), // Usuario que recibe la notificación (artista)
+                            "playlist",                    // Tipo de notificación
+                            usuario,                       // Quien agrega la canción
+                            playlist.getId()               // ID de la playlist
+                        );
+                    });
+                }
                 System.out.println("Asociando canción con ID: " + songId + " a la playlist con ID: " + playlist.getId());
             }
         }
@@ -131,6 +146,7 @@ public class PlaylistsController {
             @RequestParam(value = "songIds", required = false) List<Integer> songIds,
             @AuthenticationPrincipal UserDetails userDetails
     ) {
+    	User usuario = userRepositorio.findByUsername(userDetails.getUsername()).orElse(null);
         Optional<Playlists> playlistOpt = playlistsRepositorio.findById(id);
         if (playlistOpt.isEmpty() || songIds == null || songIds.isEmpty()) {
             return "redirect:/mostrarPlaylist/" + id;
@@ -153,8 +169,20 @@ public class PlaylistsController {
                 playlistSong.setPosicion(String.valueOf(posicion));
                 posicion++;
                 playlistSongsRepositorio.save(playlistSong);
+
+                // --- Notificación al dueño de la canción ---
+             // Notificar a todos los artistas de la canción
+                song.getSongArtists().forEach(artist -> {
+                    notificationService.createNotification(
+                        artist.getArtista().getUser(), // Usuario que recibe la notificación (artista)
+                        "playlist",                    // Tipo de notificación
+                        usuario,                       // Quien agrega la canción
+                        playlist.getId()               // ID de la playlist
+                    );
+                });
             }
         }
+       
         return "redirect:/mostrarPlaylist/" + id;
     }
 

@@ -80,6 +80,11 @@
 		    <artifactId>jackson-datatype-jsr310</artifactId>
 		    <version>2.18.2</version> <!-- Asegúrate de usar la misma versión que `jackson-databind` -->
 		</dependency>
+		<dependency>
+		    <groupId>com.h2database</groupId>
+		    <artifactId>h2</artifactId>
+		    <scope>test</scope>
+		</dependency>
 	</dependencies>
 
 	<build>

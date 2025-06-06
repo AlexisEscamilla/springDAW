@@ -748,21 +748,37 @@
               description = `<strong>@${notification.sourceUser.username}</strong> comenzó a seguirte.`;
               actionBtn = `<button class="action-btn action-view" onclick="window.location.href='/mostrarPerfil/${notification.sourceUser.id}'">Ver perfil</button>`;
               break;
-            case "like":
+            case "likePost":
+              avatarClass = "avatar-like";
+              avatarImg =
+                "https://cdn-icons-png.flaticon.com/512/12484/12484083.png";
+              title = "Le gustó tu post";
+              description = `A <strong>@${notification.sourceUser.username}</strong> le gustó tu post.`;
+              actionBtn = `<button class="action-btn action-view" onclick="window.location.href='/mostrarPerfil/${notification.contentId}'">Ver canción</button>`;
+              break;
+            case "likeSongs":
               avatarClass = "avatar-like";
               avatarImg =
                 "https://cdn-icons-png.flaticon.com/512/12484/12484083.png";
               title = "Le gustó tu canción";
               description = `A <strong>@${notification.sourceUser.username}</strong> le gustó tu canción.`;
-              actionBtn = `<button class="action-btn action-view" onclick="window.location.href='/cancion/${notification.contentId}'">Ver canción</button>`;
+              actionBtn = `<button class="action-btn action-view" onclick="window.location.href='/mostrarCancion/${notification.contentId}'">Ver canción</button>`;
               break;
-            case "comment":
+            case "commentPost":
               avatarClass = "avatar-comment";
               avatarImg =
                 "https://cdn-icons-png.flaticon.com/512/1380/1380338.png";
-              title = "Nuevo comentario";
+              title = "Nuevo comentario en tu post";
+              description = `<strong>@${notification.sourceUser.username}</strong> comentó en tu Post.`;
+              actionBtn = `<button class="action-btn action-view" onclick="window.location.href='/mostrarPerfil/${notification.contentId}'">Ver comentario</button>`;
+              break;
+            case "commentSongs":
+              avatarClass = "avatar-comment";
+              avatarImg =
+                "https://cdn-icons-png.flaticon.com/512/1380/1380338.png";
+              title = "Nuevo comentario en tu cancion";
               description = `<strong>@${notification.sourceUser.username}</strong> comentó en tu canción.`;
-              actionBtn = `<button class="action-btn action-view" onclick="window.location.href='/cancion/${notification.contentId}'">Ver comentario</button>`;
+              actionBtn = `<button class="action-btn action-view" onclick="window.location.href='/mostrarCancion/${notification.contentId}'">Ver comentario</button>`;
               break;
             case "playlist":
               avatarClass = "avatar-playlist";
@@ -770,7 +786,7 @@
                 "https://cdn-icons-png.freepik.com/512/6680/6680955.png";
               title = "Agregado a playlist";
               description = `Tu canción fue agregada a una playlist por <strong>@${notification.sourceUser.username}</strong>.`;
-              actionBtn = `<button class="action-btn action-view" onclick="window.location.href='/playlist/${notification.contentId}'">Ver playlist</button>`;
+              actionBtn = `<button class="action-btn action-view" onclick="window.location.href='/mostrarPlaylist/${notification.contentId}'">Ver playlist</button>`;
               break;
             default:
               avatarClass = "avatar-system";

@@ -23,13 +23,6 @@
         </div>
 
         <div class="action-buttons">
-          <button class="btn btn-outline">
-            <img
-              class="ajuste"
-              src="https://cdn-icons-png.flaticon.com/512/4675/4675185.png"
-            />
-          </button>
-
           <!-- Botón que abre el modal -->
           <button type="button" class="btn btn-primary" onclick="abrirModal()">
             Cerrar Sesión
@@ -354,18 +347,29 @@
 
         <!-- Right Sidebar -->
         <aside class="trending-sidebar sidebar">
-          <h3 style="margin-bottom: 16px">Trending in Web3</h3>
-          <div class="trending-card">
-            <div class="trending-title">#ETHMerge</div>
-            <div class="trending-meta">8,245 posts</div>
+          <h3 style="margin-bottom: 16px">Tendencias</h3>
+          <div th:if="${#lists.isEmpty(trendingHashtags)}">
+            <div class="trending-card">No hay tendencias recientes.</div>
           </div>
-          <div class="trending-card">
-            <div class="trending-title">#NFTSummer</div>
-            <div class="trending-meta">5,123 posts</div>
-          </div>
-          <div class="trending-card">
-            <div class="trending-title">#DeFiRevolution</div>
-            <div class="trending-meta">3,872 posts</div>
+          <div th:each="trend : ${trendingHashtags}" class="trending-card">
+            <div class="trending-title">
+              #<span th:text="${trend.hashtag}">hashtag</span>
+            </div>
+            <div class="trending-meta">
+              <span th:text="${trend.count}">0</span> usos en 24h
+              <span
+                th:if="${trend.growth > 0}"
+                style="color: #22c55e; font-weight: bold"
+              >
+                ↑ +<span th:text="${trend.growth}">0</span>
+              </span>
+              <span
+                th:if="${trend.growth < 0}"
+                style="color: #ef4444; font-weight: bold"
+              >
+                ↓ <span th:text="${trend.growth}">0</span>
+              </span>
+            </div>
           </div>
         </aside>
       </main>

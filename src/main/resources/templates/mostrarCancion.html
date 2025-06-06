@@ -46,6 +46,7 @@
         backdrop-filter: blur(10px);
         border-radius: 20px;
         padding: 40px;
+        position: relative;
         margin-bottom: 30px;
         border: 1px solid rgba(255, 255, 255, 0.1);
       }
@@ -343,8 +344,8 @@
 
       .bg-gradient-3 {
         background: var(--accent);
-        top: 30%;
-        right: 10%;
+        top: 75%;
+        right: 85%;
         width: 400px;
         height: 400px;
         animation: float 18s ease-in-out infinite;
@@ -845,12 +846,24 @@
         border: 1px solid rgba(255, 255, 255, 0.1);
         margin-bottom: 0;
       }
+
+      .music-player {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        background-color: #232442;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 20px;
+        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+      }
     </style>
   </head>
   <body>
-    <div class="bg-gradient bg-gradient-1"></div>
-    <div class="bg-gradient bg-gradient-2"></div>
-    <div class="bg-gradient bg-gradient-3"></div>
     <div class="header">
       <div class="logo">
         <img
@@ -945,8 +958,18 @@
               th:classappend="${userHasLiked} ? 'liked' : ''"
               th:text="${userHasLiked} ? 'Ya no me gusta' : 'Me gusta'"
               th:onclick="'toggleLike(' + ${cancion.id} + ')'"
+            ></button>
+          </div>
+
+          <!-- ...dentro de .profile-header, después de .profile-actions... -->
+          <!-- ...dentro de .profile-header, después de .profile-actions... -->
+          <div style="position: absolute; bottom: 30px; right: 40px">
+            <button
+              class="btn btn-primary"
+              id="play-song-btn"
+              style="padding: 12px 28px; font-size: 18px"
             >
-              Me gusta
+              ▶ Reproducir
             </button>
           </div>
         </div>
@@ -1047,6 +1070,7 @@
           type="button"
           class="btn btn-danger"
           onclick="abrirModalEliminarCancion()"
+          th:if="${esPropietario}"
         >
           Eliminar canción
         </button>
@@ -1077,6 +1101,61 @@
           </div>
         </div>
       </div>
+    </div>
+
+    <!-- ...existing code... -->
+    <div
+      id="song-player"
+      class="music-player"
+      style="display: flex; align-items: center; gap: 16px; margin: 32px 0 0 0"
+    >
+      <img
+        id="player-cover"
+        th:src="@{'/uploads/' + ${cancion.coverUrl}}"
+        alt="cover"
+        style="width: 60px; height: 60px; border-radius: 8px; object-fit: cover"
+      />
+      <div style="flex: 1">
+        <div style="font-weight: bold" th:text="${cancion.title}">Título</div>
+        <div
+          style="font-size: 0.95em; color: #aaa"
+          id="player-artists"
+          th:text="${#strings.arrayJoin(nombresArtistas, ', ')}"
+        >
+          Artista
+        </div>
+        <input
+          id="player-progress"
+          type="range"
+          min="0"
+          max="100"
+          value="0"
+          step="0.1"
+          style="width: 100%; margin-top: 6px"
+        />
+        <div
+          style="
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9em;
+            color: #aaa;
+          "
+        >
+          <span id="player-current">0:00</span>
+          <span id="player-duration">0:00</span>
+        </div>
+      </div>
+      <button
+        id="player-toggle"
+        class="btn btn-primary"
+        style="font-size: 22px; padding: 10px 18px; margin-left: 10px"
+      >
+        ▶
+      </button>
+      <audio
+        id="player-audio"
+        th:src="@{'/uploads/' + ${cancion.fileUrl}}"
+      ></audio>
     </div>
 
     <script>
@@ -1114,6 +1193,70 @@
       function cerrarModalEliminarCancion() {
         document.getElementById("modalEliminarCancion").style.display = "none";
       }
+
+      // ...existing code...
+
+      (function () {
+        const audio = document.getElementById("player-audio");
+        const btn = document.getElementById("player-toggle");
+        const btn2 = document.getElementById("play-song-btn");
+        const progress = document.getElementById("player-progress");
+        const current = document.getElementById("player-current");
+        const duration = document.getElementById("player-duration");
+
+        function formatTime(secs) {
+          if (isNaN(secs)) return "0:00";
+          const m = Math.floor(secs / 60);
+          const s = Math.floor(secs % 60);
+          return m + ":" + (s < 10 ? "0" : "") + s;
+        }
+
+        btn.addEventListener("click", function () {
+          if (audio.paused) {
+            audio.play();
+            btn.textContent = "⏸";
+          } else {
+            audio.pause();
+            btn.textContent = "▶";
+          }
+        });
+
+        btn2.addEventListener("click", function () {
+          if (audio.paused) {
+            audio.play();
+            btn2.textContent = "⏸";
+          } else {
+            audio.pause();
+            btn2.textContent = "▶ Reproducir";
+          }
+        });
+
+        audio.addEventListener("play", function () {
+          btn.textContent = "⏸";
+          btn2.textContent = "⏸";
+        });
+        audio.addEventListener("pause", function () {
+          btn.textContent = "▶";
+          btn2.textContent = "▶ Reproducir";
+        });
+
+        audio.addEventListener("loadedmetadata", function () {
+          duration.textContent = formatTime(audio.duration);
+          progress.value = 0;
+        });
+
+        audio.addEventListener("timeupdate", function () {
+          progress.value = (audio.currentTime / audio.duration) * 100 || 0;
+          current.textContent = formatTime(audio.currentTime);
+          duration.textContent = formatTime(audio.duration);
+        });
+
+        progress.addEventListener("input", function () {
+          if (!isNaN(audio.duration)) {
+            audio.currentTime = (progress.value / 100) * audio.duration;
+          }
+        });
+      })();
     </script>
   </body>
 </html>

@@ -56,8 +56,8 @@ public class PostLikesController {
         
      // Supón que tienes: user (quien recibe el like), sourceUser (quien da el like), songId o postId
         notificationService.createNotification(
-            post.getUser(),                // usuario que recibe la notificación (dueño de la canción/post)
-            "like",              // tipo
+            post.getUser(),                // usuario que recibe la notificación (dueño de la canción/post)aaaa
+            "likePost",              // tipo
             user,          // usuario que da el like
             post.getId()               // id de la canción o post
         );

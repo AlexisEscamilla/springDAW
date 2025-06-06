@@ -26,7 +26,7 @@ public class Notification {
     private String type; // Tipo de notificación (like, comment, new_follower)aaaa
 
 	@Column(name = "content_id")
-    private Integer contentId; // ID del contenido relacionado (canción, comentario, etc.)<<<aaaaaa
+    private Integer contentId; // ID del contenido relacionado (canción, comentario, etc.)<<<aaaaaaaa
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();

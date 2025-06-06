@@ -5,6 +5,7 @@ import com.example.rolas.service.PostService;
 import com.example.rolas.service.UserService;
 
 import java.security.Principal;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -28,6 +29,7 @@ import com.example.rolas.Repositorio.SongCommentsRepositorio;
 import com.example.rolas.model.Songs;
 import com.example.rolas.model.Albums;
 import com.example.rolas.model.Artista;
+import com.example.rolas.model.PlaylistSongs;
 import com.example.rolas.model.Playlists;
 import com.example.rolas.model.SongComments;
 import com.example.rolas.model.AlbumArtists;
@@ -92,7 +94,7 @@ public class WebController {
         
         model.addAttribute("album", album);
         model.addAttribute("songs", cancionesDelAlbum);
-        model.addAttribute("artistas", artistasAlbum); // Enviar los artistas al modeloaaaaaa
+        model.addAttribute("artistas", artistasAlbum); // Enviar los artistas al modeloaaaaaaaaaaaaaaa
         
         return "mostrarAlbum";
     }
@@ -104,6 +106,17 @@ public class WebController {
     	User usuarioLogueado = userRepositorio.findByUsername(userDetails.getUsername()).orElse(null);
     	boolean esCreador = playlist.getUser().getId().equals(usuarioLogueado.getId());
     	
+    	// Ordena la lista de PlaylistSongs por el campo posicion (convertido a int)
+        List<PlaylistSongs> cancionesOrdenadas = playlist.getPlaylistSongs().stream()
+            .sorted(Comparator.comparingInt(ps -> {
+                try {
+                    return Integer.parseInt(ps.getPosicion());
+                } catch (Exception e) {
+                    return 0; // O el valor que prefieras si no hay posición válidaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+                }
+            }))
+            .toList();
+        model.addAttribute("cancionesOrdenadas", cancionesOrdenadas);
     	model.addAttribute("esCreador", esCreador);
         model.addAttribute("playlist", playlist);
         

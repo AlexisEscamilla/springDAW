@@ -23,13 +23,6 @@
         </div>
 
         <div class="action-buttons">
-          <button class="btn btn-outline">
-            <img
-              class="ajuste"
-              src="https://cdn-icons-png.flaticon.com/512/4675/4675185.png"
-            />
-          </button>
-
           <!-- Botón que abre el modal -->
           <button type="button" class="btn btn-primary" onclick="abrirModal()">
             Cerrar Sesión
@@ -478,13 +471,12 @@
         }
 
         // Actualizar la barra de progreso y el tiempo actual
+        // Actualizar la barra de progreso y el tiempo actual
         audioPlayer.addEventListener("timeupdate", () => {
           const currentTime = audioPlayer.currentTime;
           const duration = audioPlayer.duration;
-          console.log("Tiempo actual:", currentTime, "Duración:", duration);
-
-          if (!isNaN(duration)) {
-            progressBar.value = (currentTime / duration) * 100 || 0;
+          if (!isNaN(duration) && duration > 0) {
+            progressBar.value = (currentTime / duration) * 100;
             currentTimeEl.textContent = formatTime(currentTime);
             totalTimeEl.textContent = formatTime(duration);
           }
@@ -493,7 +485,9 @@
         // Permitir al usuario adelantar o retroceder
         progressBar.addEventListener("input", () => {
           const duration = audioPlayer.duration;
-          audioPlayer.currentTime = (progressBar.value / 100) * duration;
+          if (!isNaN(duration) && duration > 0) {
+            audioPlayer.currentTime = (progressBar.value / 100) * duration;
+          }
         });
 
         // Función para reproducir una canción

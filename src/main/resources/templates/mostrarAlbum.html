@@ -507,13 +507,24 @@
         color: #a0a0a0;
         margin-top: 4px;
       }
+
+      .music-player {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        background-color: #232442;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 20px;
+        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+      }
     </style>
   </head>
   <body>
-    <div class="bg-gradient bg-gradient-1"></div>
-    <div class="bg-gradient bg-gradient-2"></div>
-    <div class="bg-gradient bg-gradient-3"></div>
-
     <div class="header">
       <div class="logo">
         <img
@@ -593,6 +604,27 @@
               <div class="stat-label">Artistas</div>
             </div>
           </div>
+        </div>
+        <!-- ...dentro de .profile-header, después de la info... -->
+        <!-- ...dentro de .album-info, después de los stats... -->
+        <div
+          style="margin-top: 32px; display: flex; justify-content: flex-start"
+        >
+          <button
+            id="play-playlist-btn"
+            class="btn btn-primary"
+            style="
+              padding: 16px 40px;
+              font-size: 1.3rem;
+              border-radius: 30px;
+              box-shadow: 0 4px 16px rgba(139, 92, 246, 0.15);
+              display: flex;
+              align-items: center;
+              gap: 12px;
+            "
+          >
+            ▶ Reproducir Álbum
+          </button>
         </div>
       </div>
 
@@ -692,9 +724,203 @@
           </div>
         </div>
       </div>
+
+      <!-- ...dentro de .container, al final... -->
+      <div
+        id="album-player"
+        class="music-player"
+        style="
+          display: flex;
+          align-items: center;
+          gap: 16px;
+          margin: 32px 0 0 0;
+        "
+      >
+        <img
+          id="album-player-cover"
+          src=""
+          alt="cover"
+          style="
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            object-fit: cover;
+          "
+        />
+        <div style="flex: 1">
+          <div style="font-weight: bold" id="album-player-title">Título</div>
+          <div style="font-size: 0.95em; color: #aaa" id="album-player-artists">
+            Artista
+          </div>
+          <input
+            id="album-player-progress"
+            type="range"
+            min="0"
+            max="100"
+            value="0"
+            step="0.1"
+            style="width: 100%; margin-top: 6px"
+          />
+          <div
+            style="
+              display: flex;
+              justify-content: space-between;
+              font-size: 0.9em;
+              color: #aaa;
+            "
+          >
+            <span id="album-player-current">0:00</span>
+            <span id="album-player-duration">0:00</span>
+          </div>
+        </div>
+        <button
+          id="album-player-toggle"
+          class="btn btn-primary"
+          style="font-size: 22px; padding: 10px 18px; margin-left: 10px"
+        >
+          ▶
+        </button>
+        <button
+          id="album-player-prev"
+          class="btn btn-secondary"
+          style="font-size: 18px; padding: 8px 12px; margin-left: 6px"
+          title="Anterior"
+        >
+          «
+        </button>
+        <button
+          id="album-player-next"
+          class="btn btn-secondary"
+          style="font-size: 18px; padding: 8px 12px; margin-left: 6px"
+          title="Siguiente"
+        >
+          »
+        </button>
+        <audio id="album-player-audio"></audio>
+      </div>
     </div>
 
+    <script th:inline="javascript">
+      /*<![CDATA[*/
+      var albumSongs = [
+        /*[# th:each="cancion, stat : ${songs}"]*/
+        {
+          fileUrl: /*[[@{'/uploads/' + ${cancion.fileUrl}}]]*/,
+          coverUrl: /*[[@{'/uploads/' + ${cancion.coverUrl}}]]*/,
+          title: /*[[${cancion.title}]]*/,
+          artists: /*[[${#strings.arrayJoin(cancion.songArtists.?[artista != null].![artista.user.nombre], ', ')}]]*/
+        }/*[# th:if="${!stat.last}"]*/,/*[/]*/
+        /*[/]*/
+      ];
+      /*]]>*/
+    </script>
+
     <script>
+      (function () {
+        let currentIndex = 0;
+        console.log(albumSongs);
+        const audio = document.getElementById("album-player-audio");
+        const btnPlay = document.getElementById("album-player-toggle");
+        const btnPrev = document.getElementById("album-player-prev");
+        const btnNext = document.getElementById("album-player-next");
+        const progress = document.getElementById("album-player-progress");
+        const current = document.getElementById("album-player-current");
+        const duration = document.getElementById("album-player-duration");
+        const cover = document.getElementById("album-player-cover");
+        const title = document.getElementById("album-player-title");
+        const artists = document.getElementById("album-player-artists");
+
+        function formatTime(secs) {
+          if (isNaN(secs)) return "0:00";
+          const m = Math.floor(secs / 60);
+          const s = Math.floor(secs % 60);
+          return m + ":" + (s < 10 ? "0" : "") + s;
+        }
+
+        function loadSong(idx, autoPlay = false) {
+          if (!albumSongs[idx]) return;
+          audio.src = albumSongs[idx].fileUrl;
+          cover.src = albumSongs[idx].coverUrl;
+          title.textContent = albumSongs[idx].title;
+          artists.textContent = albumSongs[idx].artists;
+          progress.value = 0;
+          current.textContent = "0:00";
+          duration.textContent = "0:00";
+          currentIndex = idx;
+          if (autoPlay) {
+            audio.play();
+            btnPlay.textContent = "⏸";
+          } else {
+            btnPlay.textContent = "▶";
+          }
+        }
+
+        btnPlay.addEventListener("click", function () {
+          if (audio.paused) {
+            audio.play();
+            btnPlay.textContent = "⏸";
+          } else {
+            audio.pause();
+            btnPlay.textContent = "▶";
+          }
+        });
+
+        btnPrev.addEventListener("click", function () {
+          if (currentIndex > 0) {
+            loadSong(currentIndex - 1, true);
+          }
+        });
+
+        btnNext.addEventListener("click", function () {
+          if (currentIndex < albumSongs.length - 1) {
+            loadSong(currentIndex + 1, true);
+          }
+        });
+
+        audio.addEventListener("play", function () {
+          btnPlay.textContent = "⏸";
+        });
+        audio.addEventListener("pause", function () {
+          btnPlay.textContent = "▶";
+        });
+
+        audio.addEventListener("loadedmetadata", function () {
+          duration.textContent = formatTime(audio.duration);
+          progress.value = 0;
+        });
+
+        audio.addEventListener("timeupdate", function () {
+          progress.value = (audio.currentTime / audio.duration) * 100 || 0;
+          current.textContent = formatTime(audio.currentTime);
+          duration.textContent = formatTime(audio.duration);
+        });
+
+        progress.addEventListener("input", function () {
+          if (!isNaN(audio.duration)) {
+            audio.currentTime = (progress.value / 100) * audio.duration;
+          }
+        });
+
+        // Reproducción automática al terminar la canción
+        audio.addEventListener("ended", function () {
+          if (currentIndex < albumSongs.length - 1) {
+            loadSong(currentIndex + 1, true);
+          } else {
+            btnPlay.textContent = "▶";
+            audio.currentTime = 0;
+          }
+        });
+
+        // Inicia con la primera canción cargada si hay canciones
+        if (albumSongs.length > 0) {
+          loadSong(0, false);
+        } else {
+          btnPlay.disabled = true;
+          btnPrev.disabled = true;
+          btnNext.disabled = true;
+        }
+      })();
+
       function abrirModal() {
         document.getElementById("modalLogout").style.display = "block";
       }
@@ -709,6 +935,22 @@
       function cerrarModalEliminarAlbum() {
         document.getElementById("modalEliminarAlbum").style.display = "none";
       }
+
+      document
+        .getElementById("play-playlist-btn")
+        .addEventListener("click", function () {
+          const audio = document.getElementById("album-player-audio");
+          const btnPlay = document.getElementById("album-player-toggle");
+          if (audio.paused) {
+            audio.play();
+            btnPlay.textContent = "⏸";
+            this.textContent = "⏸ Pausar Álbum";
+          } else {
+            audio.pause();
+            btnPlay.textContent = "▶";
+            this.textContent = "▶ Reproducir Álbum";
+          }
+        });
     </script>
   </body>
 </html>

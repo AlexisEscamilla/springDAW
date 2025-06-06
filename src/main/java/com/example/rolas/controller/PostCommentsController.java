@@ -73,7 +73,7 @@ public class PostCommentsController {
         
         notificationService.createNotification(
         	    post.getUser(),           // usuario que recibe la notificación (dueño de la canción/post)
-        	    "comment",           // tipo
+        	    "commentPost",           // tipo
         	    user,       // usuario que comenta
         	    post.getId()               // id de la canción o post
         	);

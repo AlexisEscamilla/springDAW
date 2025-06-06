@@ -4,6 +4,7 @@ import com.example.rolas.Repositorio.PostLikesRepositorio;
 import com.example.rolas.model.Post;
 import com.example.rolas.model.PostComments;
 import com.example.rolas.model.User;
+import com.example.rolas.service.HashtagService;
 import com.example.rolas.service.PostCommentsService;
 import com.example.rolas.service.PostService;
 import com.example.rolas.service.UserService;
@@ -38,6 +39,10 @@ public class FeedController {
     
     @Autowired
     private PostLikesRepositorio postLikesRepository;
+    
+    @Autowired
+    private HashtagService hashtagService;
+    
 
     @GetMapping
     public String getFeed(@AuthenticationPrincipal UserDetails userDetails, Model model) {
@@ -64,6 +69,9 @@ public class FeedController {
             int count = (int) allComments.stream().filter(c -> c.getPost().getId().equals(post.getId())).count();
             postCommentCounts.put(post.getId(), count);
         }
+        
+        List<HashtagService.HashtagTrend> trending = hashtagService.getTrendingHashtags(5);
+        model.addAttribute("trendingHashtags", trending);
         model.addAttribute("postCommentCounts", postCommentCounts);
         model.addAttribute("usuario", user);
         model.addAttribute("posts", postService.getPostsFromFollowing(user.getId()));

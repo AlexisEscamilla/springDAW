@@ -81,7 +81,7 @@ public class MostrarPerfilController {
         List<PostComments> allComments = postCommentsService.getAllCommentsForPosts(posts);
         
         for (Post post : posts) {
-            boolean liked = postLikesRepository.existsByUserAndPost(usuario, post);
+            boolean liked = postLikesRepository.existsByUserAndPost(usuarioAutenticado, post);
             post.setLikedByCurrentUser(liked); // Debes agregar este campo y su getter/setter en tu modelo Post
         }
         

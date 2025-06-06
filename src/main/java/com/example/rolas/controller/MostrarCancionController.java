@@ -19,7 +19,10 @@ import com.example.rolas.Repositorio.SongCommentsRepositorio;
 import com.example.rolas.Repositorio.SongLikesRepositorio;
 import com.example.rolas.Repositorio.SongsRepositorio;
 import com.example.rolas.Repositorio.UserRepositorio;
+import com.example.rolas.model.AlbumArtists;
 import com.example.rolas.model.Albums;
+import com.example.rolas.model.Artista;
+import com.example.rolas.model.Post;
 import com.example.rolas.model.SongComments;
 import com.example.rolas.model.SongLikes;
 import com.example.rolas.model.SongArtists;
@@ -52,7 +55,7 @@ public class MostrarCancionController {
 	private SongArtistsRepositorio songArtistRepositorio;
 	
 	@GetMapping("/mostrarCancion/{id}")
-	public String mostrarCancion(@PathVariable Integer id, Model model) {
+	public String mostrarCancion(@AuthenticationPrincipal UserDetails userDetails,@PathVariable Integer id, Model model) {
 	    // Obtener la canción por ID
 	    Songs cancion = songRepositorio.findById(id)
 	        .orElseThrow(() -> new RuntimeException("Canción no encontrada"));
@@ -61,18 +64,46 @@ public class MostrarCancionController {
 	    List<SongComments> comentarios = songCommentsRepositorio.findBySong(cancion);
 	    Albums album = cancion.getAlbum();
 
-	    // Obtener los artistas de la canción aaaaaaaaaaaaaaaaaa
-	    List<SongArtists> artistas = songArtistRepositorio.findBySong(cancion);
+	    User usuarioAutenticado = userRepositorio.findByUsername(userDetails.getUsername())
+	            .orElseThrow(() -> new RuntimeException("Usuario autenticado no encontrado"));
+	    
+	    // Obtener los artistas de la canción aaaaaaaaaaaaaaaaaaaaaa
+	    List<SongArtists> artistasCancion = songArtistRepositorio.findBySong(cancion);
+	    
+	    List<Artista> creadores = List.of();
+	    creadores = artistasCancion.stream()
+                .map(SongArtists::getArtista)
+                .distinct()
+                .toList();
+	    
+	    boolean esPropietario = false;
+	    for(Artista personaLogueado : creadores) {
+	    	if(usuarioAutenticado.getArtista() != null) {
+	    		if(usuarioAutenticado.getArtista().equals(personaLogueado)) {
+		    		esPropietario = true;
+		    	}else {
+		    		esPropietario = false;
+		    	}
+	    	}
+	    }
+	    
+	    List<String> nombresArtistas = artistasCancion.stream()
+	        .filter(sa -> sa.getArtista() != null && sa.getArtista().getUser() != null)
+	        .map(sa -> sa.getArtista().getUser().getNombre())
+	        .toList();
 
-	    // Pasar la canción, los comentarios, el álbum y los artistas al modelo
+	    boolean userHasLiked = songLikesRepositorio.existsByUserAndSong(usuarioAutenticado, cancion);
+	    
+	    // Pasar la canción, los comentarios, el álbum y los artistas al modeloaaaaaaaaaaaaaaaaaa
+	    model.addAttribute("nombresArtistas", nombresArtistas);
 	    model.addAttribute("cancion", cancion);
 	    model.addAttribute("comentarios", comentarios);
 	    model.addAttribute("album", album);
-	    model.addAttribute("artistas", artistas);
-
+	    model.addAttribute("artistas", artistasCancion);
+	    model.addAttribute("esPropietario", esPropietario);
+	    model.addAttribute("userHasLiked", userHasLiked);
 	    return "mostrarCancion";
 	}
-    
 	
 	@PostMapping("/songs/{id}/comment")
 	public String agregarComentario(@PathVariable Integer id,
@@ -99,7 +130,7 @@ public class MostrarCancionController {
 	    cancion.getSongArtists().forEach(artist -> {
 	        notificationService.createNotification(
 	            artist.getArtista().getUser(), // Usuario que recibe la notificación (artista)
-	            "comment",        // Tipo de notificación
+	            "commentSongs",        // Tipo de notificación
 	            user,             // Usuario que hizo el comentario
 	            cancion.getId()   // ID de la canción
 	        );

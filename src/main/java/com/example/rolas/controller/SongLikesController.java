@@ -41,7 +41,7 @@ public class SongLikesController {
         Songs song = songsRepositorio.findById(id)
             .orElseThrow(() -> new RuntimeException("Canción no encontrada"));
 
-        // Verificar si el usuario ya dio like
+        // Verificar si el usuario ya dio likea
         if (songLikesRepositorio.existsByUserAndSong(user, song)) {
             // Si ya dio like, eliminar el like
             SongLikes like = songLikesRepositorio.findByUserAndSong(user, song);
@@ -60,7 +60,7 @@ public class SongLikesController {
             song.getSongArtists().forEach(artist -> {
                 notificationService.createNotification(
                     artist.getArtista().getUser(), // Usuario que recibe la notificación (artista)
-                    "like",           // Tipo de notificación
+                    "likeSongs",           // Tipo de notificación
                     user,             // Usuario que dio like
                     song.getId()      // ID de la canción
                 );

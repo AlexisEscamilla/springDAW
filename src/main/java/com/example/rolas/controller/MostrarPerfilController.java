@@ -110,7 +110,7 @@ public class MostrarPerfilController {
         // Si es artista, obtiene canciones, si no, pasa lista vacía
         Artista artista = usuario.getArtista();
         List<Songs> canciones = (artista != null) ? songsRepositorio.findByArtistaId(artista.getId()) : List.of();
-
+        int cancionesCount = canciones.size();
         // Obtener todas las playlists del usuario
         List<Playlists> playlists = playlistsrepositorio.findByUser(usuario);
 
@@ -124,6 +124,7 @@ public class MostrarPerfilController {
         }
         
         System.out.println(albums.size());
+        model.addAttribute("cancionesCount", cancionesCount);
         model.addAttribute("albums", albums);
         model.addAttribute("playlists", playlists);
         model.addAttribute("usuario", usuario);

@@ -355,7 +355,7 @@ object-fit: cover;
 }
 
 .attachment-btn {
-  display: flex;
+  display: none;
   align-items: center;
   gap: 8px;
   color: rgba(255, 255, 255, 0.7);
@@ -366,6 +366,9 @@ object-fit: cover;
   padding: 8px 12px;
   border-radius: 6px;
   transition: background 0.2s;
+}
+.attachment-label:hover {
+  background: #e0e7ff;
 }
 
 .attachment-btn:hover {
@@ -878,5 +881,13 @@ object-fit: cover;
 .file-icon {
   font-size: 16px;
 }
+
+.suggested-users-section { margin-top: 24px; }
+.suggested-user-card {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 8px 0; border-bottom: 1px solid #eee;
+}
+.suggested-user-info { display: flex; align-items: center; gap: 10px; }
+.btn-follow { padding: 4px 12px; font-size: 0.95em; }
 
 

@@ -70,6 +70,9 @@ public class FeedController {
             postCommentCounts.put(post.getId(), count);
         }
         
+        List<User> suggestedUsers = userService.getSuggestedUsers(user, 5);
+        model.addAttribute("suggestedUsers", suggestedUsers);
+        
         List<HashtagService.HashtagTrend> trending = hashtagService.getTrendingHashtags(5);
         model.addAttribute("trendingHashtags", trending);
         model.addAttribute("postCommentCounts", postCommentCounts);

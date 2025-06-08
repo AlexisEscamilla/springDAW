@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -58,7 +59,7 @@ public class UserService implements UserDetailsService {
     }
     
     public User registerUser(RegistroRequest registerRequest) {
-        // Crear nuevo usuario
+        // Crear nuevo usuarioaaa
         User user = new User(
         		registerRequest.getNombre(),
                 registerRequest.getUsername(),
@@ -81,4 +82,11 @@ public class UserService implements UserDetailsService {
         
         return Optional.empty();
     }
+    
+    
+ // ...existing code...
+    public List<User> getSuggestedUsers(User currentUser, int limit) {
+    	 return userRepository.findSuggestedUsers(currentUser.getId(), limit);
+    }
+    // ...existing code...
 }

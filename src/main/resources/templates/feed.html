@@ -149,7 +149,33 @@
                 ></textarea>
               </div>
               <div class="post-actions">
-                <input type="file" name="imageUrl" class="attachment-btn" />
+                <input
+                  type="file"
+                  name="imageUrl"
+                  class="attachment-btn"
+                  id="postFileInput"
+                  accept="image/*"
+                  style="display: none"
+                />
+                <label
+                  for="postFileInput"
+                  class="attachment-label"
+                  style="
+                    cursor: pointer;
+                    display: flex;
+                    align-items: center;
+                    gap: 6px;
+                    padding: 6px 14px;
+                    border-radius: 18px;
+                    background: #f3f4f6;
+                    color: #4f46e5;
+                    font-weight: 500;
+                    transition: background 0.2s;
+                  "
+                >
+                  <span class="file-icon" style="font-size: 1.2em">📷</span>
+                  <span>Adjuntar imagen</span>
+                </label>
                 <button type="submit" class="btn btn-primary">Publicar</button>
               </div>
             </form>
@@ -347,6 +373,7 @@
 
         <!-- Right Sidebar -->
         <aside class="trending-sidebar sidebar">
+          <!-- Tendencias -->
           <h3 style="margin-bottom: 16px">Tendencias</h3>
           <div th:if="${#lists.isEmpty(trendingHashtags)}">
             <div class="trending-card">No hay tendencias recientes.</div>
@@ -371,7 +398,62 @@
               </span>
             </div>
           </div>
+
+          <!-- A quién seguir -->
+          <h3 style="margin: 24px 0 16px 0">A quién seguir</h3>
+          <div th:if="${#lists.isEmpty(suggestedUsers)}">
+            <div class="trending-card">No hay sugerencias por ahora.</div>
+          </div>
+          <div
+            th:each="userSug : ${suggestedUsers}"
+            class="suggested-user-card trending-card"
+            style="
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+              margin-bottom: 8px;
+            "
+          >
+            <div
+              class="suggested-user-info"
+              style="display: flex; align-items: center"
+            >
+              <a th:href="@{'/mostrarPerfil/' + ${userSug.id}}">
+                <img
+                  th:if="${userSug.profilePicture != null}"
+                  th:src="@{'/uploads/' + ${userSug.profilePicture}}"
+                  class="avatar-imgcreator"
+                  alt="Avatar"
+                />
+                <div
+                  th:if="${userSug.profilePicture == null}"
+                  th:text="${userSug.nombre.substring(0,1)}"
+                  class="avatar-placeholder"
+                ></div>
+              </a>
+              <div style="margin-left: 10px">
+                <div th:text="${userSug.nombre}">Nombre</div>
+                <div
+                  th:text="'@' + ${userSug.username}"
+                  style="font-size: 0.9em; color: #888"
+                >
+                  @usuario
+                </div>
+              </div>
+            </div>
+            <form
+              th:action="@{'/users/' + ${userSug.id} + '/follow'}"
+              method="post"
+              style="display: inline"
+              onsubmit="return followUserAjax(this, event);"
+            >
+              <button type="submit" class="btn btn-primary btn-follow">
+                Seguir
+              </button>
+            </form>
+          </div>
         </aside>
+        <!-- ...existing code... -->
       </main>
     </div>
 
@@ -474,6 +556,26 @@
             }, 1000);
           }, i * 100);
         }
+      }
+
+      function followUserAjax(form, event) {
+        event.preventDefault();
+        fetch(form.action, {
+          method: "POST",
+          headers: { "X-Requested-With": "XMLHttpRequest" },
+        })
+          .then((res) => res.text())
+          .then((msg) => {
+            if (msg === "followed") {
+              alert("¡Ahora sigues a este usuario!");
+              window.location.reload(); // O puedes quitar esta línea si no quieres recargar
+            } else if (msg === "already_following") {
+              alert("Ya sigues a este usuario.");
+            } else {
+              alert("Ocurrió un error.");
+            }
+          });
+        return false;
       }
     </script>
   </body>

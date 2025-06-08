@@ -30,11 +30,11 @@ public class FollowersController {
     @PostMapping("/{id}/follow")
     @ResponseBody
     public String followUser(@PathVariable Integer id, @AuthenticationPrincipal UserDetails userDetails) {
-        // Obtener el usuario autenticado
+        // Obtener el usuario autenticadoaaaaaaaaaaa
         User follower = userRepositorio.findByUsername(userDetails.getUsername())
             .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
-        // Obtener el usuario a seguir
+        // Obtener el usuario a seguira
         User following = userRepositorio.findById(id)
             .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
@@ -43,7 +43,7 @@ public class FollowersController {
             return "already_following";
         }
 
-        // Crear la relación de seguimiento
+        // Crear la relación de seguimientoaaa
         Followers follow = new Followers();
         follow.setFollower(follower);
         follow.setFollowing(following);
@@ -56,7 +56,7 @@ public class FollowersController {
         userRepositorio.save(following);
         userRepositorio.save(follower);
 
-        // Crear una notificación para el usuario seguido
+        // Crear una notificación para el usuario seguidoaaaaaaaaaaaaaaaaa
         notificationService.createNotification(
             following,       // Usuario que recibe la notificación
             "new_follower",  // Tipo de notificación

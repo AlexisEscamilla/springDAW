@@ -73,7 +73,7 @@ public class MostrarPerfilController {
         User usuario = userRepositorio.findById(id)
             .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
-        // Obtener el usuario autenticado
+        // Obtener el usuario autenticadoaaaaa
         User usuarioAutenticado = userRepositorio.findByUsername(userDetails.getUsername())
             .orElseThrow(() -> new RuntimeException("Usuario autenticado no encontrado"));
 
@@ -107,11 +107,11 @@ public class MostrarPerfilController {
         List<Followers> seguidores = followersrepositorio.findByFollower(usuario);
         List<Followers> siguiendo = followersrepositorio.findByFollowing(usuario);
 
-        // Si es artista, obtiene canciones, si no, pasa lista vacía
+        // Si es artista, obtiene canciones, si no, pasa lista vacíaaaa
         Artista artista = usuario.getArtista();
         List<Songs> canciones = (artista != null) ? songsRepositorio.findByArtistaId(artista.getId()) : List.of();
         int cancionesCount = canciones.size();
-        // Obtener todas las playlists del usuario
+        // Obtener todas las playlists del usuarioa
         List<Playlists> playlists = playlistsrepositorio.findByUser(usuario);
 
         List<Albums> albums = List.of();

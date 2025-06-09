@@ -156,26 +156,32 @@
                   id="postFileInput"
                   accept="image/*"
                   style="display: none"
+                  onchange="previewPostImage(event)"
                 />
-                <label
-                  for="postFileInput"
-                  class="attachment-label"
-                  style="
-                    cursor: pointer;
-                    display: flex;
-                    align-items: center;
-                    gap: 6px;
-                    padding: 6px 14px;
-                    border-radius: 18px;
-                    background: #f3f4f6;
-                    color: #4f46e5;
-                    font-weight: 500;
-                    transition: background 0.2s;
-                  "
-                >
-                  <span class="file-icon" style="font-size: 1.2em">📷</span>
+                <label for="postFileInput" class="attachment-label">
+                  <span class="file-icon">📷</span>
                   <span>Adjuntar imagen</span>
                 </label>
+                <div
+                  id="postImagePreviewContainer"
+                  style="margin-top: 10px; display: none"
+                >
+                  <img
+                    id="postImagePreview"
+                    src=""
+                    alt="Vista previa"
+                    style="
+                      max-width: 120px;
+                      border-radius: 8px;
+                      display: block;
+                      margin-bottom: 4px;
+                    "
+                  />
+                  <span
+                    id="postImageName"
+                    style="font-size: 0.95em; color: #4f46e5"
+                  ></span>
+                </div>
                 <button type="submit" class="btn btn-primary">Publicar</button>
               </div>
             </form>
@@ -576,6 +582,23 @@
             }
           });
         return false;
+      }
+
+      function previewPostImage(event) {
+        const input = event.target;
+        const container = document.getElementById("postImagePreviewContainer");
+        const img = document.getElementById("postImagePreview");
+        const name = document.getElementById("postImageName");
+        if (input.files && input.files[0]) {
+          const file = input.files[0];
+          img.src = URL.createObjectURL(file);
+          name.textContent = file.name;
+          container.style.display = "block";
+        } else {
+          container.style.display = "none";
+          img.src = "";
+          name.textContent = "";
+        }
       }
     </script>
   </body>

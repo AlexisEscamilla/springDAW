@@ -52,4 +52,30 @@ public class PostService {
 
         return post;
     }
+    
+    
+    public void editPost(Integer postId, Integer userId, String content, String imageUrl, boolean removeImage) {
+        Post post = postRepository.findById(postId)
+            .orElseThrow(() -> new RuntimeException("Post no encontrado"));
+        if (!post.getUser().getId().equals(userId)) {
+            throw new RuntimeException("No tienes permiso para editar este post");
+        }
+        post.setContent(content);
+        if (removeImage) {
+            post.setImageUrl(null);
+        } else if (imageUrl != null) {
+            post.setImageUrl(imageUrl);
+        }
+        postRepository.save(post);
+    }
+    
+    
+    public void deletePost(Integer postId, String username) {
+        Post post = postRepository.findById(postId)
+            .orElseThrow(() -> new RuntimeException("Post no encontrado"));
+        if (!post.getUser().getUsername().equals(username)) {
+            throw new RuntimeException("No tienes permiso para eliminar este post");
+        }
+        postRepository.delete(post);
+    }
 }

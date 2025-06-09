@@ -1,4 +1,4 @@
- :root {
+:root {
         --primary: #4f46e5;
         --secondary: #7c3aed;
         --dark: #0f172a;
@@ -377,6 +377,7 @@
         max-width: 400px;
         margin: auto;
         box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        position: relative;
       }
       .modal-buttons {
         display: flex;
@@ -837,3 +838,89 @@
         border: 1px solid rgba(255, 255, 255, 0.1);
         margin-bottom: 0;
       }
+
+      .menu-btn {
+        background: none;
+        border: none;
+        font-size: 1.5em;
+        cursor: pointer;
+        margin-left: auto;
+      }
+      .menu-dropdown {
+        position: absolute;
+        right: 0;
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        z-index: 10;
+        min-width: 120px;
+        padding: 6px 0;
+      }
+      .menu-dropdown button {
+        background: none;
+        border: none;
+        width: 100%;
+        text-align: left;
+        padding: 8px 16px;
+        cursor: pointer;
+        font-size: 1em;
+      }
+      .menu-dropdown button:hover {
+        background: #f3f4f6;
+      }
+
+      .post-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        position: relative;
+      }
+
+      .post-header > div:first-child {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .post-menu {
+        position: relative;
+        margin-left: auto;
+        /* Asegura que esté al extremo derecho */
+      }
+
+      .menu-btn {
+        background: none;
+        border: none;
+        font-size: 1.5em;
+        cursor: pointer;
+        padding: 4px 10px;
+        color: white;
+        transition: background 0.2s, color 0.2s;
+        border-radius: 50%;
+      }
+
+      .menu-btn:hover {
+        background: #4f46e5;
+        color: white;
+      }
+
+      .menu-dropdown {
+        position: absolute;
+        right: 0;
+        top: 36px;
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        z-index: 10;
+        min-width: 120px;
+        padding: 6px 0;
+      }
+
+      .btn.btn-danger {
+        background-color: #e74c3c;
+        color: white;
+      }
+

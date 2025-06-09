@@ -186,38 +186,27 @@
               actionBtn = "";
           }
 
-          const createdAt = new Date(notification.createdAt);
-          const now = new Date();
-          const diffMs = now - createdAt;
-          let timeAgo = "Hace unos segundos";
-          if (diffMs > 60000) {
-            const mins = Math.floor(diffMs / 60000);
-            timeAgo = `Hace ${mins} minuto${mins > 1 ? "s" : ""}`;
-          }
-          if (diffMs > 3600000) {
-            const hours = Math.floor(diffMs / 3600000);
-            timeAgo = `Hace ${hours} hora${hours > 1 ? "s" : ""}`;
-          }
+          const timeAgo = notification.createdAtFormatted;
 
           const notificationHTML = `
-      <div class="notification-item" data-type="${notification.type}" data-id="${notification.id}">
-        <div class="notification-content">
-          <div class="notification-avatar ${avatarClass}">
-            <img style="width: 40px; height: 40px" src="${avatarImg}" alt="rolas" />
-          </div>
-          <div class="notification-info">
-            <div class="notification-title">${title}</div>
-            <div class="notification-description">${description}</div>
-            <div class="notification-meta">
-              <div class="notification-time">${timeAgo}</div>
-              <div class="notification-actions">
-                ${actionBtn}
-              </div>
-            </div>
+  <div class="notification-item" data-type="${notification.type}" data-id="${notification.id}">
+    <div class="notification-content">
+      <div class="notification-avatar ${avatarClass}">
+        <img style="width: 40px; height: 40px" src="${avatarImg}" alt="rolas" />
+      </div>
+      <div class="notification-info">
+        <div class="notification-title">${title}</div>
+        <div class="notification-description">${description}</div>
+        <div class="notification-meta">
+          <div class="notification-time">${timeAgo}</div>
+          <div class="notification-actions">
+            ${actionBtn}
           </div>
         </div>
       </div>
-    `;
+    </div>
+  </div>
+`;
           notificationsList.innerHTML += notificationHTML;
         });
 

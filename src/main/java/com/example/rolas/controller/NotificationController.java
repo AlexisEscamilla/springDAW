@@ -13,6 +13,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Controller
@@ -53,12 +54,15 @@ public class NotificationController {
         User user = userService.findByUsername(userDetails.getUsername());
         List<Notification> notifications = notificationService.getNotificationsForUser(user.getId());
 
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        
         return notifications.stream().map(notification -> {
             NotificationDTO dto = new NotificationDTO();
             dto.setId(notification.getId());
             dto.setType(notification.getType());
-           
+           //okaa
             dto.setCreatedAt(notification.getCreatedAt());
+            dto.setCreatedAtFormatted(notification.getCreatedAt().format(formatter));
             dto.setContentId(notification.getContentId());
 
             NotificationDTO.SourceUserDTO sourceUserDTO = new NotificationDTO.SourceUserDTO();

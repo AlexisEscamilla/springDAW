@@ -9,7 +9,6 @@
   <body>
     <div class="bg-gradient bg-gradient-1"></div>
     <div class="bg-gradient bg-gradient-2"></div>
-    <div class="bg-gradient bg-gradient-3"></div>
 
     <div class="header">
       <div class="logo">
@@ -127,10 +126,203 @@
         </button>
       </div>
 
+      <!-- Modal Editar Post Mejorado -->
+      <div id="editModal" class="modal" style="display: none">
+        <div
+          class="modal-content"
+          style="padding: 0; overflow: hidden; max-width: 420px"
+        >
+          <!-- Header con gradiente -->
+          <div
+            style="
+              background: linear-gradient(90deg, #8b5cf6 0%, #06b6d4 100%);
+              padding: 22px 32px 16px 32px;
+              border-radius: 12px 12px 0 0;
+              color: #fff;
+              box-shadow: 0 2px 12px rgba(79, 70, 229, 0.1);
+              text-align: center;
+            "
+          >
+            <h3
+              style="
+                margin: 0;
+                font-size: 1.35rem;
+                font-weight: 700;
+                letter-spacing: 0.5px;
+              "
+            >
+              Editar post
+            </h3>
+          </div>
+          <form
+            id="editPostForm"
+            method="post"
+            enctype="multipart/form-data"
+            style="padding: 28px 24px 18px 24px; background: #232442"
+          >
+            <input
+              type="hidden"
+              name="removeImage"
+              id="removeImageFlag"
+              value="false"
+            />
+            <label
+              for="editContent"
+              style="
+                font-weight: 600;
+                color: #a5b4fc;
+                margin-bottom: 8px;
+                display: block;
+              "
+            >
+              Texto del post
+            </label>
+            <textarea
+              name="content"
+              id="editContent"
+              class="post-input"
+              required
+              style="
+                width: 100%;
+                min-height: 80px;
+                border-radius: 10px;
+                border: 1.5px solid #4f46e5;
+                background: #18192e;
+                color: #fff;
+                padding: 12px;
+                margin-bottom: 18px;
+                font-size: 1rem;
+                resize: vertical;
+              "
+            ></textarea>
+            <div
+              id="editImageContainer"
+              style="margin: 10px 0 18px 0; position: relative"
+            >
+              <img
+                id="editImagePreview"
+                src=""
+                alt="Imagen actual"
+                style="
+                  max-width: 100%;
+                  border-radius: 10px;
+                  box-shadow: 0 2px 12px rgba(79, 70, 229, 0.1);
+                "
+              />
+              <button
+                type="button"
+                onclick="removeEditImage()"
+                style="
+                  position: absolute;
+                  top: 8px;
+                  right: 8px;
+                  background: #ef4444;
+                  color: #fff;
+                  border: none;
+                  border-radius: 50%;
+                  width: 28px;
+                  height: 28px;
+                  font-size: 1.1rem;
+                  cursor: pointer;
+                  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.15);
+                "
+                title="Quitar imagen"
+              >
+                ✖
+              </button>
+            </div>
+            <input
+              type="file"
+              name="imageUrl"
+              id="editImageInput"
+              accept="image/*"
+              style="display: none"
+              onchange="previewEditImage(event)"
+            />
+            <span
+              id="editImageName"
+              style="
+                font-size: 0.95em;
+                color: #4f46e5;
+                display: block;
+                margin-bottom: 8px;
+              "
+            ></span>
+            <label
+              for="editImageInput"
+              class="btn"
+              style="
+                margin-bottom: 18px;
+                background: linear-gradient(90deg, #4f46e5 0%, #06b6d4 100%);
+                color: #fff;
+                border: none;
+                border-radius: 20px;
+                padding: 8px 20px;
+                cursor: pointer;
+                font-weight: 600;
+                display: inline-block;
+              "
+              >Cambiar imagen</label
+            >
+            <div class="modal-buttons" style="margin-top: 18px">
+              <button
+                type="button"
+                class="btn btn-secondary"
+                onclick="closeEditModal()"
+                style="
+                  background: transparent;
+                  color: #a5b4fc;
+                  border: 2px solid #4f46e5;
+                "
+              >
+                Cancelar
+              </button>
+              <button
+                type="submit"
+                class="btn btn-primary"
+                style="
+                  background: linear-gradient(90deg, #8b5cf6 0%, #06b6d4 100%);
+                  color: #fff;
+                  border: none;
+                "
+              >
+                Guardar cambios
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <div id="deleteModal" class="modal" style="display: none">
+        <div class="modal-content">
+          <h3>¿Eliminar este post?</h3>
+          <p>
+            ¿Estás seguro de que deseas eliminar este post? Esta acción no se
+            puede deshacer.
+          </p>
+          <div class="modal-buttons">
+            <button class="btn btn-secondary" onclick="closeDeleteModal()">
+              Cancelar
+            </button>
+            <form
+              id="deletePostForm"
+              method="post"
+              th:action="@{/posts/__ID__/delete}"
+            >
+              <button type="submit" class="btn btn-danger">Eliminar</button>
+            </form>
+          </div>
+        </div>
+      </div>
+
       <!-- Contenido de Posts -->
       <div id="posts" class="tab-content active">
         <div class="posts-list">
-          <div class="post" th:each="post : ${posts}">
+          <div
+            class="post"
+            th:each="post : ${posts}"
+            th:attr="data-post-id=${post.id}"
+          >
             <!-- Información del post -->
             <div
               class="post-header"
@@ -173,6 +365,25 @@
                   >
                 </div>
               </div>
+
+              <th:block th:if="${post.user.id == usuario.id}">
+                <div class="post-menu">
+                  <button class="menu-btn" onclick="togglePostMenu(this)">
+                    ⋮
+                  </button>
+                  <div class="menu-dropdown" style="display: none">
+                    <button th:onclick="'openEditModal(' + ${post.id} + ')'">
+                      Editar
+                    </button>
+                    <button
+                      th:onclick="'openDeleteModal(' + ${post.id} + ')'"
+                      style="color: #ef4444"
+                    >
+                      Eliminar
+                    </button>
+                  </div>
+                </div>
+              </th:block>
             </div>
 
             <!-- Contenido del post -->
@@ -628,6 +839,87 @@
               particle.remove();
             }, 1000);
           }, i * 100);
+        }
+      }
+
+      let currentPostId = null;
+
+      // Mostrar/ocultar menú de 3 puntos
+      function togglePostMenu(btn) {
+        document
+          .querySelectorAll(".menu-dropdown")
+          .forEach((d) => (d.style.display = "none"));
+        const dropdown = btn.nextElementSibling;
+        dropdown.style.display =
+          dropdown.style.display === "block" ? "none" : "block";
+        event.stopPropagation();
+      }
+      document.body.addEventListener("click", () => {
+        document
+          .querySelectorAll(".menu-dropdown")
+          .forEach((d) => (d.style.display = "none"));
+      });
+
+      // Eliminar post
+      function openDeleteModal(postId) {
+        currentPostId = postId;
+        document.getElementById("deleteModal").style.display = "block";
+        // Cambia la acción del form
+        document.getElementById(
+          "deletePostForm"
+        ).action = `/posts/${postId}/delete`;
+      }
+      function closeDeleteModal() {
+        document.getElementById("deleteModal").style.display = "none";
+      }
+
+      // Editar post
+      function openEditModal(postId) {
+        currentPostId = postId;
+        // Aquí deberías cargar los datos del post vía AJAX o tenerlos en el DOM
+        // Ejemplo simple (ajusta según tu estructura):
+        const postContent = document.querySelector(
+          `[data-post-id='${postId}'] .post-content p`
+        ).textContent;
+        const postImage = document.querySelector(
+          `[data-post-id='${postId}'] .post-image`
+        );
+        document.getElementById("editContent").value = postContent;
+        if (postImage) {
+          document.getElementById("editImagePreview").src = postImage.src;
+          document.getElementById("editImageContainer").style.display = "block";
+        } else {
+          document.getElementById("editImageContainer").style.display = "none";
+        }
+        document.getElementById("editModal").style.display = "block";
+        document.getElementById(
+          "editPostForm"
+        ).action = `/posts/${postId}/edit`;
+        document.getElementById("removeImageFlag").value = "false";
+      }
+
+      function closeEditModal() {
+        document.getElementById("editModal").style.display = "none";
+      }
+      function removeEditImage() {
+        document.getElementById("editImagePreview").src = "";
+        document.getElementById("editImageContainer").style.display = "none";
+        document.getElementById("removeImageFlag").value = "true";
+      }
+
+      function previewEditImage(event) {
+        const input = event.target;
+        const img = document.getElementById("editImagePreview");
+        const name = document.getElementById("editImageName");
+        const container = document.getElementById("editImageContainer");
+        if (input.files && input.files[0]) {
+          const file = input.files[0];
+          img.src = URL.createObjectURL(file);
+          name.textContent = file.name;
+          container.style.display = "block";
+          document.getElementById("removeImageFlag").value = "false";
+        } else {
+          name.textContent = "";
         }
       }
     </script>

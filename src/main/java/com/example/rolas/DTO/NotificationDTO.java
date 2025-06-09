@@ -8,10 +8,19 @@ public class NotificationDTO {
     private LocalDateTime createdAt;
     private Integer contentId;
     private SourceUserDTO sourceUser;
+    private String createdAtFormatted;
 
     // getters y setters
 
-    public static class SourceUserDTO {
+    public String getCreatedAtFormatted() {
+		return createdAtFormatted;
+	}
+
+	public void setCreatedAtFormatted(String createdAtFormatted) {
+		this.createdAtFormatted = createdAtFormatted;
+	}
+
+	public static class SourceUserDTO {
         private Integer id;
         private String username;
         // getters y setters

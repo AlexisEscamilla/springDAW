@@ -23,7 +23,7 @@ public class HashtagService {
         LocalDateTime since24h = now.minusHours(24);
         LocalDateTime since48h = now.minusHours(48);
 
-        // Posts de las últimas 24h y 24-48h atrás
+        // posts de las ultimas 24h y 24-48h atras
         List<Post> posts24h = postRepositorio.findAll().stream()
                 .filter(p -> p.getCreatedAt() != null && p.getCreatedAt().isAfter(since24h))
                 .toList();
@@ -44,7 +44,7 @@ public class HashtagService {
             trends.add(new HashtagTrend(tag, countNow, growth));
         }
 
-        // Ordena por más usados, luego por mayor crecimiento
+        // ordena por  usados, luego por mayor crecimiento
         trends.sort(Comparator.comparingInt(HashtagTrend::getCount).reversed()
                 .thenComparing(Comparator.comparingInt(HashtagTrend::getGrowth).reversed()));
 

@@ -72,10 +72,10 @@ public class PostCommentsController {
         postCommentsRepository.save(comment);
         
         notificationService.createNotification(
-        	    post.getUser(),           // usuario que recibe la notificación (dueño de la canción/post)
-        	    "commentPost",           // tipo
-        	    user,       // usuario que comenta
-        	    post.getId()               // id de la canción o post
+        	    post.getUser(),           
+        	    "commentPost",          
+        	    user,      
+        	    post.getId()           
         	);
         
         String referer = request.getHeader("Referer");

@@ -30,38 +30,38 @@ public class FollowersController {
     @PostMapping("/{id}/follow")
     @ResponseBody
     public String followUser(@PathVariable Integer id, @AuthenticationPrincipal UserDetails userDetails) {
-        // Obtener el usuario autenticadoaaaaaaaaaaa
+        // se obtiene el usuario autenticado
         User follower = userRepositorio.findByUsername(userDetails.getUsername())
             .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
-        // Obtener el usuario a seguira
+        // obtiene el usuario a seguir
         User following = userRepositorio.findById(id)
             .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
-        // Verificar si ya lo sigue
+        // verifica si ya lo sigue
         if (followersRepositorio.existsByFollowerAndFollowing(follower, following)) {
             return "already_following";
         }
 
-        // Crear la relación de seguimientoaaa
+        // crea la relacion de seguimiento
         Followers follow = new Followers();
         follow.setFollower(follower);
         follow.setFollowing(following);
         followersRepositorio.save(follow);
 
-        // Incrementar los contadores
+        // incrementa los contadores
         following.setSeguidores(following.getSeguidores() + 1);
         follower.setSiguiendo(follower.getSiguiendo() + 1);
 
         userRepositorio.save(following);
         userRepositorio.save(follower);
 
-        // Crear una notificación para el usuario seguidoaaaaaaaaaaaaaaaaa
+        // crea una notificacion para el usuario seguido
         notificationService.createNotification(
-            following,       // Usuario que recibe la notificación
-            "new_follower",  // Tipo de notificación
-            follower,        // Usuario que comenzó a seguir
-            null             // No se necesita un contentId para esta notificación
+            following,       
+            "new_follower",  
+            follower,       
+            null             
         );
 
         return "followed";
@@ -85,10 +85,10 @@ public class FollowersController {
             return "not_following";
         }
 
-        // Eliminar la relación de seguimiento
+        // elimina la relacion de seguimiento
         followersRepositorio.deleteByFollowerAndFollowing(follower, following);
 
-        // Decrementar los contadores
+        // decrementa los contadores
         following.setSeguidores(Math.max(0, following.getSeguidores() - 1));
         follower.setSiguiendo(Math.max(0, follower.getSiguiendo() - 1));
 

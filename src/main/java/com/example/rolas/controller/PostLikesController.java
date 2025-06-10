@@ -54,16 +54,15 @@ public class PostLikesController {
             postLikesRepository.save(like);
         }
         
-     // Supón que tienes: user (quien recibe el like), sourceUser (quien da el like), songId o postId
+    
         notificationService.createNotification(
-            post.getUser(),                // usuario que recibe la notificación (dueño de la canción/post)aaaa
-            "likePost",              // tipo
-            user,          // usuario que da el like
-            post.getId()               // id de la canción o post
+            post.getUser(),               
+            "likePost",            
+            user,          
+            post.getId()              
         );
         postRepository.save(post);
-
-        // Redirige a la página desde donde vino el usuario
+        
         String referer = request.getHeader("Referer");
         return "redirect:" + (referer != null ? referer : "/feed");
     }

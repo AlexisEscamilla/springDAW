@@ -26,7 +26,7 @@ public class PostCommentsService {
         comment.setCommentText(commentText);
         comment.setImagenAdjuntada(imageUrl);
 
-        // Incrementar el contador de comentarios
+        // incrementa el contador de comentarios
         post.setCommentCount(post.getCommentCount() + 1);
         postRepository.save(post);
 

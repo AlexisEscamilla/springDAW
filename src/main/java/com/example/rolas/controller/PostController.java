@@ -34,7 +34,7 @@ public class PostController {
     
     @GetMapping
     public String getFeed(Model model, @AuthenticationPrincipal UserDetails userDetails) {
-        User usuario = (User) userDetails; // Asegúrate de que `Usuario` implemente `UserDetails`
+        User usuario = (User) userDetails; 
         List<Post> posts = postService.getPostsFromFollowing(usuario.getId());
         model.addAttribute("posts", posts);
         return "feed";
@@ -79,7 +79,7 @@ public class PostController {
         String imageUrl = null;
         boolean removeImage = "true".equals(removeImageFlag);
 
-        // Si sube una nueva imagen, la guardamos
+        // si sube una nueva imagen, la guardamos
         if (imageFile != null && !imageFile.isEmpty()) {
             try {
                 String uploadsDir = "uploads/";
@@ -94,10 +94,10 @@ public class PostController {
             }
         }
 
-        // Llama al servicio con el flag de eliminar imagen
+        // llama al servicio con el flag de eliminar imagen
         postService.editPost(id, usuario.getId(), content, imageUrl, removeImage);
 
-        // Redirige a la página de perfil del usuario
+        // redirige a la pagina de perfil del usuario
         return "redirect:/mostrarPerfil/" + usuario.getId();
     }
     
@@ -107,7 +107,7 @@ public class PostController {
             @AuthenticationPrincipal UserDetails userDetails
     ) {
         postService.deletePost(id, userDetails.getUsername());
-        // Busca el usuario por username y redirige usando su id
+        // busca el usuario por username y redirige usando su id
         User usuario = userRepositorio.findByUsername(userDetails.getUsername()).orElseThrow();
         return "redirect:/mostrarPerfil/" + usuario.getId();
     }

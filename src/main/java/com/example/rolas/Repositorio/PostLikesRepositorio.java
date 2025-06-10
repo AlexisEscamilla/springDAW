@@ -12,6 +12,5 @@ public interface PostLikesRepositorio extends JpaRepository<PostLikes, Integer> 
     boolean existsByUserIdAndPostId(Integer userId, Integer postId);
     void deleteByUserIdAndPostId(Integer userId, Integer postId);
     boolean existsByUserAndPost(User user, Post post);
- // Obtener el registro de like de un usuario en un post
     PostLikes findByUserAndPost(User user, Post post);
 }

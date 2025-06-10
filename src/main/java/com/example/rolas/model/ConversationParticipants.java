@@ -14,14 +14,14 @@ public class ConversationParticipants {
     private ConversationParticipantsId id;
 
     @ManyToOne
-    @MapsId("conversationId") // Mapea el campo conversationId de la clave compuesta
+    @MapsId("conversationId") 
     @JoinColumn(name = "conversation_id")
     @JsonBackReference
     @JsonIgnore
     private Conversations conversation;
 
     @ManyToOne
-    @MapsId("userId") // Mapea el campo userId de la clave compuesta
+    @MapsId("userId") 
     @JoinColumn(name = "user_id")
     private User user;
 

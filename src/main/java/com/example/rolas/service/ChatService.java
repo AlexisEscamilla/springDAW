@@ -1,4 +1,4 @@
-package com.example.rolas.controller;
+package com.example.rolas.service;
 
 import java.util.HashMap;
 import java.util.List;

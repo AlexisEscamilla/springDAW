@@ -10,11 +10,11 @@ public class ConversationParticipantsId implements Serializable {
     private Integer conversationId;
     private Integer userId;
 
-    // Constructor vacío
+    
     public ConversationParticipantsId() {
     }
 
-    // Constructor con parámetros
+    
     public ConversationParticipantsId(Integer conversationId, Integer userId) {
         this.conversationId = conversationId;
         this.userId = userId;
@@ -37,7 +37,7 @@ public class ConversationParticipantsId implements Serializable {
         this.userId = userId;
     }
 
-    // Métodos equals y hashCode (necesarios para claves compuestas)
+    
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

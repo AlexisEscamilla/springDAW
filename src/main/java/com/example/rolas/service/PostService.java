@@ -38,7 +38,7 @@ public class PostService {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
-        // Crear el post
+        // crea el post
         Post post = new Post();
         post.setUser(user);
         post.setContent(content);
@@ -46,7 +46,7 @@ public class PostService {
         post.setCreatedAt(LocalDateTime.now());
         postRepository.save(post);
 
-        // Incrementar el número de posts del usuario
+        // incrementa el numero de posts del usuario
         user.setNumPosts(user.getNumPosts() + 1);
         userRepository.save(user);
 

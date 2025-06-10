@@ -6,10 +6,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
-import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 
 import com.example.rolas.Repositorio.ConversationsRepositorio;
@@ -32,11 +29,10 @@ public class WebSocketChatController {
     private UserRepositorio userRepositorio;
     
     @Autowired
-    private SimpMessagingTemplate messagingTemplate; // Agrega estoaaaaaaaaaaaaaaaa
+    private SimpMessagingTemplate messagingTemplate; 
     
     @MessageMapping("/chat")
     public void sendMessage(@Payload Map<String, Object> payload) {
-        // ...existing code to build and save the message...
         Map<String, Object> conversationMap = (Map<String, Object>) payload.get("conversation");
         Integer conversationId = Integer.parseInt(conversationMap.get("id").toString());
         String messageText = (String) payload.get("mensajeText");
@@ -56,7 +52,7 @@ public class WebSocketChatController {
 
         Messages savedMessage = messagesRepositorio.save(message);
 
-        // Envía el mensaje solo a los suscritos a este chat
+        // envia el mensaje solo a los suscritos a este chat
         messagingTemplate.convertAndSend("/topic/messages/" + conversationId, savedMessage);
     }
 

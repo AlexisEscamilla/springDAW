@@ -54,6 +54,5 @@ public class SongLikes {
 		this.createdAt = createdAt;
 	}
 
-    // Getters y setters
     
 }

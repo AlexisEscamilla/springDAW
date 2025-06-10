@@ -1,6 +1,5 @@
 package com.example.rolas.controller;
 
-import java.util.ArrayList;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.example.rolas.Repositorio.AlbumsRepositorio;
 import com.example.rolas.Repositorio.PlaylistSongsRepositorio;
 import com.example.rolas.Repositorio.PlaylistsRepositorio;
-import com.example.rolas.Repositorio.AlbumArtistsRepositorio;
 import com.example.rolas.Repositorio.SongsRepositorio;
 import com.example.rolas.Repositorio.UserRepositorio;
 import com.example.rolas.model.Albums;
@@ -22,7 +20,6 @@ import com.example.rolas.model.Artista;
 import com.example.rolas.model.Songs;
 import com.example.rolas.model.User;
 import com.example.rolas.model.Playlists;
-import com.example.rolas.service.UserService;
 import java.util.List;
 
 @Controller
@@ -36,9 +33,6 @@ public class ColeccionesController {
 
     @Autowired
     private AlbumsRepositorio albumsRepositorio;
-    
-    @Autowired
-    private AlbumArtistsRepositorio albumsartistsRepositorio;
     
     @Autowired
     private PlaylistsRepositorio playlistsRepositorio;
@@ -59,9 +53,9 @@ public class ColeccionesController {
             Artista artista = usuario.getArtista();
             boolean esArtista = (artista != null);
             model.addAttribute("esArtista", esArtista);
-            //aassldk
+            
             if (esArtista) {
-                // Artista: puede ver canciones, albums y playlists
+                // el artista  puede ver canciones, albums y playlists
                 if (tipo.equals("canciones")) {
                     List<Songs> canciones = songsRepositorio.findByArtistaId(artista.getId());
                     model.addAttribute("canciones", canciones);
@@ -76,8 +70,8 @@ public class ColeccionesController {
                     model.addAttribute("playlists", playlists);
                 }
             } else {
-                // Oyente: solo puede ver y crear playlists
-                tipo = "playlists"; // fuerza la vista a playlists
+                // el oyente  solo puede ver y crear playlists
+                tipo = "playlists";
                 List<Playlists> playlists = playlistsRepositorio.findByUser(usuario);
                 playlists.forEach(playlist -> {
                     playlist.setPlaylistSongs(playlistSongsRepositorio.findByPlaylist(playlist));

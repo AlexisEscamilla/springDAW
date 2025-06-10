@@ -14,7 +14,7 @@ public class PostComments {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id", nullable = false)
-    @JsonBackReference // Evita ciclos de serialización
+    @JsonBackReference 
     private Post post;
 
     @ManyToOne(fetch = FetchType.LAZY)

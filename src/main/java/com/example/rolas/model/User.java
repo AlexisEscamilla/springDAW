@@ -82,7 +82,7 @@ public class User implements UserDetails {
 	}
 
 	@OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Artista artista;  // Relación con Artista si es artista
+    private Artista artista; 
 
     public User() {
         this.createdAt = LocalDateTime.now();
@@ -120,7 +120,7 @@ public class User implements UserDetails {
     public String getPasswordHash() { return passwordHash; }
     public void setPasswordHash(String passwordHash) { this.passwordHash = passwordHash; }
 
-    // ✅ Getter/Setter corregidos para que Thymeleaf los reconozca
+   
     public String getProfilePicture() {
         return profile_picture;
     }

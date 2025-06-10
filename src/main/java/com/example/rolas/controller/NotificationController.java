@@ -6,7 +6,6 @@ import com.example.rolas.model.User;
 import com.example.rolas.service.NotificationService;
 import com.example.rolas.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
@@ -60,7 +59,6 @@ public class NotificationController {
             NotificationDTO dto = new NotificationDTO();
             dto.setId(notification.getId());
             dto.setType(notification.getType());
-           //okaa
             dto.setCreatedAt(notification.getCreatedAt());
             dto.setCreatedAtFormatted(notification.getCreatedAt().format(formatter));
             dto.setContentId(notification.getContentId());

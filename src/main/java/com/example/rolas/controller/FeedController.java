@@ -52,7 +52,7 @@ public class FeedController {
         
         for (Post post : posts) {
             boolean liked = postLikesRepository.existsByUserAndPost(user, post);
-            post.setLikedByCurrentUser(liked); // Debes agregar este campo y su getter/setter en tu modelo Post
+            post.setLikedByCurrentUser(liked); 
         }
         
         System.out.println("Comentarios:");

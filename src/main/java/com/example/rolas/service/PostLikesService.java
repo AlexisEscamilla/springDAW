@@ -16,13 +16,13 @@ public class PostLikesService {
     public boolean toggleLike(User user, Post post) {
         if (postLikesRepository.existsByUserIdAndPostId(user.getId(), post.getId())) {
             postLikesRepository.deleteByUserIdAndPostId(user.getId(), post.getId());
-            return false; // Like eliminado
+            return false; // like eliminado
         } else {
             PostLikes like = new PostLikes();
             like.setUser(user);
             like.setPost(post);
             postLikesRepository.save(like);
-            return true; // Like agregado
+            return true; // like agregado
         }
     }
 }

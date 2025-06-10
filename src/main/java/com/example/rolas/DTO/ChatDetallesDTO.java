@@ -1,6 +1,6 @@
 package com.example.rolas.DTO;
 
-public class ChatDetailsDTO {
+public class ChatDetallesDTO {
     private Integer id;
     private boolean isGroup;
     private String groupName;

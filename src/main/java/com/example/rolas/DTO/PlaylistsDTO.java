@@ -15,7 +15,7 @@ public class PlaylistsDTO {
     private LocalDate createdAt;
     private List<Integer> songIds;
 
-    // Constructors
+  
     public PlaylistsDTO() {}
 
     public PlaylistsDTO(Integer id, Integer userId, String title, String description, String coverImage, LocalDate createdAt, List<Integer> songIds) {
@@ -36,7 +36,7 @@ public class PlaylistsDTO {
         this.coverImage = playlist.getCoverImage();
         this.createdAt = playlist.getCreatedAt();
         this.songIds = playlist.getPlaylistSongs().stream()
-                        .map(ps -> ps.getSong().getId()) // Asume que PlaylistSongs tiene getSong().getId()
+                        .map(ps -> ps.getSong().getId()) 
                         .toList();
     }
 

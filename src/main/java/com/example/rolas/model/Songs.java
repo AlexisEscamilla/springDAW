@@ -18,16 +18,16 @@ public class Songs {
     private String title;
 
     @Column(name = "duration")
-    private String duration; // Duración de la canción, por ejemplo "3:45"
+    private String duration;
 
     @Column(name = "gender")
-    private String gender; // Género de la canción, por ejemplo "Pop", "Rock", etc.
+    private String gender; 
 
     @Column(name = "file_url")
-    private String fileUrl; // URL del archivo de audio
+    private String fileUrl; 
 
     @Column(name = "cover_url")
-    private String coverUrl; // URL de la portada de la canción
+    private String coverUrl; 
     
     @Column(name = "like_count")
     private int likeCount; 
@@ -42,14 +42,14 @@ public class Songs {
 
 	@ManyToOne
     @JoinColumn(name = "album_id")
-    private Albums album;  // Relación con el álbum al que pertenece la canción
+    private Albums album;  
 
-    // Relación uno a muchos con SongArtist (en lugar de ManyToMany)
+    
     @OneToMany(mappedBy = "song", cascade = CascadeType.ALL)
-    private Set<SongArtists> songArtists;  // Relación con los artistas
+    private Set<SongArtists> songArtists;  
 
     @Column(name = "created_at")
-    private LocalDate createdAt; // Fecha en que se creó la canción
+    private LocalDate createdAt; 
 
 	public Integer getId() {
 		return id;

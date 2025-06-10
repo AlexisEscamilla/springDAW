@@ -1,7 +1,6 @@
 package com.example.rolas.Repositorio;
 
 import com.example.rolas.model.Notification;
-import com.example.rolas.model.User;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

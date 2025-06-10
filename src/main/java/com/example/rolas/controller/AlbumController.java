@@ -10,7 +10,6 @@ import com.example.rolas.Repositorio.AlbumsRepositorio;
 import com.example.rolas.Repositorio.ArtistaRepositorio;
 import com.example.rolas.Repositorio.SongsRepositorio;
 import com.example.rolas.Repositorio.UserRepositorio;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,10 +25,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDate;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 @Controller
 public class AlbumController {
@@ -56,7 +53,7 @@ public class AlbumController {
         if (usuario == null || usuario.getArtista() == null) {
             return "redirect:/colecciones";
         }
-    	return "subirAlbum";  // El formulario HTML para subir el álbum
+    	return "subirAlbum";
     }
 
     @Transactional
@@ -75,18 +72,16 @@ public class AlbumController {
         User usuarioActual = usuarioOpt.get();
         Artista artista = usuarioActual.getArtista();
 
-        // Verificar si el artista existe en la base de datos
+        // Verifica si el artista existe en la base de datos
         if (artista == null) {
             model.addAttribute("error", "El usuario no tiene un perfil de artista.");
             return "subirAlbum";
         }
 
-        // Obtener el ID del artista desde la tabla `artistas`
-        Integer artistaId = artista.getId();  // Aquí usamos el campo `id` de la tabla `artistas`
+        // se obtiene el id del artista desde la tabla artistas
+        Integer artistaId = artista.getId();
         
-        System.out.println("PERRRO ESSS" + artista.getId());
-        
-        // Verifica si el artista existe en la tabla `artistas` por su `id`
+        // Verifica si el artista existe en la tabla artistas por su id
         Optional<Artista> artistaOpt = artistaRepositorio.findById(artistaId);
         if (artistaOpt.isEmpty()) {
             model.addAttribute("error", "El artista con id " + artistaId + " no existe en la base de datos.");
@@ -94,13 +89,13 @@ public class AlbumController {
         }
 
         
-        // Guardar la imagen de portada
+        // guarda la imagen de portada
         String coverArtFileName = null;
         if (!image.isEmpty()) {
             try {
-                // Guardar la imagen en el servidor
-                String uploadDir = new File("uploads").getAbsolutePath();  // Carpeta "uploads"
-                new File(uploadDir).mkdirs();  // Crear carpeta si no existe
+                
+                String uploadDir = new File("uploads").getAbsolutePath();  
+                new File(uploadDir).mkdirs();  
                 coverArtFileName = System.currentTimeMillis() + "_" + image.getOriginalFilename();
                 File destino = new File(uploadDir + File.separator + coverArtFileName);
                 image.transferTo(destino);
@@ -111,68 +106,65 @@ public class AlbumController {
             }
         }
 
-     // Crear un nuevo álbum
+        // crea un nuevo album
         Albums album = new Albums();
         album.setTitle(title);
-        album.setCoverArt(coverArtFileName);  // Guardar el nombre del archivo de la portada
-        album.setReleaseDate(LocalDate.now());  // Fecha de creación del álbum
+        album.setCoverArt(coverArtFileName);  // guarda el nombre del archivo de la portada
+        album.setReleaseDate(LocalDate.now()); 
 
-        // Guardar el álbum en la base de datos
-        album = albumRepositorio.save(album);  // Guardamos el álbum y obtenemos el ID generado
+        // guarda el album en la base de datos
+        album = albumRepositorio.save(album);  
 
-        // Crear la relación con el artista
+        // crea la relacion con el artista
         AlbumArtists albumArtist = new AlbumArtists();
         albumArtist.setAlbum(album);
-        albumArtist.setArtista(artista);  // Asociar el artista con el álbum
-
-        // Guardar la relación en la base de datos
+        albumArtist.setArtista(artista); 
+       
         albumArtistRepositorio.save(albumArtist);
 
-        // Redirigir a la página de colecciones después de guardar el álbum
-        return "redirect:/colecciones";  // Redirige a colecciones.html después de guardar el álbum
+        return "redirect:/colecciones";  // redirige a colecciones.html después de guardar el album
     }
     
     @PostMapping("/album/eliminar/{id}")
     public String eliminarAlbum(@PathVariable Integer id) {
-        // 1. Busca el álbum
         Albums album = albumRepositorio.findById(id).orElseThrow();
 
-        // 2. Busca todas las canciones de ese álbum
+        // busca todas las canciones de ese album
         List<Songs> canciones = songRepositorio.findByAlbumId(id);
 
-        // 3. Elimina archivos de las canciones
+        // elimina archivos de las canciones
         for (Songs song : canciones) {
-            // Elimina archivo de audio
+            // elimina archivo de audio
             if (song.getFileUrl() != null) {
                 try {
                     Files.deleteIfExists(Paths.get(song.getFileUrl()));
                 } catch (Exception e) {
-                    // Log o manejo de error si lo deseas
+                   System.out.println("error");
                 }
             }
-            // Elimina portada de la canción si aplica
+            // elimina portada de la canción si aplica
             if (song.getCoverUrl() != null) {
                 try {
                     Files.deleteIfExists(Paths.get("uploads/" + song.getCoverUrl()));
                 } catch (Exception e) {
-                    // Log o manejo de error si lo deseas
+                	System.out.println("error");
                 }
             }
         }
 
-        // 4. Elimina portada del álbum si aplica
+        //elimina portada del album si aplica
         if (album.getCoverArt() != null) {
             try {
                 Files.deleteIfExists(Paths.get("uploads/" + album.getCoverArt()));
             } catch (Exception e) {
-                // Log o manejo de error si lo deseas
+            	System.out.println("error");
             }
         }
 
-        // 5. Elimina las canciones
+        //  elimina las canciones
         songRepositorio.deleteAll(canciones);
 
-        // 6. Elimina el álbum
+        // elimina el álbum
         albumRepositorio.delete(album);
 
         return "redirect:/colecciones?tipo=albumes";

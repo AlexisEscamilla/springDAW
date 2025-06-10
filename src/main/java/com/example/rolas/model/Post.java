@@ -33,7 +33,7 @@ public class Post {
     private LocalDateTime createdAt = LocalDateTime.now();
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference // Evita ciclos de serialización
+    @JsonManagedReference 
     private List<PostComments> comments;
 
     // Getters y setters

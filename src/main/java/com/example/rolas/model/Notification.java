@@ -15,18 +15,18 @@ public class Notification {
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
-    private User user; // Usuario que recibe la notificación
+    private User user; 
 
     @ManyToOne
     @JoinColumn(name = "source_user_id")
     @JsonIgnoreProperties({"notifications"})
-    private User sourceUser; // Usuario que genera la notificación
+    private User sourceUser; 
 
     @Column(nullable = false)
-    private String type; // Tipo de notificación (like, comment, new_follower)aaaa
+    private String type; 
 
 	@Column(name = "content_id")
-    private Integer contentId; // ID del contenido relacionado (canción, comentario, etc.)<<<aaaaaaaa
+    private Integer contentId; 
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();

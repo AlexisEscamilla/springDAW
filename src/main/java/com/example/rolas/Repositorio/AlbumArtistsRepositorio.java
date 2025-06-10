@@ -8,7 +8,6 @@ import org.springframework.stereotype.Repository;
 
 import com.example.rolas.model.AlbumArtists;
 import com.example.rolas.model.Albums;
-import com.example.rolas.model.Artista;
 
 @Repository
 public interface AlbumArtistsRepositorio extends JpaRepository<AlbumArtists, Integer> {

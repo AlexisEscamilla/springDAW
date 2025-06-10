@@ -11,20 +11,14 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-
-import com.example.rolas.Repositorio.AlbumsRepositorio;
 import com.example.rolas.Repositorio.SongArtistsRepositorio;
 import com.example.rolas.Repositorio.SongCommentsRepositorio;
 import com.example.rolas.Repositorio.SongLikesRepositorio;
 import com.example.rolas.Repositorio.SongsRepositorio;
 import com.example.rolas.Repositorio.UserRepositorio;
-import com.example.rolas.model.AlbumArtists;
 import com.example.rolas.model.Albums;
 import com.example.rolas.model.Artista;
-import com.example.rolas.model.Post;
 import com.example.rolas.model.SongComments;
-import com.example.rolas.model.SongLikes;
 import com.example.rolas.model.SongArtists;
 import com.example.rolas.model.Songs;
 import com.example.rolas.model.User;
@@ -49,25 +43,22 @@ public class MostrarCancionController {
 	private NotificationService notificationService;
 	
 	@Autowired
-	private AlbumsRepositorio albumRepositorio;
-	
-	@Autowired
 	private SongArtistsRepositorio songArtistRepositorio;
 	
 	@GetMapping("/mostrarCancion/{id}")
 	public String mostrarCancion(@AuthenticationPrincipal UserDetails userDetails,@PathVariable Integer id, Model model) {
-	    // Obtener la canción por ID
+	    // obtiene la cancion 
 	    Songs cancion = songRepositorio.findById(id)
 	        .orElseThrow(() -> new RuntimeException("Canción no encontrada"));
 
-	    // Obtener los comentarios relacionados con la canción
+	    // obtiene los comentarios relacionados con la cancion
 	    List<SongComments> comentarios = songCommentsRepositorio.findBySong(cancion);
 	    Albums album = cancion.getAlbum();
 
 	    User usuarioAutenticado = userRepositorio.findByUsername(userDetails.getUsername())
 	            .orElseThrow(() -> new RuntimeException("Usuario autenticado no encontrado"));
 	    
-	    // Obtener los artistas de la canción aaaaaaaaaaaaaaaaaaaaaa
+	    // obtiene los artistas de la cancion
 	    List<SongArtists> artistasCancion = songArtistRepositorio.findBySong(cancion);
 	    
 	    List<Artista> creadores = List.of();
@@ -94,7 +85,7 @@ public class MostrarCancionController {
 
 	    boolean userHasLiked = songLikesRepositorio.existsByUserAndSong(usuarioAutenticado, cancion);
 	    
-	    // Pasar la canción, los comentarios, el álbum y los artistas al modeloaaaaaaaaaaaaaaaaaa
+	    // se pasa la cancion, los comentarios, el album y los artistas al modelo
 	    model.addAttribute("nombresArtistas", nombresArtistas);
 	    model.addAttribute("cancion", cancion);
 	    model.addAttribute("comentarios", comentarios);
@@ -109,34 +100,34 @@ public class MostrarCancionController {
 	public String agregarComentario(@PathVariable Integer id,
 	                                @RequestParam("comment") String commentText,
 	                                @AuthenticationPrincipal UserDetails userDetails) {
-	    // Obtener la canción
+	    // obtiene la cancion
 	    Songs cancion = songRepositorio.findById(id)
 	        .orElseThrow(() -> new RuntimeException("Canción no encontrada"));
 
-	    // Obtener el usuario autenticado
+	    // obtiene el usuario autenticado
 	    User user = userRepositorio.findByUsername(userDetails.getUsername())
 	        .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
-	    // Crear el comentario
+	    // crea el comentario
 	    SongComments comentario = new SongComments();
 	    comentario.setSong(cancion);
 	    comentario.setUser(user);
 	    comentario.setCommentText(commentText);
 
-	    // Guardar el comentario
+	    // guarda el comentario
 	    songCommentsRepositorio.save(comentario);
 
-	    // Crear una notificación para cada artista de la canción
+	    // crea una notificacion para cada artista de la cancion
 	    cancion.getSongArtists().forEach(artist -> {
 	        notificationService.createNotification(
-	            artist.getArtista().getUser(), // Usuario que recibe la notificación (artista)
-	            "commentSongs",        // Tipo de notificación
-	            user,             // Usuario que hizo el comentario
-	            cancion.getId()   // ID de la canción
+	            artist.getArtista().getUser(), 
+	            "commentSongs",        
+	            user,             
+	            cancion.getId()   
 	        );
 	    });
 
-	    // Redirigir a la página de la canción
+	    
 	    return "redirect:/mostrarCancion/" + id;
 	}
 	

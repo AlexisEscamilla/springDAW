@@ -13,18 +13,15 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
 import com.example.rolas.Repositorio.AlbumArtistsRepositorio;
-import com.example.rolas.Repositorio.AlbumsRepositorio;
 import com.example.rolas.Repositorio.FollowersRepositorio;
 import com.example.rolas.Repositorio.PlaylistsRepositorio;
 import com.example.rolas.Repositorio.PostLikesRepositorio;
 import com.example.rolas.Repositorio.PostRepositorio;
 import com.example.rolas.Repositorio.SongsRepositorio;
 import com.example.rolas.Repositorio.UserRepositorio;
-import com.example.rolas.model.SongComments;
 import com.example.rolas.model.Songs;
 import com.example.rolas.model.User;
 import com.example.rolas.service.PostCommentsService;
-import com.example.rolas.service.PostService;
 import com.example.rolas.model.AlbumArtists;
 import com.example.rolas.model.Albums;
 import com.example.rolas.model.Artista;
@@ -53,12 +50,6 @@ public class MostrarPerfilController {
     private AlbumArtistsRepositorio albumArtistsRepositorio;
     
     @Autowired
-    private AlbumsRepositorio albumsRepositorio;
-    
-    @Autowired
-    private PostService postService;
-    
-    @Autowired
     private PostRepositorio postRepositorio;
     
     @Autowired
@@ -69,11 +60,11 @@ public class MostrarPerfilController {
 
     @GetMapping("/mostrarPerfil/{id}")
     public String mostrarPerfil(@PathVariable Integer id, @AuthenticationPrincipal UserDetails userDetails, Model model) {
-        // Obtener el usuario por ID
+        // obtiene el usuario por ID
         User usuario = userRepositorio.findById(id)
             .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
-        // Obtener el usuario autenticadoaaaaa
+        // obtiene el usuario autenticado
         User usuarioAutenticado = userRepositorio.findByUsername(userDetails.getUsername())
             .orElseThrow(() -> new RuntimeException("Usuario autenticado no encontrado"));
 
@@ -82,36 +73,27 @@ public class MostrarPerfilController {
         
         for (Post post : posts) {
             boolean liked = postLikesRepository.existsByUserAndPost(usuarioAutenticado, post);
-            post.setLikedByCurrentUser(liked); // Debes agregar este campo y su getter/setter en tu modelo Post
+            post.setLikedByCurrentUser(liked); 
         }
         
-        System.out.println("Comentarios:");
-        allComments.forEach(comment -> {
-            if (comment != null) {
-                System.out.println("Comentario ID: " + comment.getId() + ", Texto: " + comment.getCommentText());
-            } else {
-                System.out.println("Comentario nulo encontrado");
-            }
-        });
-        //aaaaaaaa
         Map<Integer, Integer> postCommentCounts = new HashMap<>();
         for (Post post : posts) {
             int count = (int) allComments.stream().filter(c -> c.getPost().getId().equals(post.getId())).count();
             postCommentCounts.put(post.getId(), count);
         }
         
-        // Verificar si el usuario autenticado ya sigue al usuario del perfil
+        // verifica si el usuario autenticado ya sigue al usuario del perfil
         boolean isFollowing = followersrepositorio.existsByFollowerAndFollowing(usuarioAutenticado, usuario);
 
         // Seguidores y siguiendo
         List<Followers> seguidores = followersrepositorio.findByFollower(usuario);
         List<Followers> siguiendo = followersrepositorio.findByFollowing(usuario);
 
-        // Si es artista, obtiene canciones, si no, pasa lista vacíaaaa
+        // si es artista, obtiene canciones, si no, pasa lista vacia
         Artista artista = usuario.getArtista();
         List<Songs> canciones = (artista != null) ? songsRepositorio.findByArtistaId(artista.getId()) : List.of();
         int cancionesCount = canciones.size();
-        // Obtener todas las playlists del usuarioa
+        // obtiene todas las playlists del usuario
         List<Playlists> playlists = playlistsrepositorio.findByUser(usuario);
 
         List<Albums> albums = List.of();
@@ -123,7 +105,6 @@ public class MostrarPerfilController {
                     .toList();
         }
         
-        System.out.println(albums.size());
         model.addAttribute("cancionesCount", cancionesCount);
         model.addAttribute("albums", albums);
         model.addAttribute("playlists", playlists);

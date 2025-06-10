@@ -20,11 +20,11 @@ public class Artista {
     private String discografica;
     
 
-    // Relación con la tabla SongArtists (mappedBy hace referencia a 'artista' en SongArtists)
+    
     @OneToMany(mappedBy = "artista", cascade = CascadeType.ALL)
     private Set<SongArtists> songArtists;
 
-    // Relación con la tabla AlbumArtists
+   
     @OneToMany(mappedBy = "artista", cascade = CascadeType.ALL)
     private Set<AlbumArtists> albumArtists;
 

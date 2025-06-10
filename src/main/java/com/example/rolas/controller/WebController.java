@@ -1,17 +1,13 @@
 package com.example.rolas.controller;
 
 import com.example.rolas.model.User;
-import com.example.rolas.service.PostService;
-import com.example.rolas.service.UserService;
 
-import java.security.Principal;
+
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
@@ -23,17 +19,12 @@ import com.example.rolas.Repositorio.UserRepositorio;
 import com.example.rolas.Repositorio.SongsRepositorio;
 import com.example.rolas.Repositorio.AlbumArtistsRepositorio;
 import com.example.rolas.Repositorio.AlbumsRepositorio;
-import com.example.rolas.Repositorio.ArtistaRepositorio;
 import com.example.rolas.Repositorio.PlaylistsRepositorio;
-import com.example.rolas.Repositorio.SongCommentsRepositorio;
 import com.example.rolas.model.Songs;
 import com.example.rolas.model.Albums;
-import com.example.rolas.model.Artista;
 import com.example.rolas.model.PlaylistSongs;
 import com.example.rolas.model.Playlists;
-import com.example.rolas.model.SongComments;
 import com.example.rolas.model.AlbumArtists;
-import com.example.rolas.model.Post;
 
 @Controller
 public class WebController {
@@ -52,9 +43,6 @@ public class WebController {
 	
 	@Autowired
 	private PlaylistsRepositorio playlistsRepositorio;
-	
-	@Autowired
-	private PostService postService;
 	
     @GetMapping("/")
     public String home() {
@@ -84,17 +72,17 @@ public class WebController {
         
         List<Songs> cancionesDelAlbum = songsRepositorio.findByAlbumId(album.getId());
         
-        // Obtener las relaciones de AlbumArtists
+        // obtiene las relaciones de AlbumArtists
         List<AlbumArtists> relaciones = albumArtistsRepositorio.findByAlbumId(album.getId());
         
-        // Extraer los artistas de las relaciones
+        // extrae los artistas de las relaciones
         List<User> artistasAlbum = relaciones.stream()
-            .map(AlbumArtists::getUsuario) // Suponiendo que AlbumArtists tiene un método getArtista()
+            .map(AlbumArtists::getUsuario)
             .collect(Collectors.toList());
         
         model.addAttribute("album", album);
         model.addAttribute("songs", cancionesDelAlbum);
-        model.addAttribute("artistas", artistasAlbum); // Enviar los artistas al modeloaaaaaaaaaaaaaaa
+        model.addAttribute("artistas", artistasAlbum); 
         
         return "mostrarAlbum";
     }
@@ -106,13 +94,13 @@ public class WebController {
     	User usuarioLogueado = userRepositorio.findByUsername(userDetails.getUsername()).orElse(null);
     	boolean esCreador = playlist.getUser().getId().equals(usuarioLogueado.getId());
     	
-    	// Ordena la lista de PlaylistSongs por el campo posicion (convertido a int)
+    	// ordena la lista de PlaylistSongs por el campo posicion (convertido a int)
         List<PlaylistSongs> cancionesOrdenadas = playlist.getPlaylistSongs().stream()
             .sorted(Comparator.comparingInt(ps -> {
                 try {
                     return Integer.parseInt(ps.getPosicion());
                 } catch (Exception e) {
-                    return 0; // O el valor que prefieras si no hay posición válidaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+                    return 0; 
                 }
             }))
             .toList();

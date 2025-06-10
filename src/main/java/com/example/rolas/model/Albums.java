@@ -17,14 +17,14 @@ public class Albums {
     private String title;
 
     @Column(name = "cover_art")
-    private String coverArt;  // Nombre del archivo de la portada
-
+    private String coverArt; 
+    
     @Column(name = "release_date")
     private LocalDate releaseDate;
 
-    // Relación uno a muchos con la tabla intermedia `AlbumArtists`aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+   
     @OneToMany(mappedBy = "album", cascade = CascadeType.ALL)
-    private Set<AlbumArtists> albumArtists = new HashSet<>();  // Lista de relaciones entre álbumes y artistas
+    private Set<AlbumArtists> albumArtists = new HashSet<>();  
 
     // Getters y setters
     public Integer getId() {

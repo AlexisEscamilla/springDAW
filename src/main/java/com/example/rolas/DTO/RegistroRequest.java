@@ -7,7 +7,6 @@ public class RegistroRequest {
     private String password;
     private String userType;
 
-    // Getters y setters
     public String getNombre() {
         return nombre;
     }

@@ -10,8 +10,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.rolas.DTO.AlbumDTO;
+import com.example.rolas.DTO.CancionDTO;
+import com.example.rolas.DTO.PlaylistsDTO;
+import com.example.rolas.DTO.UserDTO;
+import com.example.rolas.Repositorio.AlbumsRepositorio;
+import com.example.rolas.Repositorio.PlaylistsRepositorio;
 import com.example.rolas.Repositorio.SongsRepositorio;
 import com.example.rolas.Repositorio.UserRepositorio;
 import com.example.rolas.model.Songs;
@@ -26,24 +33,29 @@ public class ApiController {
     
     @Autowired
     private UserRepositorio userRepositorio;
+    
+    @Autowired
+    private AlbumsRepositorio albumsRepositorio;
+
+    @Autowired
+    private PlaylistsRepositorio playlistsRepositorio;
 
     @GetMapping("/buscarUsuarios")
     public List<Map<String, Object>> buscarUsuarios(@RequestParam String query) {
         List<User> usuarios;
         if (query == null || query.isBlank()) {
-            usuarios = Collections.emptyList(); // No devolver nada si no hay query
+            usuarios = Collections.emptyList();
         } else {
-            // Busca usuarios por nombre o username que contengan la query
+            // busca usuarios por nombre o username que contengan la query
             usuarios = userRepositorio.findByNombreContainingIgnoreCaseOrUsernameContainingIgnoreCase(query, query);
         }
         
-        // Mapea solo los campos necesarios
+        // mapea solo los campos necesarios
         return usuarios.stream().map(user -> {
             Map<String, Object> map = new HashMap<>();
             map.put("id", user.getId());
             map.put("nombre", user.getNombre());
             map.put("username", user.getUsername());
-            // Puedes agregar más campos si los necesitas en el frontend
             return map;
         }).collect(Collectors.toList());
     }
@@ -56,7 +68,7 @@ public class ApiController {
         } else {
             canciones = songsRepositorio.findByTitleContainingIgnoreCase(query);
         }
-        // Devuelve solo los datos necesarios para el modal
+        // devuelve solo los datos necesarios
         return canciones.stream().map(song -> {
             Map<String, Object> map = new HashMap<>();
             map.put("id", song.getId());
@@ -67,5 +79,37 @@ public class ApiController {
                 .collect(Collectors.joining(", ")));
             return map;
         }).collect(Collectors.toList());
+    }
+    
+    @GetMapping("/buscar")
+    @ResponseBody
+    public Map<String, Object> buscarJson(@RequestParam("query") String query) {
+        Map<String, Object> resultados = new HashMap<>();
+
+        List<CancionDTO> canciones = songsRepositorio.findByTitleContainingIgnoreCase(query)
+            .stream()
+            .map(CancionDTO::new)
+            .collect(Collectors.toList());
+
+        List<UserDTO> usuarios = userRepositorio.findByNombreContainingIgnoreCase(query)
+            .stream()
+            .map(UserDTO::new)
+            .collect(Collectors.toList());
+
+        List<AlbumDTO> albums = albumsRepositorio.findByTitleContainingIgnoreCase(query)
+            .stream()
+            .map(AlbumDTO::new)
+            .collect(Collectors.toList());
+
+        List<PlaylistsDTO> playlists =  playlistsRepositorio.findByTitleContainingIgnoreCase(query)
+        		.stream()
+                .map(PlaylistsDTO::new)
+                .collect(Collectors.toList());
+        
+        resultados.put("canciones", canciones);
+        resultados.put("playlists", playlists);
+        resultados.put("usuarios", usuarios);
+        resultados.put("albums", albums);
+        return resultados;
     }
 }

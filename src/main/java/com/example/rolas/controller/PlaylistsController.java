@@ -27,7 +27,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -61,24 +60,23 @@ public class PlaylistsController {
                                 @RequestParam("songIds") List<Integer> songIds,
                                 @AuthenticationPrincipal UserDetails userDetails,
                                 Model model) {
-        // Validar que el archivo no esté vacío
+        // valida que el archivo no este vacio
         if (imagen.isEmpty()) {
             model.addAttribute("error", "La imagen de la playlist es obligatoria.");
             return "subirPlaylist";
         }
 
-        // Guardar la imagen en el sistema de archivos
+        // guarda la imagen en el sistema de archivos
         String imagenFileName = imagen.getOriginalFilename();
         Path imagenPath = Path.of("uploads", imagenFileName);
 
         try {
-            // Crear la carpeta de uploads si no existe
+            
             File uploadDir = new File("uploads");
             if (!uploadDir.exists()) {
                 uploadDir.mkdir();
             }
 
-            // Guardar la imagen
             Files.copy(imagen.getInputStream(), imagenPath, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
             e.printStackTrace();
@@ -86,7 +84,7 @@ public class PlaylistsController {
             return "subirPlaylist";
         }
 
-        // Obtener el usuario autenticado
+        // obtiene el usuario autenticado
         Optional<User> usuarioOpt = userRepositorio.findByUsername(userDetails.getUsername());
         if (usuarioOpt.isEmpty()) {
             model.addAttribute("error", "Usuario no encontrado.");
@@ -95,7 +93,7 @@ public class PlaylistsController {
 
         User usuario = usuarioOpt.get();
 
-        // Crear la playlist
+        // crea la playlist
         Playlists playlist = new Playlists();
         playlist.setTitle(title);
         playlist.setCoverImage(imagenPath.toString());
@@ -103,11 +101,9 @@ public class PlaylistsController {
         playlist.setDescription(descripcion);
         playlist.setCreatedAt(LocalDate.now());
 
-        // Guardar la playlist en la base de datos
+        // guarda la playlist en la base de datos
         playlistsRepositorio.save(playlist);
-
-        // Asociar las canciones seleccionadas a la playlist
-     // ...existing code...
+        
         if (songIds != null && !songIds.isEmpty()) {
             int posicion = 1;
             for (Integer songId : songIds) {
@@ -122,14 +118,14 @@ public class PlaylistsController {
                     posicion++;
                     playlistSongsRepositorio.save(playlistSong);
 
-                    // --- Notificación al dueño de la canción ---
-                 // Notificar a todos los artistas de la canción
+                   
+                 // Notifica a todos los artistas de la cancion
                     song.getSongArtists().forEach(artist -> {
                         notificationService.createNotification(
-                            artist.getArtista().getUser(), // Usuario que recibe la notificación (artista)
-                            "playlist",                    // Tipo de notificación
-                            usuario,                       // Quien agrega la canción
-                            playlist.getId()               // ID de la playlist
+                            artist.getArtista().getUser(),
+                            "playlist",                   
+                            usuario,                       
+                            playlist.getId()               
                         );
                     });
                 }
@@ -158,10 +154,10 @@ public class PlaylistsController {
             Optional<Songs> optionalSong = songRepositorio.findById(songId);
             if (optionalSong.isPresent()) {
                 Songs song = optionalSong.get();
-                // Elimina cualquier relación previa entre esta playlist y esta canción
+                // elimina cualquier relacion previa entre esta playlist y esta cancion
                 playlistSongsRepositorio.deleteByPlaylistIdAndSongId(id, songId);
 
-                // Ahora sí, crea la nueva relación
+                // crea la nueva relación
                 PlaylistSongs playlistSong = new PlaylistSongs();
                 playlistSong.setPlaylist(playlist);
                 playlistSong.setSong(song);
@@ -170,14 +166,14 @@ public class PlaylistsController {
                 posicion++;
                 playlistSongsRepositorio.save(playlistSong);
 
-                // --- Notificación al dueño de la canción ---
-             // Notificar a todos los artistas de la canción
+                
+             // Notifica a todos los artistas de la cancion
                 song.getSongArtists().forEach(artist -> {
                     notificationService.createNotification(
-                        artist.getArtista().getUser(), // Usuario que recibe la notificación (artista)
-                        "playlist",                    // Tipo de notificación
-                        usuario,                       // Quien agrega la canción
-                        playlist.getId()               // ID de la playlist
+                        artist.getArtista().getUser(), 
+                        "playlist",                    
+                        usuario,                       
+                        playlist.getId()               
                     );
                 });
             }
@@ -186,7 +182,7 @@ public class PlaylistsController {
         return "redirect:/mostrarPlaylist/" + id;
     }
 
-    // Eliminar una canción de la playlistaaaaaaaaaaaaa
+    // elimina una cancion de la playlist
     @PostMapping("/playlist/{playlistId}/eliminarCancion/{songId}")
     public String eliminarCancionDePlaylist(
             @PathVariable Integer playlistId,
@@ -197,7 +193,7 @@ public class PlaylistsController {
         return "redirect:/mostrarPlaylist/" + playlistId;
     }
 
-    // Eliminar la playlist completaaaaaaaaa
+    // elimina la playlist completa
     @PostMapping("/playlist/{id}/eliminar")
     public String eliminarPlaylist(
             @PathVariable Integer id,

@@ -35,7 +35,7 @@ public class SecurityConfig {
             .and()
             .logout(logout -> logout
                     .logoutUrl("/logout")
-                    .logoutSuccessUrl("/login?logout") // Redirige después de cerrar sesiónaaaa
+                    .logoutSuccessUrl("/login?logout") // Redirige despues de cerrar sesion
                     .permitAll()
                 );
 
@@ -47,7 +47,7 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    // Aquí ya no hay inyección circular
+   
     @Bean
     public AuthenticationManager authenticationManager(
             HttpSecurity http,

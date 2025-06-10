@@ -65,6 +65,4 @@ public class SongComments {
 		this.createdAt = createdAt;
 	}
 
-    // Getters y setters
-    
 }

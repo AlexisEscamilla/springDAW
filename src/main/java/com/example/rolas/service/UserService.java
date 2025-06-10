@@ -30,12 +30,6 @@ public class UserService implements UserDetailsService {
     }
 
     
-
-    @Autowired
-    private PostRepositorio postRepository;
-
-    
-    
     public void save(User user) {
         userRepository.save(user);
     }
@@ -59,7 +53,7 @@ public class UserService implements UserDetailsService {
     }
     
     public User registerUser(RegistroRequest registerRequest) {
-        // Crear nuevo usuarioaaa
+        // crea nuevo usuario
         User user = new User(
         		registerRequest.getNombre(),
                 registerRequest.getUsername(),
@@ -83,10 +77,7 @@ public class UserService implements UserDetailsService {
         return Optional.empty();
     }
     
-    
- // ...existing code...
     public List<User> getSuggestedUsers(User currentUser, int limit) {
     	 return userRepository.findSuggestedUsers(currentUser.getId(), limit);
     }
-    // ...existing code...
 }

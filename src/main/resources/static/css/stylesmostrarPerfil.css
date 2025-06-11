@@ -31,8 +31,10 @@
 
       /* Header del perfil */
       .profile-header {
+        position: relative;
         display: flex;
-        align-items: center;
+        flex-wrap: wrap;
+        align-items: flex-start;
         gap: 30px;
         background: rgba(255, 255, 255, 0.05);
         backdrop-filter: blur(10px);
@@ -1042,3 +1044,30 @@
   }
 }
 
+.profile-edit-btn-container {
+  margin-left: auto;
+  align-self: flex-end;
+}
+@media (max-width: 600px) {
+  .profile-header {
+    flex-direction: column;
+    align-items: center;
+  }
+  .profile-edit-btn-container {
+    margin-left: 0;
+    align-self: center;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+}
+
+a.stat, a.stat:visited, a.stat:active {
+  color: inherit !important;
+  text-decoration: none !important;
+  background: none !important;
+  outline: none !important;
+}
+a.stat .stat-value, a.stat .stat-label {
+  color: inherit !important;
+}

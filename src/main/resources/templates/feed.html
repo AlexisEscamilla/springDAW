@@ -84,14 +84,21 @@
                 <div class="stat-value" th:text="${usuario.numPosts}">0</div>
                 <div class="stat-label">Posts</div>
               </div>
-              <div class="stat">
-                <div class="stat-value" th:text="${usuario.siguiendo}">0</div>
-                <div class="stat-label">Following</div>
-              </div>
-              <div class="stat">
-                <div class="stat-value" th:text="${usuario.seguidores}">0</div>
-                <div class="stat-label">Followers</div>
-              </div>
+
+              <a th:href="@{'/follows/' + ${usuario.id}}" class="stat">
+                <div class="stat">
+                  <div class="stat-value" th:text="${usuario.siguiendo}">0</div>
+                  <div class="stat-label">Following</div>
+                </div>
+              </a>
+              <a th:href="@{'/follows/' + ${usuario.id}}" class="stat">
+                <div class="stat">
+                  <div class="stat-value" th:text="${usuario.seguidores}">
+                    0
+                  </div>
+                  <div class="stat-label">Followers</div>
+                </div>
+              </a>
             </div>
           </div>
           <div class="sidebar-menu">
@@ -108,7 +115,7 @@
             <a href="/colecciones" class="menu-item">
               <div class="menu-text">Coleccion</div>
             </a>
-            <a href="/perfil" class="menu-item">
+            <a th:href="@{'/mostrarPerfil/' + ${usuario.id}}" class="menu-item">
               <div class="menu-text">Profile</div>
             </a>
           </div>

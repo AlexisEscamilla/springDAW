@@ -67,15 +67,18 @@
           <h1 class="username" th:text="${usuario.nombre}">Nombre</h1>
           <p class="handle" th:text="'@' + ${usuario.username}">@username</p>
           <div class="stats">
-            <div class="stat">
-              <div class="stat-number" th:text="${usuario.seguidores}">0</div>
-              <div class="stat-label">Seguidores</div>
-            </div>
-            <div class="stat">
-              <div class="stat-number" th:text="${usuario.siguiendo}">0</div>
-              <div class="stat-label">Siguiendo</div>
-            </div>
-
+            <a th:href="@{'/follows/' + ${usuario.id}}" class="stat">
+              <div class="stat">
+                <div class="stat-number" th:text="${usuario.seguidores}">0</div>
+                <div class="stat-label">Seguidores</div>
+              </div>
+            </a>
+            <a th:href="@{'/follows/' + ${usuario.id}}" class="stat">
+              <div class="stat">
+                <div class="stat-number" th:text="${usuario.siguiendo}">0</div>
+                <div class="stat-label">Siguiendo</div>
+              </div>
+            </a>
             <div class="stat">
               <div class="stat-number" th:text="${cancionesCount}">0</div>
               <div class="stat-label">Canciones</div>
@@ -100,6 +103,17 @@
             </button>
           </div>
         </div>
+        <!-- ...dentro de .profile-header, después de .profile-info... -->
+        <th:block th:if="${usuario.id == usuarioAutenticado.id}">
+          <div
+            class="profile-edit-btn-container"
+            style="margin-left: auto; align-self: flex-end"
+          >
+            <a href="/perfil" class="btn btn-primary" style="margin-top: 12px">
+              Editar perfil
+            </a>
+          </div>
+        </th:block>
       </div>
 
       <!-- Navegación de tabs -->

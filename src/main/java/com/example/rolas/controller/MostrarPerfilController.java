@@ -109,6 +109,7 @@ public class MostrarPerfilController {
         model.addAttribute("albums", albums);
         model.addAttribute("playlists", playlists);
         model.addAttribute("usuario", usuario);
+        model.addAttribute("usuarioAutenticado", usuarioAutenticado);
         model.addAttribute("seguidores", seguidores);
         model.addAttribute("siguiendo", siguiendo);
         model.addAttribute("isFollowing", isFollowing);

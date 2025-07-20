@@ -28,11 +28,8 @@ public class SecurityConfig {
                 .anyRequest().authenticated()
             )
             .formLogin()
-                .loginPage("/login")
-                .loginProcessingUrl("/login")
-                .defaultSuccessUrl("/feed", true)
-                .permitAll()
-            .and()
+                .disable()
+            
             .logout(logout -> logout
                     .logoutUrl("/logout")
                     .logoutSuccessUrl("/login?logout") // Redirige despues de cerrar sesion

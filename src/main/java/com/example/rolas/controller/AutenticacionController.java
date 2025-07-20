@@ -19,7 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-@CrossOrigin(origins = "*", maxAge = 3600)
+@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/api/auth")
 public class AutenticacionController {
@@ -72,6 +72,8 @@ public class AutenticacionController {
 
     @PostMapping("/login")
     public ResponseEntity<?> loginUser(@RequestBody LoginRequest loginRequest) {
+        System.out.println("Intentando login con: " + loginRequest.getUsername() + " / " + loginRequest.getPassword());
+
         Optional<User> userOptional = userService.authenticateUser(loginRequest);
 
         if (userOptional.isPresent()) {
@@ -80,10 +82,11 @@ public class AutenticacionController {
             Map<String, String> response = new HashMap<>();
             response.put("token", token);
             response.put("username", loginRequest.getUsername());
-            
+
             return ResponseEntity.ok(response);
         }
 
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciales inválidas");
     }
+
 }

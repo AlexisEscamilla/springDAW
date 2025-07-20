@@ -67,22 +67,16 @@ public class UserService implements UserDetailsService {
     
     public Optional<User> authenticateUser(LoginRequest loginRequest) {
         Optional<User> userOptional = userRepository.findByUsername(loginRequest.getUsername());
-
+        
         if (userOptional.isPresent()) {
             User user = userOptional.get();
-
-            System.out.println("Contraseña desde cliente: " + loginRequest.getPassword());
-            System.out.println("Contraseña en BD (hash): " + user.getPasswordHash());
-            System.out.println("Match?: " + passwordEncoder.matches(loginRequest.getPassword(), user.getPasswordHash()));
-
             if (passwordEncoder.matches(loginRequest.getPassword(), user.getPasswordHash())) {
                 return Optional.of(user);
             }
         }
-
+        
         return Optional.empty();
     }
-
     
     
     public List<User> getSuggestedUsers(User currentUser, int limit) {

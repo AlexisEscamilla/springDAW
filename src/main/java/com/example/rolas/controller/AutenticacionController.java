@@ -3,13 +3,21 @@ package com.example.rolas.controller;
 
 import com.example.rolas.Repositorio.ArtistaRepositorio;
 import com.example.rolas.Repositorio.UserRepositorio;
+import com.example.rolas.config.JwtUtil;
 import com.example.rolas.model.Artista;
 import com.example.rolas.model.User;
+import com.example.rolas.service.UserService;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -24,7 +32,9 @@ public class AutenticacionController {
     @Autowired
     private PasswordEncoder passwordEncoder;  
     
-   
+    @Autowired
+	private UserService userService;
+    
     @PostMapping("/register")
     public String registerUser(@RequestBody Map<String, Object> request, Model model) {
         String nombre = (String) request.get("nombre");
@@ -66,5 +76,20 @@ public class AutenticacionController {
         return "redirect:/login"; 
     }
 
-    
+    @PostMapping("/login")
+    public ResponseEntity<?> loginUser(@RequestBody LoginRequest loginRequest) {
+        Optional<User> userOptional = userService.authenticateUser(loginRequest);
+
+        if (userOptional.isPresent()) {
+            String token = JwtUtil.generateToken(loginRequest.getUsername());
+
+            Map<String, String> response = new HashMap<>();
+            response.put("token", token);
+            response.put("username", loginRequest.getUsername());
+            
+            return ResponseEntity.ok(response);
+        }
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciales inválidas");
+    }
 }

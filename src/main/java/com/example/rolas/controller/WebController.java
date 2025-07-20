@@ -45,9 +45,6 @@ public class WebController {
 	
 	@Autowired
 	private AlbumsRepositorio albumRepositorio;
-	
-	@Autowired
-	private UserService userService;
 
 	@Autowired
 	private AlbumArtistsRepositorio albumArtistsRepositorio;
@@ -121,23 +118,5 @@ public class WebController {
         
         return "mostrarPlaylist";
     }
-    
-    @PostMapping("/login")
-    public ResponseEntity<?> loginUser(@RequestBody LoginRequest loginRequest) {
-        Optional<User> userOptional = userService.authenticateUser(loginRequest);
 
-        if (userOptional.isPresent()) {
-            String token = JwtUtil.generateToken(loginRequest.getUsername());
-
-            Map<String, String> response = new HashMap<>();
-            response.put("token", token);
-            response.put("username", loginRequest.getUsername());
-            
-            return ResponseEntity.ok(response);
-        }
-
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciales inválidas");
-    }
-
-    
 }

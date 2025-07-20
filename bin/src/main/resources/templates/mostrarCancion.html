@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Detalles de la Canción</title>
+    <link rel="stylesheet" href="/css/stylesmostrarCancion.css" />
+  </head>
+  <body>
+    <div class="header">
+      <div class="logo">
+        <img
+          class="imagi"
+          src="https://images.vexels.com/media/users/3/150846/isolated/preview/a77bce5e752802277f78088150b16923-musica-de-icono-de-auriculares-de-audio.png"
+          alt="rolas"
+        />
+        <div class="logo-icon"></div>
+        <a href="/feed" class="tituloLogo">Rolas</a>
+      </div>
+
+      <div class="nav-links">
+        <a class="nav-link tituloNAV" href="/feed">Home</a>
+        <a class="nav-link tituloNAV" href="/explorar">Explorar</a>
+        <a class="nav-link tituloNAV" href="/mostrarNotificaciones"
+          >Notificaciones</a
+        >
+        <a class="nav-link tituloNAV" href="/chats">Chats</a>
+        <a class="nav-link tituloNAV" href="/colecciones">Colecciones</a>
+      </div>
+
+      <div class="user-menu">
+        <!-- Botón que abre el modal -->
+        <button type="button" class="btn btn-primary" onclick="abrirModal()">
+          Cerrar Sesión
+        </button>
+      </div>
+    </div>
+
+    <div class="modal" id="modalLogout">
+      <div class="modal-content">
+        <h2>¿Estás seguro de que quieres cerrar sesión?</h2>
+        <div class="modal-buttons">
+          <button class="btn btn-secondary" onclick="cerrarModal()">
+            Cancelar
+          </button>
+          <form th:action="@{/logout}" method="post">
+            <button type="submit" class="btn btn-danger">Cerrar Sesión</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+      <!-- Header del perfil -->
+      <div class="profile-header">
+        <div class="avatar">
+          <img
+            th:src="@{'/uploads/' + ${cancion.coverUrl}}"
+            alt="Avatar"
+            class="avatar-img"
+          />
+        </div>
+        <div class="profile-info">
+          <h1 class="username" th:text="${cancion.title}">TituloSong</h1>
+          <p class="handle">
+            <span th:each="sa, iterStat : ${artistas}">
+              <span th:text="${sa.artista.user.nombre}">Artista</span
+              ><span th:if="${!iterStat.last}">, </span>
+            </span>
+          </p>
+          <div class="stats">
+            <div class="stat">
+              <div class="stat-number" th:text="${cancion.duration}">0:00</div>
+              <div class="stat-label">Duración</div>
+            </div>
+            <div class="stat">
+              <div class="stat-number" th:text="${cancion.gender}">Gender</div>
+              <div class="stat-label">Género</div>
+            </div>
+
+            <div class="stat">
+              <div class="stat-number" th:text="${album.title}">--</div>
+              <div class="stat-label">Album</div>
+            </div>
+
+            <div class="stat">
+              <div
+                class="stat-number"
+                id="like-count"
+                th:text="${cancion.likeCount}"
+              >
+                0
+              </div>
+              <div class="stat-label">Likes</div>
+            </div>
+          </div>
+          <div class="profile-actions">
+            <button
+              id="like-btn"
+              class="btn btn-like"
+              th:classappend="${userHasLiked} ? 'liked' : ''"
+              th:text="${userHasLiked} ? 'Ya no me gusta' : 'Me gusta'"
+              th:onclick="'toggleLike(' + ${cancion.id} + ')'"
+            ></button>
+          </div>
+
+          <!-- ...dentro de .profile-header, después de .profile-actions... -->
+          <!-- ...dentro de .profile-header, después de .profile-actions... -->
+          <div style="position: absolute; bottom: 30px; right: 40px">
+            <button
+              class="btn btn-primary"
+              id="play-song-btn"
+              style="padding: 12px 28px; font-size: 18px"
+            >
+              ▶ Reproducir
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="content-card">
+        <h2>Comentarios</h2>
+        <form
+          th:action="@{/songs/{id}/comment(id=${cancion.id})}"
+          method="post"
+          class="comment-form"
+        >
+          <div class="comment-textarea-container">
+            <textarea
+              name="comment"
+              class="comment-input"
+              placeholder="Escribe un comentario..."
+              required
+            ></textarea>
+          </div>
+          <div class="comment-actions" style="margin-top: 8px">
+            <button type="submit" class="comment-submit-btn">Comentar</button>
+          </div>
+        </form>
+
+        <div class="comments-list">
+          <div th:each="comentario : ${comentarios}" class="comment">
+            <div
+              class="comment-header"
+              style="display: flex; align-items: center; gap: 12px"
+            >
+              <div class="comment-avatar">
+                <img
+                  th:if="${comentario.user.profilePicture != null}"
+                  th:src="@{'/uploads/' + ${comentario.user.profilePicture}}"
+                  alt="Avatar"
+                  style="
+                    width: 40px;
+                    height: 40px;
+                    border-radius: 50%;
+                    object-fit: cover;
+                    border: 2px solid #6366f1;
+                  "
+                />
+                <div
+                  th:if="${comentario.user.profilePicture == null}"
+                  th:text="${comentario.user.nombre.substring(0,1)}"
+                  class="comment-avatar-placeholder"
+                  style="
+                    width: 40px;
+                    height: 40px;
+                    border-radius: 50%;
+                    background: linear-gradient(
+                      135deg,
+                      #6366f1 0%,
+                      #8b5cf6 100%
+                    );
+                    color: white;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-weight: 600;
+                    font-size: 16px;
+                  "
+                ></div>
+              </div>
+              <div class="comment-user-info">
+                <div
+                  class="comment-user-name"
+                  th:text="${comentario.user.nombre}"
+                >
+                  Usuario
+                </div>
+                <div class="comment-username">
+                  <span th:text="'@' + ${comentario.user.username}"
+                    >@usuario</span
+                  >
+                  <span class="separator">·</span>
+                  <span
+                    class="comment-time"
+                    th:text="${#temporals.format(comentario.createdAt, 'HH:mm')}"
+                    >Hace 1h</span
+                  >
+                </div>
+              </div>
+            </div>
+            <div class="comment-content" style="margin-left: 52px">
+              <p th:text="${comentario.commentText}" class="comment-text">
+                Comentario
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="eliminaCuenta" style="text-align: center; margin-top: 24px">
+        <button
+          type="button"
+          class="btn btn-danger"
+          onclick="abrirModalEliminarCancion()"
+          th:if="${esPropietario}"
+        >
+          Eliminar canción
+        </button>
+      </div>
+
+      <!-- Modal de confirmación para eliminar canción -->
+      <div id="modalEliminarCancion" class="modal" style="display: none">
+        <div class="modal-content">
+          <p>
+            ¿Estás seguro de que deseas eliminar esta canción? Se eliminará el
+            archivo y todos los datos asociados. Esta acción no se puede
+            deshacer.
+          </p>
+          <div class="modal-buttons">
+            <form
+              th:action="@{/cancion/eliminar/{id}(id=${cancion.id})}"
+              method="post"
+            >
+              <button type="submit" class="btn btn-danger">Sí, eliminar</button>
+            </form>
+            <button
+              type="button"
+              class="btn btn-secondary"
+              onclick="cerrarModalEliminarCancion()"
+            >
+              Cancelar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ...existing code... -->
+    <div
+      id="song-player"
+      class="music-player"
+      style="display: flex; align-items: center; gap: 16px; margin: 32px 0 0 0"
+    >
+      <img
+        id="player-cover"
+        th:src="@{'/uploads/' + ${cancion.coverUrl}}"
+        alt="cover"
+        style="width: 60px; height: 60px; border-radius: 8px; object-fit: cover"
+      />
+      <div style="flex: 1">
+        <div style="font-weight: bold" th:text="${cancion.title}">Título</div>
+        <div
+          style="font-size: 0.95em; color: #aaa"
+          id="player-artists"
+          th:text="${#strings.arrayJoin(nombresArtistas, ', ')}"
+        >
+          Artista
+        </div>
+        <input
+          id="player-progress"
+          type="range"
+          min="0"
+          max="100"
+          value="0"
+          step="0.1"
+          style="width: 100%; margin-top: 6px"
+        />
+        <div
+          style="
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9em;
+            color: #aaa;
+          "
+        >
+          <span id="player-current">0:00</span>
+          <span id="player-duration">0:00</span>
+        </div>
+      </div>
+      <button
+        id="player-toggle"
+        class="btn btn-primary"
+        style="font-size: 22px; padding: 10px 18px; margin-left: 10px"
+      >
+        ▶
+      </button>
+      <audio
+        id="player-audio"
+        th:src="@{'/uploads/' + ${cancion.fileUrl}}"
+      ></audio>
+    </div>
+
+    <script>
+      function toggleLike(songId) {
+        fetch(`/songs/${songId}/like`, { method: "POST" })
+          .then((response) => response.text())
+          .then((status) => {
+            const likeBtn = document.getElementById("like-btn");
+            const likeCount = document.getElementById("like-count");
+
+            if (status === "liked") {
+              likeBtn.classList.add("liked");
+              likeBtn.textContent = "Ya no me gusta";
+              likeCount.textContent = parseInt(likeCount.textContent) + 1;
+            } else if (status === "unliked") {
+              likeBtn.classList.remove("liked");
+              likeBtn.textContent = "Me gusta";
+              likeCount.textContent = parseInt(likeCount.textContent) - 1;
+            }
+          })
+          .catch((error) => console.error("Error al dar like:", error));
+      }
+
+      function abrirModal() {
+        document.getElementById("modalLogout").style.display = "block";
+      }
+
+      function cerrarModal() {
+        document.getElementById("modalLogout").style.display = "none";
+      }
+
+      function abrirModalEliminarCancion() {
+        document.getElementById("modalEliminarCancion").style.display = "block";
+      }
+      function cerrarModalEliminarCancion() {
+        document.getElementById("modalEliminarCancion").style.display = "none";
+      }
+
+      // ...existing code...
+
+      (function () {
+        const audio = document.getElementById("player-audio");
+        const btn = document.getElementById("player-toggle");
+        const btn2 = document.getElementById("play-song-btn");
+        const progress = document.getElementById("player-progress");
+        const current = document.getElementById("player-current");
+        const duration = document.getElementById("player-duration");
+
+        function formatTime(secs) {
+          if (isNaN(secs)) return "0:00";
+          const m = Math.floor(secs / 60);
+          const s = Math.floor(secs % 60);
+          return m + ":" + (s < 10 ? "0" : "") + s;
+        }
+
+        btn.addEventListener("click", function () {
+          if (audio.paused) {
+            audio.play();
+            btn.textContent = "⏸";
+          } else {
+            audio.pause();
+            btn.textContent = "▶";
+          }
+        });
+
+        btn2.addEventListener("click", function () {
+          if (audio.paused) {
+            audio.play();
+            btn2.textContent = "⏸";
+          } else {
+            audio.pause();
+            btn2.textContent = "▶ Reproducir";
+          }
+        });
+
+        audio.addEventListener("play", function () {
+          btn.textContent = "⏸";
+          btn2.textContent = "⏸";
+        });
+        audio.addEventListener("pause", function () {
+          btn.textContent = "▶";
+          btn2.textContent = "▶ Reproducir";
+        });
+
+        audio.addEventListener("loadedmetadata", function () {
+          duration.textContent = formatTime(audio.duration);
+          progress.value = 0;
+        });
+
+        audio.addEventListener("timeupdate", function () {
+          progress.value = (audio.currentTime / audio.duration) * 100 || 0;
+          current.textContent = formatTime(audio.currentTime);
+          duration.textContent = formatTime(audio.duration);
+        });
+
+        progress.addEventListener("input", function () {
+          if (!isNaN(audio.duration)) {
+            audio.currentTime = (progress.value / 100) * audio.duration;
+          }
+        });
+      })();
+    </script>
+  </body>
+</html>

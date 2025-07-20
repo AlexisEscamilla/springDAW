@@ -1,0 +1,400 @@
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Notificaciones - Música App</title>
+    <link rel="stylesheet" href="/css/stylesmostrarNotificaciones.css" />
+  </head>
+  <body>
+    <div class="header">
+      <div class="logo">
+        <img
+          class="imagi"
+          src="https://images.vexels.com/media/users/3/150846/isolated/preview/a77bce5e752802277f78088150b16923-musica-de-icono-de-auriculares-de-audio.png"
+          alt="rolas"
+        />
+        <div class="logo-icon"></div>
+        <a href="/feed" class="tituloLogo">Rolas</a>
+      </div>
+
+      <div class="nav-links">
+        <a class="nav-link tituloNAV" href="/feed">Home</a>
+        <a class="nav-link tituloNAV" href="/explorar">Explorar</a>
+        <a class="nav-link tituloNAV" href="/mostrarNotificaciones"
+          >Notificaciones</a
+        >
+        <a class="nav-link tituloNAV" href="/chats">Chats</a>
+        <a class="nav-link tituloNAV" href="/colecciones">Colecciones</a>
+      </div>
+
+      <div class="user-menu">
+        <!-- Botón que abre el modal -->
+        <button type="button" class="btn btn-primary" onclick="abrirModal()">
+          Cerrar Sesión
+        </button>
+      </div>
+    </div>
+    <div class="container">
+      <!-- VERDADERO Header -->
+
+      <div class="modal" id="modalLogout">
+        <div class="modal-content">
+          <h2>¿Estás seguro de que quieres cerrar sesión?</h2>
+          <div class="modal-buttons">
+            <button class="btn btn-secondary" onclick="cerrarModal()">
+              Cancelar
+            </button>
+            <form th:action="@{/logout}" method="post">
+              <button type="submit" class="btn btn-danger">
+                Cerrar Sesión
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+      <!-- Header FALSO-->
+      <div class="notifications-header">
+        <div class="header-title">
+          <div class="notification-icon">
+            <img
+              style="width: 40px; height: 40px"
+              src="https://cdn-icons-png.flaticon.com/512/10099/10099006.png"
+              alt="rolas"
+            />
+          </div>
+          <div class="title-text">
+            <h1>Notificaciones</h1>
+            <p>Mantente al día con toda tu actividad musical</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filtros -->
+      <div class="notification-filters">
+        <button class="filter-btn active" onclick="filterNotifications('all')">
+          Todas <span class="filter-count"></span>
+        </button>
+        <button
+          class="filter-btn"
+          onclick="filterNotifications('new_follower')"
+        >
+          Seguidores <span class="filter-count"></span>
+        </button>
+        <button class="filter-btn" onclick="filterNotifications('like')">
+          Me gusta <span class="filter-count"></span>
+        </button>
+        <button class="filter-btn" onclick="filterNotifications('comment')">
+          Comentarios <span class="filter-count"></span>
+        </button>
+      </div>
+
+      <!-- Lista de notificaciones -->
+      <div class="notifications-list" id="notificationsList">
+        <!-- Aquí se insertarán las notificaciones dinámicamente -->
+      </div>
+
+      <!-- Paginación -->
+      <div class="pagination"></div>
+    </div>
+
+    <div class="watermark">Diseño mostrarNotificaciones - Sistema completo</div>
+
+    <script>
+      // ...existing code...
+
+      let allNotifications = [];
+      let filteredNotifications = [];
+      let currentPage = 1;
+      const pageSize = 6;
+      let currentFilter = "all";
+
+      function renderNotificationsPage(page) {
+        const notificationsList = document.getElementById("notificationsList");
+        notificationsList.innerHTML = "";
+
+        const start = (page - 1) * pageSize;
+        const end = start + pageSize;
+        const pageNotifications = filteredNotifications.slice(start, end);
+
+        if (pageNotifications.length === 0) {
+          showEmptyState(currentFilter);
+          return;
+        }
+
+        pageNotifications.forEach((notification) => {
+          let avatarClass = "";
+          let avatarImg = "";
+          let title = "";
+          let description = "";
+          let actionBtn = "";
+
+          switch (notification.type) {
+            case "new_follower":
+              avatarClass = "avatar-follow";
+              avatarImg =
+                "https://cdn-icons-png.flaticon.com/512/983/983886.png";
+              title = "¡Nuevo seguidor!";
+              description = `<strong>@${notification.sourceUser.username}</strong> comenzó a seguirte.`;
+              actionBtn = `<button class="action-btn action-view" onclick="window.location.href='/mostrarPerfil/${notification.sourceUser.id}'">Ver perfil</button>`;
+              break;
+            case "likePost":
+              avatarClass = "avatar-like";
+              avatarImg =
+                "https://cdn-icons-png.flaticon.com/512/12484/12484083.png";
+              title = "Le gustó tu post";
+              description = `A <strong>@${notification.sourceUser.username}</strong> le gustó tu post.`;
+              actionBtn = `<button class="action-btn action-view" onclick="window.location.href='/mostrarPerfil/${notification.contentId}'">Ver canción</button>`;
+              break;
+            case "likeSongs":
+              avatarClass = "avatar-like";
+              avatarImg =
+                "https://cdn-icons-png.flaticon.com/512/12484/12484083.png";
+              title = "Le gustó tu canción";
+              description = `A <strong>@${notification.sourceUser.username}</strong> le gustó tu canción.`;
+              actionBtn = `<button class="action-btn action-view" onclick="window.location.href='/mostrarCancion/${notification.contentId}'">Ver canción</button>`;
+              break;
+            case "commentPost":
+              avatarClass = "avatar-comment";
+              avatarImg =
+                "https://cdn-icons-png.flaticon.com/512/1380/1380338.png";
+              title = "Nuevo comentario en tu post";
+              description = `<strong>@${notification.sourceUser.username}</strong> comentó en tu Post.`;
+              actionBtn = `<button class="action-btn action-view" onclick="window.location.href='/mostrarPerfil/${notification.contentId}'">Ver comentario</button>`;
+              break;
+            case "commentSongs":
+              avatarClass = "avatar-comment";
+              avatarImg =
+                "https://cdn-icons-png.flaticon.com/512/1380/1380338.png";
+              title = "Nuevo comentario en tu cancion";
+              description = `<strong>@${notification.sourceUser.username}</strong> comentó en tu canción.`;
+              actionBtn = `<button class="action-btn action-view" onclick="window.location.href='/mostrarCancion/${notification.contentId}'">Ver comentario</button>`;
+              break;
+            case "playlist":
+              avatarClass = "avatar-playlist";
+              avatarImg =
+                "https://cdn-icons-png.freepik.com/512/6680/6680955.png";
+              title = "Agregado a playlist";
+              description = `Tu canción fue agregada a una playlist por <strong>@${notification.sourceUser.username}</strong>.`;
+              actionBtn = `<button class="action-btn action-view" onclick="window.location.href='/mostrarPlaylist/${notification.contentId}'">Ver playlist</button>`;
+              break;
+            default:
+              avatarClass = "avatar-system";
+              avatarImg =
+                "https://cdn-icons-png.flaticon.com/512/10099/10099006.png";
+              title = "Notificación";
+              description = "Tienes una nueva notificación.";
+              actionBtn = "";
+          }
+
+          const timeAgo = notification.createdAtFormatted;
+
+          const notificationHTML = `
+  <div class="notification-item" data-type="${notification.type}" data-id="${notification.id}">
+    <div class="notification-content">
+      <div class="notification-avatar ${avatarClass}">
+        <img style="width: 40px; height: 40px" src="${avatarImg}" alt="rolas" />
+      </div>
+      <div class="notification-info">
+        <div class="notification-title">${title}</div>
+        <div class="notification-description">${description}</div>
+        <div class="notification-meta">
+          <div class="notification-time">${timeAgo}</div>
+          <div class="notification-actions">
+            ${actionBtn}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+`;
+          notificationsList.innerHTML += notificationHTML;
+        });
+
+        renderPagination();
+      }
+
+      function renderPagination() {
+        const pagination = document.querySelector(".pagination");
+        const totalPages = Math.ceil(filteredNotifications.length / pageSize);
+        let html = "";
+
+        html += `<button class="page-btn" ${
+          currentPage === 1 ? "disabled" : ""
+        } onclick="goToPage(${currentPage - 1})">‹</button>`;
+        for (let i = 1; i <= totalPages; i++) {
+          html += `<button class="page-btn${
+            i === currentPage ? " active" : ""
+          }" onclick="goToPage(${i})">${i}</button>`;
+        }
+        html += `<button class="page-btn" ${
+          currentPage === totalPages ? "disabled" : ""
+        } onclick="goToPage(${currentPage + 1})">›</button>`;
+
+        pagination.innerHTML = html;
+      }
+
+      function goToPage(page) {
+        const totalPages = Math.ceil(filteredNotifications.length / pageSize);
+        if (page < 1 || page > totalPages) return;
+        currentPage = page;
+        renderNotificationsPage(currentPage);
+      }
+
+      function filterNotifications(type) {
+        // Actualizar botones activos
+        document.querySelectorAll(".filter-btn").forEach((btn) => {
+          btn.classList.remove("active");
+        });
+        event.target.classList.add("active");
+
+        // Oculta el estado vacío anterior si existe
+        hideEmptyState();
+
+        currentFilter = type;
+        if (type === "all") {
+          filteredNotifications = allNotifications;
+        } else {
+          filteredNotifications = allNotifications.filter(
+            (notification) => notification.type === type
+          );
+        }
+        currentPage = 1;
+        renderNotificationsPage(currentPage);
+      }
+
+      function loadNotifications() {
+        fetch("/mostrarNotificaciones/data")
+          .then((response) => {
+            if (!response.ok)
+              throw new Error("Error al cargar las notificaciones");
+            return response.json();
+          })
+          .then((notifications) => {
+            allNotifications = notifications;
+            filteredNotifications = notifications;
+            currentPage = 1;
+            currentFilter = "all";
+            renderNotificationsPage(currentPage);
+          })
+          .catch((error) => {
+            console.error("Error al cargar las notificaciones:", error);
+          });
+      }
+
+      document.addEventListener("DOMContentLoaded", loadNotifications);
+
+      function filterNotifications(type) {
+        // Actualizar botones activos
+        document.querySelectorAll(".filter-btn").forEach((btn) => {
+          btn.classList.remove("active");
+        });
+        event.target.classList.add("active");
+
+        // Oculta el estado vacío anterior si existe
+        hideEmptyState();
+
+        // Filtrar notificaciones
+        const notifications = document.querySelectorAll(".notification-item");
+        let visibleCount = 0;
+        notifications.forEach((notification) => {
+          if (type === "all") {
+            notification.style.display = "block";
+            visibleCount++;
+          } else {
+            const notificationType = notification.getAttribute("data-type");
+            if (notificationType === type) {
+              notification.style.display = "block";
+              visibleCount++;
+            } else {
+              notification.style.display = "none";
+            }
+          }
+        });
+
+        // Mostrar estado vacío si no hay notificaciones visibles
+        setTimeout(() => {
+          if (visibleCount === 0 && type !== "all") {
+            showEmptyState(type);
+          } else {
+            hideEmptyState();
+          }
+        }, 100);
+      }
+
+      function showEmptyState(type) {
+        const existing = document.querySelector(".empty-state");
+        if (existing) return;
+
+        const emptyState = document.createElement("div");
+        emptyState.className = "empty-state";
+
+        const typeMessages = {
+          new_follower: {
+            icon: "👥",
+            title: "Sin notificaciones de seguidores",
+            desc: "Cuando alguien te siga, aparecerá aquí",
+          },
+          like: {
+            icon: "❤️",
+            title: "Sin me gusta recientes",
+            desc: "Los likes a tu música aparecerán aquí",
+          },
+          comment: {
+            icon: "💬",
+            title: "Sin comentarios nuevos",
+            desc: "Los comentarios en tu música aparecerán aquí",
+          },
+          playlist: {
+            icon: "🎵",
+            title: "Sin agregados a playlist",
+            desc: "Cuando agreguen tus canciones a playlists aparecerá aquí",
+          },
+        };
+
+        const message = typeMessages[type] || {
+          icon: "🔔",
+          title: "Sin notificaciones",
+          desc: "No hay notificaciones en esta categoría",
+        };
+
+        emptyState.innerHTML = `
+                <div class="empty-icon">${message.icon}</div>
+                <div class="empty-title">${message.title}</div>
+                <div class="empty-description">${message.desc}</div>
+            `;
+
+        document.querySelector(".notifications-list").appendChild(emptyState);
+      }
+
+      function hideEmptyState() {
+        const emptyState = document.querySelector(".empty-state");
+        if (emptyState) {
+          emptyState.remove();
+        }
+      }
+
+      // Animación de entrada para notificaciones
+      document.addEventListener("DOMContentLoaded", function () {
+        const notifications = document.querySelectorAll(".notification-item");
+        notifications.forEach((notification, index) => {
+          notification.style.opacity = "0";
+          notification.style.transform = "translateY(20px)";
+
+          setTimeout(() => {
+            notification.style.transition = "all 0.5s ease";
+            notification.style.opacity = "1";
+            notification.style.transform = "translateY(0)";
+          }, index * 100);
+        });
+      });
+
+      function abrirModal() {
+        document.getElementById("modalLogout").style.display = "block";
+      }
+
+      function cerrarModal() {
+        document.getElementById("modalLogout").style.display = "none";
+      }
+    </script>
+  </body>
+</html>

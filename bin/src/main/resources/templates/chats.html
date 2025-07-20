@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <title>Chat</title>
+    <meta charset="UTF-8" />
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+    />
+    <!-- Font awesome -->
+    <link
+      rel="stylesheet"
+      href="https://use.fontawesome.com/releases/v5.5.0/css/all.css"
+    />
+
+    <link
+      rel="stylesheet"
+      href="css/styleschats.css"
+    />
+  </head>
+  <body>
+    <div class="bg-gradient bg-gradient-1"></div>
+    <div class="bg-gradient bg-gradient-2"></div>
+    <div class="bg-gradient bg-gradient-3"></div>
+
+    <!-- Cabecera igual a subirCancion -->
+    <div class="header">
+      <div class="logo">
+        <img
+          class="imagi"
+          src="https://images.vexels.com/media/users/3/150846/isolated/preview/a77bce5e752802277f78088150b16923-musica-de-icono-de-auriculares-de-audio.png"
+          alt="rolas"
+        />
+        <div class="logo-icon"></div>
+        <a href="/feed" class="tituloLogo">Rolas</a>
+      </div>
+      <div class="nav-links">
+        <a class="nav-link tituloNAV" href="/feed">Home</a>
+        <a class="nav-link tituloNAV" href="/explorar">Explorar</a>
+        <a class="nav-link tituloNAV" href="/mostrarNotificaciones"
+          >Notificaciones</a
+        >
+        <a class="nav-link tituloNAV" href="/chats">Chats</a>
+        <a class="nav-link tituloNAV" href="/colecciones">Colecciones</a>
+      </div>
+      <div class="user-menu">
+        <!-- Botón que abre el modal -->
+        <button type="button" class="btn btn-primary" onclick="abrirModal()">
+          Cerrar Sesión
+        </button>
+      </div>
+    </div>
+
+    <div id="modalLogout" class="modal" style="display: none">
+      <div class="modal-content">
+        <p>¿Estás seguro de que deseas cerrar sesión?</p>
+        <div class="modal-buttons">
+          <form th:action="@{/logout}" method="post">
+            <button type="submit" class="btn btn-danger">Sí, salir</button>
+          </form>
+          <button
+            type="button"
+            class="btn btn-secondary"
+            onclick="cerrarModal()"
+          >
+            Cancelar
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="container-fluid h-100">
+      <div class="row justify-content-center h-100">
+        <div class="col-md-4 col-xl-3 chat">
+          <div class="card mb-sm-3 mb-md-0 contacts_card">
+            <div class="card-header">
+              <div class="input-group">
+                <input
+                  type="text"
+                  placeholder="Search..."
+                  name=""
+                  class="form-control search"
+                />
+                <div class="input-group-prepend">
+                  <span class="input-group-text search_btn"
+                    ><i class="fas fa-search"></i
+                  ></span>
+                </div>
+              </div>
+            </div>
+            <div class="card-body contacts_body">
+              <ul class="contacts" id="chatList">
+                <li th:each="chat : ${conversations}">
+                  <div
+                    class="d-flex bd-highlight"
+                    th:attr="data-chat-id=${chat.id},
+              data-is-group=${chat.isGroup},
+              data-group-name=${chat.groupName},
+              data-created-by=${chat.createdBy.username},
+              data-group-photo=${chat.groupPhoto != null ? '/uploads/' + chat.groupPhoto : 'https://via.placeholder.com/50'},
+              data-partner-name=${oneToOnePartners[chat.id]?.nombre},
+              data-partner-id=${oneToOnePartners[chat.id]?.id},
+              data-partner-photo=${oneToOnePartners[chat.id]?.profilePicture != null ? '/uploads/' + oneToOnePartners[chat.id]?.profilePicture : 'https://static.turbosquid.com/Preview/001292/481/WV/_D.jpg'}"
+                    onclick="selectChat(this)"
+                  >
+                    <div class="img_cont">
+                      <img
+                        th:if="${chat.isGroup}"
+                        th:src="${chat.groupPhoto != null} ? ${'/uploads/' + chat.groupPhoto} : 'https://via.placeholder.com/50'"
+                        class="rounded-circle user_img"
+                      />
+                      <img
+                        th:if="${!chat.isGroup}"
+                        th:src="@{'/uploads/' + ${oneToOnePartners[chat.id]?.profilePicture}}"
+                        class="rounded-circle user_img"
+                      />
+                    </div>
+                    <div class="user_info">
+                      <span
+                        th:text="${chat.isGroup} ? ${chat.groupName} : ${oneToOnePartners[chat.id]?.nombre}"
+                      >
+                        Chat Name
+                      </span>
+                    </div>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <div class="card-footer"></div>
+          </div>
+        </div>
+        <div class="col-md-8 col-xl-6 chat">
+          <div class="card">
+            <div class="card-header msg_head">
+              <div class="d-flex bd-highlight">
+                <div class="img_cont">
+                  <img
+                    id="chatImage"
+                    src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_640.png"
+                    class="rounded-circle user_img"
+                  />
+                </div>
+                <div class="user_info">
+                  <h2 id="chatName"></h2>
+                </div>
+              </div>
+              <span id="action_menu_btn"
+                ><i class="fas fa-ellipsis-v"></i
+              ></span>
+              <div class="action_menu" id="actionMenu">
+                <ul id="actionMenuList">
+                  <!-- El contenido se llena dinámicamente con JS según el chat seleccionado -->
+                </ul>
+              </div>
+            </div>
+            <div class="card-body msg_card_body">
+              <div
+                class="text-center text-muted"
+                id="noMessagesMessage"
+                style="display: none"
+              >
+                No hay mensajes en este chat.
+              </div>
+            </div>
+
+            <!-- Mensajes ocultos para cada chat -->
+            <div id="hiddenMessages" style="display: none">
+              <div th:each="msg : ${messages}">
+                <div
+                  th:attr="data-chat-id=${msg.conversationId}"
+                  th:classappend="${msg.mine} ? 'd-flex justify-content-end mb-4' : 'd-flex justify-content-start mb-4'"
+                  class="message"
+                >
+                  <div th:if="${!msg.mine}" class="img_cont_msg">
+                    <img
+                      th:src="${'/uploads/' + msg.senderPhoto}"
+                      class="rounded-circle user_img_msg"
+                      data-user-id="..."
+                      onclick="goToProfile(this)"
+                    />
+                  </div>
+                  <div
+                    th:classappend="${msg.mine} ? 'msg_cotainer_send' : 'msg_cotainer'"
+                  >
+                    <span th:text="${msg.texto}">Mensaje</span>
+                    <span
+                      th:classappend="${msg.mine} ? 'msg_time_send' : 'msg_time'"
+                      th:text="${#temporals.format(msg.createdAt, 'HH:mm')}"
+                    >
+                      Hora
+                    </span>
+                  </div>
+                  <div th:if="${msg.mine}" class="img_cont_msg">
+                    <img
+                      th:src="${'/uploads/' + msg.senderPhoto}"
+                      class="rounded-circle user_img_msg"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="card-footer">
+              <form id="sendMessageForm" onsubmit="sendMessage(event)">
+                <div class="input-group">
+                  <textarea
+                    id="messageText"
+                    class="form-control type_msg"
+                    placeholder="Type your message..."
+                    style="resize: none"
+                  ></textarea>
+                  <div class="input-group-append">
+                    <button
+                      type="submit"
+                      id="sendBtn"
+                      class="btn btn-success"
+                      style="
+                        margin-left: 10px;
+                        font-size: 22px;
+                        font-weight: bold;
+                        padding: 0 22px;
+                        transition: background 0.2s;
+                      "
+                    >
+                      <i class="fas fa-location-arrow"></i> Enviar
+                    </button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Botón flotante -->
+    <div
+      id="createChatButton"
+      class="floating-buttonGrupo"
+      onclick="openCreateChatGrupoModal()"
+    >
+      <i class="fa fa-users"></i>
+    </div>
+
+    <div
+      id="createChatButton"
+      class="floating-button"
+      onclick="openCreateChatModal()"
+    >
+      <i class="fas fa-plus"></i>
+    </div>
+
+    <!-- Ventana emergente para crear chats -->
+    <div id="createChatModal" class="modal">
+      <div class="modal-content">
+        <span class="close" onclick="closeCreateChatModal()">&times;</span>
+        <h3>Crear Conversacion</h3>
+        <form id="createChatForm" onsubmit="createChat(event)">
+          <label>Selecciona el usuario:</label>
+          <div id="userList" class="user-list">
+            <ul>
+              <li th:each="user : ${followers}">
+                <button
+                  style="align-items: center; display: flex"
+                  type="button"
+                  class="user-select-btn"
+                  th:attr="data-user-id=${user.id}"
+                  onclick="toggleUserSelection(this)"
+                >
+                  <div class="img_cont">
+                    <img
+                      th:src="${'/uploads/' + user.profilePicture}"
+                      alt="Imagen de [[${user.nombre}]]"
+                      class="rounded-circle user_img"
+                    />
+                  </div>
+                  <span th:text="${user.nombre}">Nombre del usuario</span>
+                </button>
+              </li>
+            </ul>
+          </div>
+          <input type="hidden" name="selectedUsers" id="selectedUsers" />
+          <button type="submit" class="btn btn-primary">Crear Chat</button>
+
+          <!-- Mensaje de error -->
+          <div id="groupCreationError" style="color: red; display: none"></div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Ventana emergente para crear chats grupales -->
+    <div id="createChatGrupoModal" class="modal">
+      <div class="modal-content">
+        <span class="close" onclick="closeCreateChatGrupoModal()">&times;</span>
+        <h3>Crear Grupo</h3>
+        <form id="createChatForm" onsubmit="createGroup(event)">
+          <div id="groupOptions">
+            <label for="groupName">Nombre del Grupo</label>
+            <input
+              type="text"
+              id="groupName"
+              class="form-control"
+              placeholder="Nombre del grupo"
+            />
+            <label for="groupPhoto">Foto del Grupo</label>
+            <input type="file" id="groupPhoto" class="form-control" />
+          </div>
+          <label>Selecciona usuarios</label>
+          <div id="userCheckboxesGrupo">
+            <ul>
+              <li th:each="user : ${followers}">
+                <button
+                  style="align-items: center; display: flex"
+                  type="button"
+                  class="user-select-btn"
+                  th:attr="data-user-id=${user.id}"
+                  onclick="toggleUserSelection(this)"
+                >
+                  <div class="img_cont">
+                    <img
+                      th:src="${'/uploads/' + user.profilePicture}"
+                      alt="Imagen de [[${user.nombre}]]"
+                      class="rounded-circle user_img"
+                    />
+                  </div>
+                  <span th:text="${user.nombre}">Nombre del usuario</span>
+                </button>
+              </li>
+            </ul>
+          </div>
+          <button type="submit" class="btn btn-primary">Crear</button>
+
+          <!-- Mensaje de error -->
+          <span
+            id="createGroupError"
+            style="color: red; font-size: 14px"
+          ></span>
+          <span
+            id="currentUsername"
+            th:text="${user.username}"
+            style="display: none"
+          ></span>
+          <span
+            id="fotoUsuario"
+            th:text="${user.profilePicture}"
+            style="display: none"
+          ></span>
+        </form>
+      </div>
+    </div>
+
+    <!-- Modal para agregar a grupo -->
+    <!-- Modal para agregar a grupo -->
+    <!-- Modal para agregar a grupo -->
+    <!-- Modal para agregar a grupo -->
+    <!-- Modal para agregar a grupo -->
+    <div id="addToGroupModal" class="modal">
+      <div class="modal-content">
+        <span
+          class="close"
+          onclick="document.getElementById('addToGroupModal').style.display='none'"
+          >&times;</span
+        >
+        <h3>Agregar a grupo</h3>
+        <form id="addToGroupForm" onsubmit="addToGroup(event)">
+          <label for="groupSelect">Selecciona un grupo:</label>
+          <select id="groupSelect" class="form-control" required>
+            <option value="" disabled selected>Selecciona un grupo</option>
+            <!-- Renderiza los grupos del usuario -->
+            <option
+              th:each="grupo : ${gruposPropios}"
+              th:value="${grupo.id}"
+              th:text="${grupo.groupName}"
+            ></option>
+          </select>
+          <button
+            type="submit"
+            class="btn btn-primary"
+            style="margin-top: 16px"
+          >
+            Agregar
+          </button>
+        </form>
+        <div id="addToGroupMsg" style="color: green; margin-top: 10px"></div>
+      </div>
+    </div>
+  </body>
+
+  <script src="https://cdn.jsdelivr.net/npm/sockjs-client/dist/sockjs.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/stompjs/lib/stomp.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script type="text/javascript" src="scripts.js"></script>
+  <script>
+    let stompClient = null;
+    let selectedChatId = null;
+    let chatSubscription = null;
+    var input = document.getElementById("messageText");
+    var boton = document.getElementById("sendBtn");
+
+    input.addEventListener("keydown", function (event) {
+      if (event.keyCode === 13) {
+        boton.click(); // Simula el clic en el botón
+      }
+    });
+    function connect() {
+      const socket = new SockJS("/ws");
+      stompClient = Stomp.over(socket);
+      stompClient.connect({}, function () {
+        console.log("Conectado a WebSocket");
+        // No te suscribas aquí globalmente
+      });
+    }
+    connect();
+
+    function sendMessage(event) {
+      event.preventDefault();
+
+      if (!stompClient || !stompClient.connected) {
+        console.error("WebSocket no está conectado");
+        return;
+      }
+
+      if (!selectedChatId) {
+        console.error("No se ha seleccionado un chat");
+        return;
+      }
+
+      const messageText = document.getElementById("messageText").value;
+
+      // Obtén el username del sender desde el elemento con ID "currentUsername"
+      const nombreUsuario = document
+        .getElementById("currentUsername")
+        .textContent.trim();
+
+      const fotoUsuario = document
+        .getElementById("fotoUsuario")
+        .textContent.trim();
+
+      if (!nombreUsuario) {
+        console.error("No se pudo obtener el nombre de usuario del sender");
+        return;
+      }
+
+      const message = {
+        conversation: { id: selectedChatId },
+        mensajeText: messageText,
+        sender: { username: nombreUsuario }, // Incluye el `username` del usuario autenticado
+      };
+
+      stompClient.send("/app/chat", {}, JSON.stringify(message));
+
+      // Agrega el mensaje al contenedor de mensajes
+      const messagesContainer = document.querySelector(".msg_card_body");
+      const messageElement = document.createElement("div");
+      messageElement.className = "d-flex justify-content-end mb-4";
+      messageElement.innerHTML = `
+      <div class="msg_cotainer_send">
+        ${messageText}
+        <span class="msg_time_send">${new Date().toLocaleTimeString()}</span>
+      </div>
+      <div class="img_cont_msg">
+        <img src="/uploads/${fotoUsuario}" class="rounded-circle user_img_msg" />
+      </div>
+    `;
+      messagesContainer.appendChild(messageElement);
+
+      // Auto scroll al final
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+      // Limpia el campo de texto
+      document.getElementById("messageText").value = "";
+    }
+    function createChat(event) {
+      event.preventDefault();
+
+      if (!validateUserSelection()) return;
+
+      const selectedUsers = Array.from(selectedUserIds);
+      if (selectedUsers.length !== 1) {
+        alert("Por favor selecciona solo un usuario para el chat individual.");
+        return;
+      }
+
+      const userId = selectedUsers[0];
+
+      fetch("/chats/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({ userId: userId }),
+      })
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error("Error al crear el chat");
+          }
+          return response.json();
+        })
+        .then((chat) => {
+          // Cierra el modal correcto
+          document.getElementById("createChatModal").style.display = "none";
+          // Muestra feedback visual
+          alert("¡Chat creado correctamente!");
+          // Opcional: recarga la página para mostrar el nuevo chat
+          window.location.reload();
+        })
+        .catch((error) => {
+          console.error("Error al crear el chat:", error);
+          // Mostrar el mensaje de error en el modal correcto
+          const errorMessage = document.getElementById("groupCreationError");
+          errorMessage.textContent = "Hubo un problema al crear el chat.";
+          errorMessage.style.display = "block";
+        });
+    }
+
+    function createGroup(event) {
+      event.preventDefault();
+
+      const groupName = document.getElementById("groupName").value;
+      const groupPhoto = document.getElementById("groupPhoto");
+      const selectedUsers = Array.from(selectedUserIds); // asegúrate que sea solo IDs
+
+      if (selectedUsers.length < 2) {
+        showError("Debes seleccionar al menos 2 usuarios.");
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("groupName", groupName);
+      if (groupPhoto.files[0]) {
+        formData.append("groupPhoto", groupPhoto.files[0]);
+      }
+      selectedUsers.forEach((id) => formData.append("userIds", id)); // múltiple key
+
+      fetch("/chats/createGroup", {
+        method: "POST",
+        body: formData,
+      })
+        .then((response) => {
+          if (!response.ok) {
+            return response.text().then((errorMsg) => {
+              showError(errorMsg);
+              throw new Error(errorMsg);
+            });
+          }
+          return response.json();
+        })
+        .then((chat) => {
+          document.getElementById("createChatGrupoModal").style.display =
+            "none";
+          alert("¡Grupo creado correctamente!");
+          window.location.reload();
+        })
+        .catch((error) => {
+          console.error("Error al crear el grupo:", error);
+        });
+    }
+
+    function showError(message) {
+      const errorContainer = document.getElementById("createGroupError");
+      if (errorContainer) {
+        errorContainer.textContent = message;
+      }
+    }
+
+    function openCreateChatModal() {
+      document.getElementById("createChatModal").style.display = "block";
+    }
+
+    function openCreateChatGrupoModal() {
+      document.getElementById("createChatGrupoModal").style.display = "block";
+    }
+
+    function closeCreateChatModal() {
+      document.getElementById("createChatModal").style.display = "none";
+    }
+
+    function closeCreateChatGrupoModal() {
+      document.getElementById("createChatGrupoModal").style.display = "none";
+    }
+
+    function loadMessages(chatId) {
+      const messagesContainer = document.querySelector(".msg_card_body");
+      messagesContainer.innerHTML = ""; // Limpia mensajes previos
+
+      fetch(`/chats/${chatId}/messages`)
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error(`Error al cargar los mensajes: ${response.status}`);
+          }
+          return response.json();
+        })
+        .then((messages) => {
+          console.log("Respuesta del servidor:", messages); // Inspecciona la respuesta aquí
+
+          if (!Array.isArray(messages)) {
+            throw new Error("La respuesta no es un array de mensajes");
+          }
+
+          messages.forEach((msg) => {
+            const messageElement = document.createElement("div");
+            const formattedDate = new Date(msg.createdAt).toLocaleString();
+
+            if (msg.isMine) {
+              messageElement.className = "d-flex justify-content-end mb-4";
+              messageElement.innerHTML = `
+              <div class="msg_cotainer_send">
+                ${msg.texto}
+                <span class="msg_time_send">${formattedDate}</span>
+              </div>
+              <div class="img_cont_msg">
+                <img src="/uploads/${msg.senderPhoto}" class="rounded-circle user_img_msg" />
+              </div>
+            `;
+            } else {
+              messageElement.className = "d-flex justify-content-start mb-4";
+              messageElement.innerHTML = `
+              <div class="img_cont_msg">
+                <img src="/uploads/${msg.senderPhoto}" class="rounded-circle user_img_msg" />
+              </div>
+              <div class="msg_cotainer">
+                ${msg.texto}
+                <span class="msg_time">${formattedDate}</span>
+              </div>
+            `;
+            }
+
+            messagesContainer.appendChild(messageElement);
+          });
+
+          // Auto scroll al final
+          messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        })
+        .catch((error) => {
+          console.error("Error al cargar los mensajes:", error);
+        });
+    }
+
+    function selectChat(chatElement) {
+      const chatId = chatElement.getAttribute("data-chat-id");
+      const isGroup = chatElement.getAttribute("data-is-group") === "true";
+      const partnerId =
+        chatElement.getAttribute("data-user-id") ||
+        chatElement.getAttribute("data-partner-id");
+
+      const groupName = chatElement.getAttribute("data-group-name");
+      const groupPhoto = chatElement.getAttribute("data-group-photo");
+      const partnerName = chatElement.getAttribute("data-partner-name");
+      const partnerPhoto = chatElement.getAttribute("data-partner-photo");
+      const createdBy = chatElement.getAttribute("data-created-by");
+      const currentUser = document
+        .getElementById("currentUsername")
+        .textContent.trim();
+      // Actualiza el menú de acciones
+      const actionMenuList = document.getElementById("actionMenuList");
+      actionMenuList.innerHTML = ""; // Limpia el menú
+      if (chatSubscription) {
+        chatSubscription.unsubscribe();
+      }
+
+      if (!chatId) {
+        console.error("El ID del chat no es válido");
+        return;
+      }
+
+      chatSubscription = stompClient.subscribe(
+        "/topic/messages/" + chatId,
+        function (message) {
+          showMessage(JSON.parse(message.body));
+        }
+      );
+
+      if (!isGroup) {
+        actionMenuList.innerHTML += `
+        <li onclick="goToProfileFromMenu()">
+          <i class="fas fa-user-circle"></i> View profile
+        </li>
+        <li onclick="openAddToGroupModal()">
+          <i class="fas fa-plus"></i> Add to group
+        </li>
+      `;
+        // Guarda el id del usuario para usarlo en viewProfile/openAddToGroupModal
+        document
+          .getElementById("actionMenu")
+          .setAttribute("data-user-id", partnerId);
+        if (createdBy === currentUser) {
+          actionMenuList.innerHTML += `
+      <li onclick="deleteChat()">
+        <i class="fas fa-trash"></i> Eliminar chat
+      </li>
+    `;
+        }
+      } else {
+        if (createdBy === currentUser) {
+          actionMenuList.innerHTML += `
+      <li onclick="deleteChat()">
+        <i class="fas fa-trash"></i> Eliminar chat
+      </li>
+    `;
+        } else {
+          actionMenuList.innerHTML += `
+      <li onclick="leaveGroup()">
+        <i class="fas fa-sign-out-alt"></i> Salir del grupo
+      </li>
+    `;
+        }
+        document.getElementById("actionMenu").removeAttribute("data-user-id");
+      }
+      // Actualiza la variable global `selectedChatId`
+      selectedChatId = chatId;
+
+      console.log("Chat seleccionado:", chatId);
+
+      // Actualiza la imagen y el nombre del chat
+      const chatImage = document.getElementById("chatImage");
+      const chatName = document.getElementById("chatName");
+
+      chatImage.src = isGroup ? groupPhoto : partnerPhoto;
+      chatName.textContent = isGroup ? groupName : partnerName;
+
+      // Carga los mensajes del chat seleccionado
+      updateMessages(chatId);
+    }
+
+    function updateMessages(chatId) {
+      const messagesContainer = document.querySelector(".msg_card_body");
+      const noMessagesMessage = document.getElementById("noMessagesMessage");
+      const hiddenMessages = document.querySelectorAll(
+        `#hiddenMessages [data-chat-id="${chatId}"]`
+      );
+
+      console.log("Mensajes ocultos encontrados:", hiddenMessages.length);
+
+      // Limpia los mensajes previos
+      messagesContainer.innerHTML = "";
+
+      if (hiddenMessages.length === 0) {
+        console.log("No hay mensajes para este chat.");
+        if (noMessagesMessage) {
+          noMessagesMessage.style.display = "block";
+        }
+        return;
+      }
+
+      console.log("Mostrando mensajes para el chat ID:", chatId);
+
+      // Oculta el mensaje de "No hay mensajes"
+      if (noMessagesMessage) {
+        noMessagesMessage.style.display = "none";
+      }
+
+      // Agrega los mensajes filtrados al contenedor
+      hiddenMessages.forEach((msg) => {
+        messagesContainer.appendChild(msg.cloneNode(true));
+      });
+
+      // Auto scroll al final
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+
+    function showMessage(msg) {
+      // msg.conversation.id o msg.conversationId según tu DTO
+      if (!selectedChatId || msg.conversation.id != selectedChatId) return;
+
+      const messagesContainer = document.querySelector(".msg_card_body");
+      const formattedDate = new Date(msg.createdAt).toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+      const isMine =
+        msg.sender &&
+        msg.sender.username ===
+          document.getElementById("currentUsername").textContent.trim();
+
+      const messageElement = document.createElement("div");
+      messageElement.className = isMine
+        ? "d-flex justify-content-end mb-4"
+        : "d-flex justify-content-start mb-4";
+      messageElement.innerHTML = isMine
+        ? `<div class="msg_cotainer_send">${
+            msg.mensajeText || msg.texto
+          }<span class="msg_time_send">${formattedDate}</span></div>
+         <div class="img_cont_msg"><img src="/uploads/${
+           msg.senderPhoto || (msg.sender && msg.sender.profilePicture) || ""
+         }" class="rounded-circle user_img_msg" /></div>`
+        : `<div class="img_cont_msg"><img src="/uploads/${
+            msg.senderPhoto || (msg.sender && msg.sender.profilePicture) || ""
+          }" class="rounded-circle user_img_msg" /></div>
+         <div class="msg_cotainer">${
+           msg.mensajeText || msg.texto
+         }<span class="msg_time">${formattedDate}</span></div>`;
+
+      messagesContainer.appendChild(messageElement);
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+
+    // Obtener referencias a los elementos
+    const menuToggle = document.getElementById("action_menu_btn");
+    const actionMenu = document.getElementById("actionMenu");
+
+    // Función para alternar la visibilidad del menú
+    menuToggle.addEventListener("click", function (event) {
+      actionMenu.classList.toggle("active");
+      event.stopPropagation();
+    });
+
+    // Cerrar el menú cuando se hace clic en cualquier parte fuera de él
+    document.addEventListener("click", function (event) {
+      if (!actionMenu.contains(event.target) && event.target !== menuToggle) {
+        actionMenu.classList.remove("active");
+      }
+    });
+
+    // Prevenir que el menú se cierre cuando se hace clic dentro de él
+    actionMenu.addEventListener("click", function (event) {
+      event.stopPropagation();
+    });
+
+    const selectedUserIds = new Set();
+
+    function toggleUserSelection(button) {
+      const userId = button.getAttribute("data-user-id");
+
+      if (selectedUserIds.has(userId)) {
+        // Deseleccionar usuario
+        selectedUserIds.delete(userId);
+        button.classList.remove("selected"); // Elimina la clase de selección
+        console.log("Usuario deseleccionado:", userId);
+      } else {
+        // Seleccionar usuario
+        selectedUserIds.add(userId);
+        button.classList.add("selected"); // Agrega la clase de selección
+        console.log("Usuario seleccionado:", userId);
+      }
+    }
+    function validateUserSelection() {
+      if (selectedUserIds.size === 0) {
+        alert("Por favor, selecciona al menos un usuario para crear el chat.");
+        return false;
+      }
+
+      if (selectedUserIds.size > 1) {
+        alert("Solo puedes seleccionar un usuario para un chat individual.");
+        return false;
+      }
+
+      document.getElementById("selectedUsers").value =
+        Array.from(selectedUserIds).join(",");
+      return true;
+    }
+
+    function validateGroupSelection() {
+      if (selectedUserIds.size < 2) {
+        alert("Por favor, selecciona al menos 2 usuarios para crear un grupo.");
+        return false;
+      }
+
+      document.getElementById("selectedUsers").value =
+        Array.from(selectedUserIds).join(",");
+      return true;
+    }
+
+    function abrirModal() {
+      document.getElementById("modalLogout").style.display = "block";
+    }
+
+    function cerrarModal() {
+      document.getElementById("modalLogout").style.display = "none";
+    }
+
+    function viewProfile() {
+      // Solo para chat individual
+      const chatElement = document.querySelector(".contacts .active");
+      if (!chatElement) return;
+      const isGroup = chatElement.getAttribute("data-is-group") === "true";
+      if (isGroup) return;
+
+      // Obtén el id del usuario con quien hablas
+      const userId =
+        chatElement.getAttribute("data-user-id") ||
+        chatElement.getAttribute("data-partner-id");
+      if (userId) {
+        window.location.href = "/mostrarPerfil/" + userId;
+      }
+    }
+    document.querySelector("#actionMenu ul li:nth-child(1)").onclick =
+      viewProfile;
+
+    function openAddToGroupModal() {
+      // Lee el userId del menú de acciones
+      const userId = document
+        .getElementById("actionMenu")
+        .getAttribute("data-user-id");
+      if (!userId) return;
+      window.userToAddId = userId;
+      document.getElementById("addToGroupModal").style.display = "block";
+    }
+    document.querySelector("#actionMenu ul li:nth-child(2)").onclick =
+      openAddToGroupModal;
+
+    function addToGroup(event) {
+      event.preventDefault();
+      const groupId = document.getElementById("groupSelect").value;
+      const userId = window.userToAddId;
+      fetch(`/chats/${groupId}/agregarUsuario`, {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: `userId=${userId}`,
+      })
+        .then((res) => (res.ok ? res.text() : Promise.reject("Error")))
+        .then((msg) => {
+          document.getElementById("addToGroupMsg").textContent =
+            "Usuario agregado al grupo correctamente.";
+          setTimeout(() => {
+            document.getElementById("addToGroupModal").style.display = "none";
+            document.getElementById("addToGroupMsg").textContent = "";
+          }, 1500);
+        })
+        .catch(() => {
+          document.getElementById("addToGroupMsg").textContent =
+            "Error al agregar usuario.";
+        });
+    }
+
+    function leaveGroup() {
+      if (!selectedChatId) return;
+      if (
+        !confirm(
+          "¿Seguro que quieres salir de este grupo? Seguirás viendo el chat si eres agregado de nuevo."
+        )
+      )
+        return;
+      fetch(`/chats/${selectedChatId}/salir`, { method: "POST" })
+        .then((res) => {
+          if (res.ok) {
+            window.location.reload();
+          } else {
+            return res.text().then((msg) => {
+              alert(msg || "No se pudo salir del grupo");
+            });
+          }
+        })
+        .catch(() => {
+          alert("No se pudo salir del grupo");
+        });
+    }
+
+    function goToProfileFromMenu() {
+      // Lee el userId del menú de acciones
+      const userId = document
+        .getElementById("actionMenu")
+        .getAttribute("data-user-id");
+      if (userId) {
+        window.location.href = "/mostrarPerfil/" + userId;
+      }
+    }
+
+    function deleteChat() {
+      if (!selectedChatId) return;
+      if (
+        !confirm(
+          "¿Seguro que quieres eliminar este chat? Esta acción no se puede deshacer."
+        )
+      )
+        return;
+      fetch(`/chats/${selectedChatId}/eliminar`, { method: "POST" }).then(
+        (res) => {
+          if (res.ok) window.location.reload();
+          else alert("No se pudo eliminar el chat");
+        }
+      );
+    }
+  </script>
+</html>

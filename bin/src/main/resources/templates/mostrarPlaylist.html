@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Detalles de la Playlist</title>
+    <link rel="stylesheet" href="/css/stylesmostrarPlaylist.css" />
+  </head>
+  <body data-playlist-id="[[${playlist.id}]]">
+    <div class="bg-gradient bg-gradient-1"></div>
+    <div class="bg-gradient bg-gradient-2"></div>
+    <div class="bg-gradient bg-gradient-1"></div>
+
+    <div class="header">
+      <div class="logo">
+        <img
+          class="imagi"
+          src="https://images.vexels.com/media/users/3/150846/isolated/preview/a77bce5e752802277f78088150b16923-musica-de-icono-de-auriculares-de-audio.png"
+          alt="rolas"
+        />
+        <div class="logo-icon"></div>
+        <a href="/feed" class="tituloLogo">Rolas</a>
+      </div>
+
+      <div class="nav-links">
+        <a class="nav-link tituloNAV" href="/feed">Home</a>
+        <a class="nav-link tituloNAV" href="/explorar">Explorar</a>
+        <a class="nav-link tituloNAV" href="/mostrarNotificaciones"
+          >Notificaciones</a
+        >
+        <a class="nav-link tituloNAV" href="/chats">Chats</a>
+        <a class="nav-link tituloNAV" href="/colecciones">Colecciones</a>
+      </div>
+
+      <div class="user-menu">
+        <!-- Botón que abre el modal -->
+        <button type="button" class="btn btn-primary" onclick="abrirModal()">
+          Cerrar Sesión
+        </button>
+      </div>
+    </div>
+
+    <div class="modal" id="modalLogout">
+      <div class="modal-content">
+        <h2>¿Estás seguro de que quieres cerrar sesión?</h2>
+        <div class="modal-buttons">
+          <button class="btn btn-secondary" onclick="cerrarModal()">
+            Cancelar
+          </button>
+          <form th:action="@{/logout}" method="post">
+            <button type="submit" class="btn btn-danger">Cerrar Sesión</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+      <main>
+        <!-- Cabecera de la Playlist llamativa -->
+        <div class="profile-header">
+          <!-- Portada estilo banner -->
+          <div class="cover-container">
+            <img
+              th:src="@{'/' + ${playlist.coverImage}}"
+              alt="Cover"
+              class="cover-photo"
+              style="
+                width: 220px;
+                height: 220px;
+                border-radius: 16px;
+                object-fit: cover;
+                box-shadow: 0 8px 32px rgba(139, 92, 246, 0.2);
+              "
+            />
+            <div class="cover-overlay"></div>
+          </div>
+
+          <div class="profile-info">
+            <h1
+              class="username"
+              th:text="${playlist.title}"
+              style="font-size: 2.5rem; font-weight: bold; margin-bottom: 8px"
+            >
+              Título Playlist
+            </h1>
+            <div
+              class="handle"
+              style="color: #a0a0a0; font-size: 1.1rem; margin-bottom: 20px"
+            >
+              Creada por
+              <span
+                style="color: #8b5cf6; font-weight: 600"
+                th:text="${playlist.user.nombre}"
+                >Usuario</span
+              >
+            </div>
+            <div
+              class="stats"
+              style="display: flex; gap: 40px; margin-bottom: 20px"
+            >
+              <div class="stat">
+                <div
+                  class="stat-number"
+                  th:text="${#temporals.format(playlist.createdAt, 'dd/MM/yyyy')}"
+                >
+                  Fecha
+                </div>
+                <div class="stat-label">Fecha de creación</div>
+              </div>
+              <div class="stat">
+                <div
+                  class="stat-number"
+                  th:text="${#lists.size(playlist.playlistSongs)}"
+                >
+                  0
+                </div>
+                <div class="stat-label">Canciones</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ...dentro de .profile-header, después de la info... -->
+          <div style="position: absolute; bottom: 30px; right: 40px">
+            <button
+              id="play-playlist-btn"
+              class="btn btn-primary"
+              style="
+                padding: 24px 60px;
+                font-size: 2rem;
+                border-radius: 40px;
+                box-shadow: 0 8px 32px rgba(139, 92, 246, 0.2);
+              "
+            >
+              ▶ Reproducir Playlist
+            </button>
+          </div>
+        </div>
+
+        <!-- Sección de canciones -->
+        <!-- Sección de canciones -->
+        <div class="content-card" style="margin-top: 32px">
+          <h2 class="card-title">Canciones en la playlist</h2>
+          <div class="item-list">
+            <div
+              class="item"
+              th:each="cancion, iterStat : ${cancionesOrdenadas}"
+              style="
+                display: flex;
+                align-items: center;
+                gap: 18px;
+                margin-bottom: 18px;
+                background: rgba(30, 41, 59, 0.5);
+                border-radius: 10px;
+                padding: 12px;
+              "
+            >
+              <div class="item-image">
+                <img
+                  th:src="@{'/uploads/' + ${cancion.song.coverUrl}}"
+                  alt="Portada Canción"
+                  style="width: 60px; height: 60px; border-radius: 8px"
+                />
+              </div>
+              <div class="item-info" style="flex: 1">
+                <div
+                  class="item-title"
+                  th:text="${cancion.song.title}"
+                  style="font-weight: 600"
+                >
+                  Título de la canción
+                </div>
+                <div
+                  class="item-subtitle"
+                  style="font-size: 14px; color: #cbd5e1"
+                >
+                  <span th:each="sa, iterStat : ${cancion.song.songArtists}">
+                    <span th:text="${sa.artista.user.nombre}">Artista</span
+                    ><span th:if="${!iterStat.last}">, </span>
+                  </span>
+                  •
+                  <span th:text="${cancion.song.duration}">Duración</span>
+                  •
+                  <span th:text="${cancion.song.gender}">Género</span>
+                </div>
+              </div>
+
+              <div>
+                <a
+                  th:href="@{/mostrarCancion/{id}(id=${cancion.song.id})}"
+                  class="btn btn-secondary"
+                  style="padding: 8px 16px; border-radius: 8px; font-size: 14px"
+                  >Ver</a
+                >
+
+                <form
+                  th:if="${esCreador}"
+                  th:action="@{/playlist/{playlistId}/eliminarCancion/{songId}(playlistId=${playlist.id},songId=${cancion.song.id})}"
+                  method="post"
+                  style="display: inline"
+                >
+                  <button
+                    type="submit"
+                    class="btn btn-danger"
+                    style="
+                      margin-left: 8px;
+                      padding: 8px 16px;
+                      border-radius: 8px;
+                      font-size: 14px;
+                    "
+                  >
+                    Eliminar
+                  </button>
+                </form>
+              </div>
+            </div>
+            <div th:if="${#lists.isEmpty(playlist.playlistSongs)}">
+              <span>No hay canciones en esta playlist.</span>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <button
+        th:if="${esCreador}"
+        class="btn btn-primary"
+        style="
+          position: fixed;
+          bottom: 800px;
+          right: 40px;
+          z-index: 1000;
+          border-radius: 50%;
+          width: 60px;
+          height: 60px;
+          font-size: 32px;
+          font-family: auto;
+          box-shadow: 0 4px 16px rgba(139, 92, 246, 0.2);
+          background: linear-gradient(45deg, #8b5cf6, #a855f7);
+        "
+        onclick="abrirModalAgregarCancion()"
+        title="Agregar canciones"
+      >
+        +
+      </button>
+    </div>
+
+    <div th:if="${esCreador}" style="margin-top: 40px; text-align: center">
+      <form
+        th:action="@{/playlist/{id}/eliminar(id=${playlist.id})}"
+        method="post"
+      >
+        <button type="submit" class="btn btn-danger">Eliminar Playlist</button>
+      </form>
+    </div>
+
+    <!-- Modal para agregar canciones a la playlist -->
+    <div class="modal" id="modalAgregarCancion" style="display: none">
+      <div class="modal-content" style="max-width: 600px">
+        <h2>Agregar canciones a la playlist</h2>
+        <input
+          type="text"
+          id="buscadorCanciones"
+          placeholder="Buscar canciones..."
+          style="
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 16px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+          "
+          oninput="buscarCanciones()"
+          autocomplete="off"
+        />
+        <form
+          id="formAgregarCanciones"
+          th:action="@{/playlist/{id}/agregarCanciones(id=${playlist.id})}"
+          method="post"
+        >
+          <div
+            id="resultadosCanciones"
+            style="max-height: 220px; overflow-y: auto; margin-bottom: 16px"
+          >
+            <!-- Aquí se mostrarán las canciones con checkboxes -->
+          </div>
+          <div style="margin-bottom: 16px">
+            <strong>Canciones seleccionadas:</strong>
+            <div
+              id="seleccionadas"
+              style="
+                min-height: 32px;
+                margin-top: 8px;
+                display: flex;
+                flex-wrap: wrap;
+                gap: 8px;
+              "
+            ></div>
+          </div>
+          <div class="modal-buttons">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              onclick="cerrarModalAgregarCancion()"
+            >
+              Cancelar
+            </button>
+            <button type="submit" class="btn btn-primary">
+              Agregar seleccionadas
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div
+      id="playlist-player"
+      class="music-player"
+      style="display: flex; align-items: center; gap: 16px; margin: 32px 0 0 0"
+    >
+      <img
+        id="playlist-player-cover"
+        src=""
+        alt="cover"
+        style="width: 60px; height: 60px; border-radius: 8px; object-fit: cover"
+      />
+      <div style="flex: 1">
+        <div style="font-weight: bold" id="playlist-player-title">Título</div>
+        <div
+          style="font-size: 0.95em; color: #aaa"
+          id="playlist-player-artists"
+        >
+          Artista
+        </div>
+        <input
+          id="playlist-player-progress"
+          type="range"
+          min="0"
+          max="100"
+          value="0"
+          step="0.1"
+          style="width: 100%; margin-top: 6px"
+        />
+        <div
+          style="
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9em;
+            color: #aaa;
+          "
+        >
+          <span id="playlist-player-current">0:00</span>
+          <span id="playlist-player-duration">0:00</span>
+        </div>
+      </div>
+      <button
+        id="playlist-player-toggle"
+        class="btn btn-primary"
+        style="font-size: 22px; padding: 10px 18px; margin-left: 10px"
+      >
+        ▶
+      </button>
+      <button
+        id="playlist-player-prev"
+        class="btn btn-secondary"
+        style="font-size: 18px; padding: 8px 12px; margin-left: 6px"
+        title="Anterior"
+      >
+        «
+      </button>
+      <button
+        id="playlist-player-next"
+        class="btn btn-secondary"
+        style="font-size: 18px; padding: 8px 12px; margin-left: 6px"
+        title="Siguiente"
+      >
+        »
+      </button>
+      <audio id="playlist-player-audio"></audio>
+    </div>
+
+    <script th:inline="javascript">
+      /*<![CDATA[*/
+      var playlistSongs = [
+        /*[# th:each="cancion, stat : ${cancionesOrdenadas}"]*/
+        {
+          fileUrl: /*[[@{'/uploads/' + ${cancion.song.fileUrl}}]]*/,
+          coverUrl: /*[[@{'/uploads/' + ${cancion.song.coverUrl}}]]*/,
+          title: /*[[${cancion.song.title}]]*/,
+          artists: /*[[${#strings.arrayJoin(cancion.song.songArtists.?[artista != null].![artista.user.nombre], ', ')}]]*/
+        }/*[# th:if="${!stat.last}"]*/,/*[/]*/
+        /*[/]*/
+      ];
+      /*]]>*/
+    </script>
+
+    <script th:inline="javascript">
+      (function () {
+        let currentIndex = 0;
+        console.log(playlistSongs);
+        const audio = document.getElementById("playlist-player-audio");
+        const btnPlay = document.getElementById("playlist-player-toggle");
+        const btnPrev = document.getElementById("playlist-player-prev");
+        const btnNext = document.getElementById("playlist-player-next");
+        const progress = document.getElementById("playlist-player-progress");
+        const current = document.getElementById("playlist-player-current");
+        const duration = document.getElementById("playlist-player-duration");
+        const cover = document.getElementById("playlist-player-cover");
+        const title = document.getElementById("playlist-player-title");
+        const artists = document.getElementById("playlist-player-artists");
+        const btnPlayPlaylist = document.getElementById("play-playlist-btn");
+
+        function formatTime(secs) {
+          if (isNaN(secs)) return "0:00";
+          const m = Math.floor(secs / 60);
+          const s = Math.floor(secs % 60);
+          return m + ":" + (s < 10 ? "0" : "") + s;
+        }
+
+        function loadSong(idx, autoPlay = false) {
+          if (!playlistSongs[idx]) return;
+          audio.src = playlistSongs[idx].fileUrl;
+          cover.src = playlistSongs[idx].coverUrl;
+          title.textContent = playlistSongs[idx].title;
+          artists.textContent = playlistSongs[idx].artists;
+          progress.value = 0;
+          current.textContent = "0:00";
+          duration.textContent = "0:00";
+          currentIndex = idx;
+          if (autoPlay) {
+            audio.play();
+            btnPlay.textContent = "⏸";
+            btnPlayPlaylist.textContent = "⏸ Pausar Playlist";
+          } else {
+            btnPlay.textContent = "▶";
+            btnPlayPlaylist.textContent = "▶ Reproducir Playlist";
+          }
+        }
+
+        // Botón gigante: inicia o pausa la playlist
+        btnPlayPlaylist.addEventListener("click", function () {
+          if (audio.paused) {
+            loadSong(currentIndex, true);
+          } else {
+            audio.pause();
+            btnPlayPlaylist.textContent = "▶ Reproducir Playlist";
+          }
+        });
+
+        // Botón pequeño play/pause
+        btnPlay.addEventListener("click", function () {
+          if (audio.paused) {
+            audio.play();
+            btnPlay.textContent = "⏸";
+            btnPlayPlaylist.textContent = "⏸ Pausar Playlist";
+          } else {
+            audio.pause();
+            btnPlay.textContent = "▶";
+            btnPlayPlaylist.textContent = "▶ Reproducir Playlist";
+          }
+        });
+
+        // Siguiente canción
+        btnNext.addEventListener("click", function () {
+          if (currentIndex < playlistSongs.length - 1) {
+            loadSong(currentIndex + 1, true);
+          }
+        });
+
+        // Anterior canción
+        btnPrev.addEventListener("click", function () {
+          if (currentIndex > 0) {
+            loadSong(currentIndex - 1, true);
+          }
+        });
+
+        audio.addEventListener("play", function () {
+          btnPlay.textContent = "⏸";
+          btnPlayPlaylist.textContent = "⏸ Pausar Playlist";
+        });
+        audio.addEventListener("pause", function () {
+          btnPlay.textContent = "▶";
+          btnPlayPlaylist.textContent = "▶ Reproducir Playlist";
+        });
+
+        audio.addEventListener("loadedmetadata", function () {
+          duration.textContent = formatTime(audio.duration);
+          progress.value = 0;
+        });
+
+        audio.addEventListener("timeupdate", function () {
+          progress.value = (audio.currentTime / audio.duration) * 100 || 0;
+          current.textContent = formatTime(audio.currentTime);
+          duration.textContent = formatTime(audio.duration);
+        });
+
+        progress.addEventListener("input", function () {
+          if (!isNaN(audio.duration)) {
+            audio.currentTime = (progress.value / 100) * audio.duration;
+          }
+        });
+
+        // Reproducción automática al terminar la canción
+        audio.addEventListener("ended", function () {
+          if (currentIndex < playlistSongs.length - 1) {
+            loadSong(currentIndex + 1, true);
+          } else {
+            btnPlay.textContent = "▶";
+            btnPlayPlaylist.textContent = "▶ Reproducir Playlist";
+            audio.currentTime = 0;
+          }
+        });
+
+        // Inicia con la primera canción cargada si hay canciones
+        if (playlistSongs.length > 0) {
+          loadSong(0, false);
+        } else {
+          btnPlay.disabled = true;
+          btnPrev.disabled = true;
+          btnNext.disabled = true;
+          btnPlayPlaylist.disabled = true;
+        }
+      })();
+
+      //ALKSALSKALSKALASKQASL
+      //ALKSALSKALSKALASKQASL
+      //ALKSALSKALSKALASKQASL
+      //ALKSALSKALSKALASKQASL
+      //ALKSALSKALSKALASKQASL
+      //ALKSALSKALSKALASKQASL
+
+      function buscarCanciones() {
+        const query = document.getElementById("buscadorCanciones").value.trim();
+        const contenedor = document.getElementById("resultadosCanciones");
+        if (query.length === 0) {
+          contenedor.innerHTML = "";
+          return;
+        }
+        fetch("/api/canciones?query=" + encodeURIComponent(query))
+          .then((r) => r.json())
+          .then((canciones) => {
+            contenedor.innerHTML = "";
+            canciones.forEach((c) => {
+              const div = document.createElement("div");
+              div.style.display = "flex";
+              div.style.alignItems = "center";
+              div.style.gap = "10px";
+              div.style.marginBottom = "8px";
+              div.innerHTML = `
+          <input type="checkbox" name="songIds" value="${c.id}" id="cancion-${
+                c.id
+              }" ${cancionesSeleccionadas[c.id] ? "checked" : ""}>
+          <label for="cancion-${c.id}">
+            <img src="/uploads/${
+              c.coverUrl
+            }" alt="" style="width:32px;height:32px;border-radius:6px;vertical-align:middle;margin-right:8px;">
+            <strong>${c.title}</strong> <span style="color:#aaa;">${
+                c.artists
+              }</span>
+          </label>
+        `;
+              div
+                .querySelector("input")
+                .addEventListener("change", function (e) {
+                  if (e.target.checked) {
+                    cancionesSeleccionadas[c.id] = c;
+                  } else {
+                    delete cancionesSeleccionadas[c.id];
+                  }
+                  renderSeleccionadas();
+                });
+              contenedor.appendChild(div);
+            });
+            renderSeleccionadas();
+          });
+      }
+
+      function renderSeleccionadas() {
+        const seleccionadasDiv = document.getElementById("seleccionadas");
+        seleccionadasDiv.innerHTML = "";
+        Object.values(cancionesSeleccionadas).forEach((c) => {
+          const tag = document.createElement("span");
+          tag.style.background = "#8b5cf6";
+          tag.style.color = "white";
+          tag.style.padding = "4px 10px";
+          tag.style.borderRadius = "12px";
+          tag.style.display = "inline-flex";
+          tag.style.alignItems = "center";
+          tag.style.gap = "6px";
+          tag.innerHTML = `
+      <img src="/uploads/${c.coverUrl}" style="width:18px;height:18px;border-radius:4px;vertical-align:middle;">
+      ${c.title}
+      <button type="button" style="background:none;border:none;color:white;font-weight:bold;cursor:pointer;font-size:14px;" onclick="deseleccionarCancion(${c.id})">&times;</button>
+      `;
+          seleccionadasDiv.appendChild(tag);
+        });
+        // Sincroniza los checkboxes
+        document
+          .querySelectorAll("#resultadosCanciones input[type=checkbox]")
+          .forEach((cb) => {
+            cb.checked = !!cancionesSeleccionadas[cb.value];
+          });
+      }
+
+      function deseleccionarCancion(id) {
+        delete cancionesSeleccionadas[id];
+        renderSeleccionadas();
+      }
+
+      // Al enviar el formulario, solo envía los seleccionados
+      document
+        .getElementById("formAgregarCanciones")
+        .addEventListener("submit", function (e) {
+          // Elimina todos los checkboxes no seleccionados antes de enviar
+          document
+            .querySelectorAll("#resultadosCanciones input[type=checkbox]")
+            .forEach((cb) => {
+              if (!cb.checked) cb.parentNode.removeChild(cb);
+            });
+        });
+
+      function abrirModalEliminarCancion(songId) {
+        const modal = document.getElementById("modalEliminarCancion");
+        const form = document.getElementById("formEliminarCancion");
+        const playlistId = document.body.getAttribute("data-playlist-id");
+        // Agrega el contexto de la aplicación (si existe)
+        const contextPath = window.location.pathname.split("/")[1]; // Obtiene el contexto de la URL
+        form.action = `/${contextPath}/playlist/${playlistId}/eliminarCancion/${songId}`;
+        modal.style.display = "flex";
+      }
+
+      function cerrarModalEliminarCancion() {
+        document.getElementById("modalEliminarCancion").style.display = "none";
+      }
+
+      function abrirModalAgregarCancion() {
+        document.getElementById("modalAgregarCancion").style.display = "flex";
+        buscarCanciones(); // Carga todas las canciones al abrir
+      }
+      function cerrarModalAgregarCancion() {
+        document.getElementById("modalAgregarCancion").style.display = "none";
+      }
+      async function buscarCanciones() {
+        const query = document.getElementById("buscadorCanciones").value;
+        const response = await fetch(
+          "/api/canciones?query=" + encodeURIComponent(query)
+        );
+        const canciones = await response.json();
+        const contenedor = document.getElementById("resultadosCanciones");
+        contenedor.innerHTML = "";
+        canciones.forEach((c) => {
+          const div = document.createElement("div");
+          div.style.display = "flex";
+          div.style.alignItems = "center";
+          div.style.gap = "10px";
+          div.style.marginBottom = "8px";
+          div.innerHTML = `
+            <input type="checkbox" name="songIds" value="${c.id}" id="cancion-${c.id}">
+            <label for="cancion-${c.id}">
+              <img src="/uploads/${c.coverUrl}" alt="" style="width:32px;height:32px;border-radius:6px;vertical-align:middle;margin-right:8px;">
+              <strong>${c.title}</strong> <span style="color:#aaa;">${c.artists}</span>
+            </label>
+          `;
+          contenedor.appendChild(div);
+        });
+      }
+    </script>
+  </body>
+</html>

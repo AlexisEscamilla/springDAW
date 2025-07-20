@@ -1,0 +1,612 @@
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Rolas</title>
+    <link rel="stylesheet" href="/css/stylesFeed.css" />
+  </head>
+  <body>
+    <div class="bg-gradient bg-gradient-1"></div>
+    <div class="bg-gradient bg-gradient-2"></div>
+    <div class="bg-gradient bg-gradient-3"></div>
+
+    <div class="container">
+      <header>
+        <div class="logo">
+          <img
+            class="imagi"
+            src="https://images.vexels.com/media/users/3/150846/isolated/preview/a77bce5e752802277f78088150b16923-musica-de-icono-de-auriculares-de-audio.png"
+            alt="rolas"
+          />
+          <div class="logo-icon"></div>
+          <a href="/feed">Rolas</a>
+        </div>
+
+        <div class="action-buttons">
+          <!-- Botón que abre el modal -->
+          <button type="button" class="btn btn-primary" onclick="abrirModal()">
+            Cerrar Sesión
+          </button>
+        </div>
+
+        <!-- Modal de confirmación -->
+        <div id="modalLogout" class="modal" style="display: none">
+          <div class="modal-content">
+            <p>¿Estás seguro de que deseas cerrar sesión?</p>
+            <div class="modal-buttons">
+              <form th:action="@{/logout}" method="post">
+                <button type="submit" class="btn btn-danger">Sí, salir</button>
+              </form>
+              <button
+                type="button"
+                class="btn btn-secondary"
+                onclick="cerrarModal()"
+              >
+                Cancelar
+              </button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <main class="feed-container">
+        <!-- Left Sidebar -->
+        <aside class="sidebar">
+          <div class="profile-card">
+            <div class="profile-avatar">
+              <!-- Si el usuario tiene imagen de perfil -->
+              <a
+                th:href="@{'/mostrarPerfil/' + ${usuario.id}}"
+                class="avatar-link"
+              >
+                <img
+                  th:if="${usuario.profilePicture != null}"
+                  th:src="@{'/uploads/' + ${usuario.profilePicture}}"
+                  class="avatar-img"
+                  alt="Avatar"
+                />
+
+                <!-- Si no tiene imagen, muestra inicial -->
+                <div
+                  th:if="${usuario.profilePicture == null}"
+                  th:text="${usuario.nombre.substring(0,1)}"
+                  class="avatar-placeholder"
+                ></div>
+              </a>
+            </div>
+
+            <h2 th:text="${usuario.nombre}">Nombre</h2>
+            <div class="profile-username" th:text="'@' + ${usuario.username}">
+              @usuario
+            </div>
+            <div class="profile-stats">
+              <div class="stat">
+                <div class="stat-value" th:text="${usuario.numPosts}">0</div>
+                <div class="stat-label">Posts</div>
+              </div>
+
+              <a th:href="@{'/follows/' + ${usuario.id}}" class="stat">
+                <div class="stat">
+                  <div class="stat-value" th:text="${usuario.siguiendo}">0</div>
+                  <div class="stat-label">Following</div>
+                </div>
+              </a>
+              <a th:href="@{'/follows/' + ${usuario.id}}" class="stat">
+                <div class="stat">
+                  <div class="stat-value" th:text="${usuario.seguidores}">
+                    0
+                  </div>
+                  <div class="stat-label">Followers</div>
+                </div>
+              </a>
+            </div>
+          </div>
+          <div class="sidebar-menu">
+            <h3>Menu</h3>
+            <a href="/explorar" class="menu-item">
+              <div class="menu-text">Explorar</div>
+            </a>
+            <a href="/mostrarNotificaciones" class="menu-item">
+              <div class="menu-text">Notificaciones</div>
+            </a>
+            <a href="/chats" class="menu-item">
+              <div class="menu-text">Chats</div>
+            </a>
+            <a href="/colecciones" class="menu-item">
+              <div class="menu-text">Coleccion</div>
+            </a>
+            <a th:href="@{'/mostrarPerfil/' + ${usuario.id}}" class="menu-item">
+              <div class="menu-text">Profile</div>
+            </a>
+          </div>
+        </aside>
+
+        <!-- Main Feed -->
+        <section class="feed">
+          <div class="post-creator">
+            <form
+              th:action="@{/feed/create}"
+              method="post"
+              enctype="multipart/form-data"
+            >
+              <div class="post-input-container">
+                <div class="creator-avatar">
+                  <a
+                    th:href="@{'/mostrarPerfil/' + ${usuario.id}}"
+                    class="avatar-link"
+                  >
+                    <img
+                      th:if="${usuario.profilePicture != null}"
+                      th:src="@{'/uploads/' + ${usuario.profilePicture}}"
+                      class="avatar-imgcreator"
+                      alt="Avatar"
+                    />
+                    <div
+                      th:if="${usuario.profilePicture == null}"
+                      th:text="${usuario.nombre.substring(0,1)}"
+                      class="avatar-placeholder"
+                    ></div>
+                  </a>
+                </div>
+                <textarea
+                  name="content"
+                  class="post-input"
+                  placeholder="¿Qué estás pensando?"
+                  required
+                ></textarea>
+              </div>
+              <div class="post-actions">
+                <input
+                  type="file"
+                  name="imageUrl"
+                  class="attachment-btn"
+                  id="postFileInput"
+                  accept="image/*"
+                  style="display: none"
+                  onchange="previewPostImage(event)"
+                />
+                <label for="postFileInput" class="attachment-label">
+                  <span class="file-icon">📷</span>
+                  <span>Adjuntar imagen</span>
+                </label>
+                <div
+                  id="postImagePreviewContainer"
+                  style="margin-top: 10px; display: none"
+                >
+                  <img
+                    id="postImagePreview"
+                    src=""
+                    alt="Vista previa"
+                    style="
+                      max-width: 120px;
+                      border-radius: 8px;
+                      display: block;
+                      margin-bottom: 4px;
+                    "
+                  />
+                  <span
+                    id="postImageName"
+                    style="font-size: 0.95em; color: #4f46e5"
+                  ></span>
+                </div>
+                <button type="submit" class="btn btn-primary">Publicar</button>
+              </div>
+            </form>
+          </div>
+
+          <div th:each="post : ${posts}" class="post">
+            <!-- Información del post -->
+            <div class="post-header">
+              <div class="creator-avatar">
+                <a
+                  th:href="@{'/mostrarPerfil/' + ${post.user.id}}"
+                  class="avatar-link"
+                >
+                  <img
+                    th:if="${post.user.profilePicture != null}"
+                    th:src="@{'/uploads/' + ${post.user.profilePicture}}"
+                    class="avatar-imgcreator"
+                    alt="Avatar"
+                  />
+                  <div
+                    th:if="${post.user.profilePicture == null}"
+                    th:text="${post.user.nombre.substring(0,1)}"
+                    class="avatar-placeholder"
+                  ></div>
+                </a>
+              </div>
+              <div class="post-user-info">
+                <div class="post-user-name" th:text="${post.user.nombre}">
+                  Nombre
+                </div>
+                <div class="post-username">
+                  <span th:text="'@' + ${post.user.username}">@usuario</span> ·
+                  <span
+                    class="post-time"
+                    th:text="${#temporals.format(post.createdAt, 'HH:mm')}"
+                  >
+                    Hace 2h
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Contenido del post -->
+            <div class="post-content">
+              <p th:text="${post.content}">Contenido del post</p>
+            </div>
+
+            <div th:if="${!#strings.isEmpty(post.imageUrl)}">
+              <img
+                th:src="@{'/uploads/' + ${post.imageUrl}}"
+                alt="Imagen del post"
+                class="post-image"
+              />
+            </div>
+
+            <!-- Interacciones -->
+            <div class="post-interactions">
+              <!-- Botón de Like -->
+              <form
+                th:action="@{/posts/{postId}/likes(postId=${post.id})}"
+                method="post"
+              >
+                <button
+                  type="submit"
+                  class="interaction"
+                  th:classappend="${post.likedByCurrentUser} ? ' liked' : ''"
+                  onclick="handleLikeClick(this, event)"
+                  th:onclick="|handleLikeClick(this, event); submitLike(${post.id});|"
+                >
+                  <span
+                    class="heart-icon"
+                    th:classappend="${post.likedByCurrentUser} ? ' filled' : ' outline'"
+                    th:text="${post.likedByCurrentUser} ? '❤️' : '🤍'"
+                    >🤍</span
+                  >
+                  <span th:text="${post.likeCount}">0</span>
+                </button>
+              </form>
+
+              <!-- Botón para mostrar comentarios -->
+              <button
+                type="button"
+                class="interaction"
+                th:onclick="|toggleComments('comments-' + ${post.id})|"
+              >
+                💬
+                <span th:text="${postCommentCounts[post.id]}">0</span>
+              </button>
+            </div>
+
+            <!-- Comentarios -->
+            <div
+              th:id="'comments-' + ${post.id}"
+              class="comments-section"
+              style="display: none"
+            >
+              <!-- Lista de comentarios -->
+              <div class="comments-list">
+                <div
+                  th:each="comment : ${comments}"
+                  th:if="${comment != null and comment.post.id == post.id}"
+                  class="comment"
+                >
+                  <div class="comment-header">
+                    <div class="comment-avatar">
+                      <img
+                        th:if="${comment.user.profilePicture != null}"
+                        th:src="@{'/uploads/' + ${comment.user.profilePicture}}"
+                        alt="Avatar"
+                      />
+                      <div
+                        th:if="${comment.user.profilePicture == null}"
+                        th:text="${comment.user.nombre.substring(0,1)}"
+                        class="comment-avatar-placeholder"
+                      ></div>
+                    </div>
+                    <div class="comment-user-info">
+                      <div
+                        class="comment-user-name"
+                        th:text="${comment.user.nombre}"
+                      >
+                        Nombre
+                      </div>
+                      <div class="comment-username">
+                        <span th:text="'@' + ${comment.user.username}"
+                          >@usuario</span
+                        >
+                        <span class="separator">·</span>
+                        <span
+                          class="comment-time"
+                          th:text="${#temporals.format(comment.createdAt, 'HH:mm')}"
+                        >
+                          Hace 1h
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="comment-content">
+                    <p th:text="${comment.commentText}" class="comment-text">
+                      Texto del comentario
+                    </p>
+                    <div th:if="${!#strings.isEmpty(comment.imagenAdjuntada)}">
+                      <img
+                        th:src="@{'/uploads/' + ${comment.imagenAdjuntada}}"
+                        alt="Imagen del comentario"
+                        class="comment-image"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <form
+                th:action="@{/posts/{postId}/comments(postId=${post.id})}"
+                method="post"
+                enctype="multipart/form-data"
+                class="comment-form"
+              >
+                <div class="comment-textarea-container">
+                  <textarea
+                    name="commentText"
+                    class="comment-input"
+                    placeholder="Escribe un comentario..."
+                    required
+                  ></textarea>
+                </div>
+
+                <div class="comment-actions">
+                  <div>
+                    <input
+                      type="file"
+                      name="imageUrl"
+                      id="commentFileInput-${post.id}"
+                      class="comment-file-input"
+                      accept="image/*"
+                    />
+                    <label
+                      for="commentFileInput-${post.id}"
+                      class="comment-file-label"
+                    >
+                      <span class="file-icon">📷</span>
+                      <span>Adjuntar imagen</span>
+                    </label>
+                  </div>
+
+                  <button type="submit" class="comment-submit-btn">
+                    Comentar
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </section>
+
+        <!-- Right Sidebar -->
+        <aside class="trending-sidebar sidebar">
+          <!-- Tendencias -->
+          <h3 style="margin-bottom: 16px">Tendencias</h3>
+          <div th:if="${#lists.isEmpty(trendingHashtags)}">
+            <div class="trending-card">No hay tendencias recientes.</div>
+          </div>
+          <div th:each="trend : ${trendingHashtags}" class="trending-card">
+            <div class="trending-title">
+              #<span th:text="${trend.hashtag}">hashtag</span>
+            </div>
+            <div class="trending-meta">
+              <span th:text="${trend.count}">0</span> usos en 24h
+              <span
+                th:if="${trend.growth > 0}"
+                style="color: #22c55e; font-weight: bold"
+              >
+                ↑ +<span th:text="${trend.growth}">0</span>
+              </span>
+              <span
+                th:if="${trend.growth < 0}"
+                style="color: #ef4444; font-weight: bold"
+              >
+                ↓ <span th:text="${trend.growth}">0</span>
+              </span>
+            </div>
+          </div>
+
+          <!-- A quién seguir -->
+          <h3 style="margin: 24px 0 16px 0">A quién seguir</h3>
+          <div th:if="${#lists.isEmpty(suggestedUsers)}">
+            <div class="trending-card">No hay sugerencias por ahora.</div>
+          </div>
+          <div
+            th:each="userSug : ${suggestedUsers}"
+            class="suggested-user-card trending-card"
+            style="
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+              margin-bottom: 8px;
+            "
+          >
+            <div
+              class="suggested-user-info"
+              style="display: flex; align-items: center"
+            >
+              <a th:href="@{'/mostrarPerfil/' + ${userSug.id}}">
+                <img
+                  th:if="${userSug.profilePicture != null}"
+                  th:src="@{'/uploads/' + ${userSug.profilePicture}}"
+                  class="avatar-imgcreator"
+                  alt="Avatar"
+                />
+                <div
+                  th:if="${userSug.profilePicture == null}"
+                  th:text="${userSug.nombre.substring(0,1)}"
+                  class="avatar-placeholder"
+                ></div>
+              </a>
+              <div style="margin-left: 10px">
+                <div th:text="${userSug.nombre}">Nombre</div>
+                <div
+                  th:text="'@' + ${userSug.username}"
+                  style="font-size: 0.9em; color: #888"
+                >
+                  @usuario
+                </div>
+              </div>
+            </div>
+            <form
+              th:action="@{'/users/' + ${userSug.id} + '/follow'}"
+              method="post"
+              style="display: inline"
+              onsubmit="return followUserAjax(this, event);"
+            >
+              <button type="submit" class="btn btn-primary btn-follow">
+                Seguir
+              </button>
+            </form>
+          </div>
+        </aside>
+        <!-- ...existing code... -->
+      </main>
+    </div>
+
+    <script>
+      function abrirModal() {
+        document.getElementById("modalLogout").style.display = "block";
+      }
+
+      function cerrarModal() {
+        document.getElementById("modalLogout").style.display = "none";
+      }
+
+      function toggleComments(commentsId) {
+        const commentsSection = document.getElementById(commentsId);
+        if (
+          commentsSection.style.display === "none" ||
+          commentsSection.style.display === ""
+        ) {
+          commentsSection.style.display = "block";
+        } else {
+          commentsSection.style.display = "none";
+        }
+      }
+
+      // Mejorar la experiencia del textarea
+      document.addEventListener("DOMContentLoaded", function () {
+        const textareas = document.querySelectorAll(".comment-input");
+
+        textareas.forEach((textarea) => {
+          textarea.addEventListener("input", function () {
+            this.style.height = "auto";
+            this.style.height = Math.min(this.scrollHeight, 150) + "px";
+          });
+        });
+      });
+
+      function handleLikeClick(button, event) {
+        // Crear efecto de ondas
+        createRipple(button, event);
+
+        const heartIcon = button.querySelector(".heart-icon");
+        const isLiked = button.classList.contains("liked");
+
+        if (!isLiked) {
+          // Dar like
+          button.classList.add("liked");
+          heartIcon.textContent = "❤️";
+          heartIcon.classList.remove("outline");
+          heartIcon.classList.add("filled");
+
+          // Crear partículas
+          createParticles(button);
+        } else {
+          // Quitar like
+          button.classList.remove("liked");
+          heartIcon.textContent = "🤍";
+          heartIcon.classList.remove("filled");
+          heartIcon.classList.add("outline");
+        }
+      }
+
+      function createRipple(button, e) {
+        const ripple = document.createElement("span");
+        const rect = button.getBoundingClientRect();
+        const size = Math.max(rect.width, rect.height);
+        const x = e.clientX - rect.left - size / 2;
+        const y = e.clientY - rect.top - size / 2;
+
+        ripple.classList.add("ripple");
+        ripple.style.width = ripple.style.height = size + "px";
+        ripple.style.left = x + "px";
+        ripple.style.top = y + "px";
+
+        button.appendChild(ripple);
+
+        setTimeout(() => {
+          ripple.remove();
+        }, 600);
+      }
+
+      function createParticles(button) {
+        const particles = ["❤️", "💖", "✨", "💕", "🌟"];
+
+        for (let i = 0; i < 6; i++) {
+          setTimeout(() => {
+            const particle = document.createElement("span");
+            particle.classList.add("particle");
+            particle.textContent =
+              particles[Math.floor(Math.random() * particles.length)];
+
+            const rect = button.getBoundingClientRect();
+            particle.style.left = rect.left + Math.random() * rect.width + "px";
+            particle.style.top = rect.top + "px";
+            particle.style.position = "fixed";
+
+            document.body.appendChild(particle);
+
+            setTimeout(() => {
+              particle.remove();
+            }, 1000);
+          }, i * 100);
+        }
+      }
+
+      function followUserAjax(form, event) {
+        event.preventDefault();
+        fetch(form.action, {
+          method: "POST",
+          headers: { "X-Requested-With": "XMLHttpRequest" },
+        })
+          .then((res) => res.text())
+          .then((msg) => {
+            if (msg === "followed") {
+              alert("¡Ahora sigues a este usuario!");
+              window.location.reload(); // O puedes quitar esta línea si no quieres recargar
+            } else if (msg === "already_following") {
+              alert("Ya sigues a este usuario.");
+            } else {
+              alert("Ocurrió un error.");
+            }
+          });
+        return false;
+      }
+
+      function previewPostImage(event) {
+        const input = event.target;
+        const container = document.getElementById("postImagePreviewContainer");
+        const img = document.getElementById("postImagePreview");
+        const name = document.getElementById("postImageName");
+        if (input.files && input.files[0]) {
+          const file = input.files[0];
+          img.src = URL.createObjectURL(file);
+          name.textContent = file.name;
+          container.style.display = "block";
+        } else {
+          container.style.display = "none";
+          img.src = "";
+          name.textContent = "";
+        }
+      }
+    </script>
+  </body>
+</html>

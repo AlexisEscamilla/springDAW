@@ -1,0 +1,205 @@
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rolas</title>
+    <link rel="stylesheet" href="/css/stylesSubirPlaylist.css">
+</head>
+<body>
+    <div class="bg-gradient bg-gradient-1"></div>
+    <div class="bg-gradient bg-gradient-2"></div>
+    <div class="bg-gradient bg-gradient-3"></div>
+    <!-- Cabecera -->
+    <div class="header">
+        <div class="logo">
+            <img class = "imagi" src="https://images.vexels.com/media/users/3/150846/isolated/preview/a77bce5e752802277f78088150b16923-musica-de-icono-de-auriculares-de-audio.png" alt="rolas">
+            <div class="logo-icon"></div>
+            <a href="/feed" class="tituloLogo">Rolas</a>
+        </div>
+        
+        <div class="nav-links">
+            <a class="nav-link tituloNAV" href="/feed">Home</a>
+            <a class="nav-link tituloNAV" href="/explorar">Explorar</a>
+            <a class="nav-link tituloNAV" href="/mostrarNotificaciones">Notificaciones</a>
+            <a class="nav-link tituloNAV" href="/chats">Chats</a>
+            <a class="nav-link tituloNAV" href="/colecciones">Colecciones</a>
+        </div>
+        
+        <div class="user-menu">
+            <!-- Botón que abre el modal -->
+         <button type="button" class="btn btn-primary" onclick="abrirModal()">
+           Cerrar Sesión
+         </button>
+       </div>
+    </div>
+
+    <div id="modalLogout" class="modal" style="display: none">
+        <div class="modal-content">
+          <p>¿Estás seguro de que deseas cerrar sesión?</p>
+          <div class="modal-buttons">
+            <form th:action="@{/logout}" method="post">
+              <button type="submit" class="btn btn-danger">Sí, salir</button>
+            </form>
+            <button
+              type="button"
+              class="btn btn-secondary"
+              onclick="cerrarModal()"
+            >
+              Cancelar
+            </button>
+          </div>
+        </div>
+      </div>
+    
+    <div class="container">
+        
+
+
+    <!-- Formulario para subir playlist -->
+    <form class="subir-album-form" th:action="@{/subirPlaylist}" method="post" enctype="multipart/form-data">
+        <div class="form-title">Subir Playlist</div>
+    
+        <!-- Imagen de la Playlist -->
+        <div class="album-avatar-container">
+            <label for="profilePictureInput" class="album-avatar" style="cursor: pointer; position: relative;">
+                <img id="coverPreview" class="avatar-img" src="/img/placeholder_cover.jpg" alt="Portada de la playlist">
+                <div class="change-avatar"
+                    style="opacity: 0; position: absolute; bottom: 0; left: 0; right: 0;
+                            background-color: rgba(0,0,0,0.6); color: white;
+                            text-align: center; padding: 5px 0; transition: opacity 0.3s;">
+                    Cambiar
+                </div>
+            </label>
+            <input type="file" id="profilePictureInput" name="imagen" accept="image/*" style="display: none;">
+        </div>
+    
+        <!-- Información básica de la playlist -->
+        <div class="form-section">
+            <div class="form-section-title">Información básica</div>
+    
+            <div class="form-group">
+                <label class="form-label" for="title">Título</label>
+                <input type="text" id="title" name="title" class="form-input" placeholder="Título de la playlist" required>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="text">Descripcion</label>
+                <input type="text" id="description" name="description" class="form-input" placeholder="Descripcion de la playlist" required>
+            </div>
+        </div>
+
+        <!-- Buscador de canciones -->
+    <div class="form-section">
+        <div class="form-section-title">Buscar Canciones</div>
+        <div class="form-group">
+            <label class="form-label" for="songSearch">Buscar canciones</label>
+            <input type="text" id="songSearch" class="form-input" placeholder="Escribe el título de la canción">
+            <div id="searchResults" class="search-results"></div>
+        </div>
+    </div>
+
+    <!-- Listado de canciones seleccionadas -->
+    <div class="form-section">
+        <div class="form-section-title">Canciones Seleccionadas</div>
+        <ul id="selectedSongs" class="selected-songs"></ul>
+    </div>
+
+     <!-- Campo oculto para enviar los IDs de las canciones seleccionadas -->
+        <input type="hidden" name="songIds" id="songIds">
+    
+        <!-- Controles del formulario -->
+        <div class="profile-controls">
+            <a href="/colecciones" class="btn btn-secondary">Cancelar</a>
+            <button class="btn btn-primary" type="submit">Guardar</button>
+        </div>
+    </form>
+    
+    <script>
+        const avatarLabel = document.querySelector('.album-avatar');
+        const avatarText = avatarLabel.querySelector('.change-avatar');
+        const fileInput = document.getElementById('profilePictureInput');
+        const avatarImg = avatarLabel.querySelector('.avatar-img');
+    
+        avatarLabel.addEventListener('mouseenter', () => avatarText.style.opacity = '1');
+        avatarLabel.addEventListener('mouseleave', () => avatarText.style.opacity = '0');
+    
+        fileInput.addEventListener('change', function () {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    avatarImg.src = e.target.result;
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+
+
+        const songSearchInput = document.getElementById('songSearch');
+        const searchResults = document.getElementById('searchResults');
+        const selectedSongs = document.getElementById('selectedSongs');
+        const selectedSongIds = new Set(); // Para evitar duplicados
+        const songIdsInput = document.getElementById('songIds'); // Campo oculto
+
+        // Buscar canciones en tiempo real
+        songSearchInput.addEventListener('input', function () {
+            const query = this.value.trim();
+            if (query.length > 0) {
+                fetch(`/buscarCanciones?query=${query}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        searchResults.innerHTML = '';
+                        data.forEach(song => {
+                            const resultItem = document.createElement('div');
+                            resultItem.textContent = `${song.title} - ${song.artist}`;
+                            resultItem.dataset.songId = song.id;
+                            resultItem.addEventListener('click', () => addSongToPlaylist(song));
+                            searchResults.appendChild(resultItem);
+                        });
+                    })
+                    .catch(error => console.error('Error al buscar canciones:', error));
+            } else {
+                searchResults.innerHTML = '';
+            }
+        });
+
+        // Agregar canción al listado de seleccionadas
+        function addSongToPlaylist(song) {
+            if (selectedSongIds.has(song.id)) return; // Evitar duplicados
+
+            selectedSongIds.add(song.id);
+            updateSongIdsInput(); // Actualizar el campo oculto
+
+            const listItem = document.createElement('li');
+            listItem.textContent = `${song.title} - ${song.artist}`;
+            const removeButton = document.createElement('button');
+            removeButton.textContent = 'Eliminar';
+            removeButton.addEventListener('click', () => {
+                selectedSongIds.delete(song.id);
+                updateSongIdsInput(); // Actualizar el campo oculto
+                listItem.remove();
+            });
+            listItem.appendChild(removeButton);
+            selectedSongs.appendChild(listItem);
+
+            // Limpiar resultados de búsqueda
+            searchResults.innerHTML = '';
+            songSearchInput.value = '';
+        }
+
+        // Actualizar el campo oculto con los IDs de las canciones seleccionadas
+        function updateSongIdsInput() {
+            songIdsInput.value = Array.from(selectedSongIds).join(',');
+        }
+
+        function abrirModal() {
+        document.getElementById("modalLogout").style.display = "block";
+      }
+
+function cerrarModal() {
+  document.getElementById("modalLogout").style.display = "none";
+    }
+    </script>
+
+</body>
+</html>

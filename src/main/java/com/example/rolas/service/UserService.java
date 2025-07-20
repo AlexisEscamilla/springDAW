@@ -1,9 +1,10 @@
 package com.example.rolas.service;
 
 import com.example.rolas.model.User;
-import com.example.rolas.DTO.LoginRequest;
 import com.example.rolas.DTO.RegistroRequest;
 import com.example.rolas.Repositorio.*;
+import com.example.rolas.controller.LoginRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -76,6 +77,7 @@ public class UserService implements UserDetailsService {
         
         return Optional.empty();
     }
+    
     
     public List<User> getSuggestedUsers(User currentUser, int limit) {
     	 return userRepository.findSuggestedUsers(currentUser.getId(), limit);

@@ -1,0 +1,214 @@
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rolas</title>
+    <link rel="stylesheet" href="/css/stylesPerfil.css">
+</head>
+<body>
+    <div class="bg-gradient bg-gradient-1"></div>
+    <div class="bg-gradient bg-gradient-2"></div>
+    <div class="bg-gradient bg-gradient-3"></div>
+    <!-- Cabecera -->
+    <div class="header">
+        <div class="logo">
+            <img class = "imagi" src="https://images.vexels.com/media/users/3/150846/isolated/preview/a77bce5e752802277f78088150b16923-musica-de-icono-de-auriculares-de-audio.png" alt="rolas">
+            <div class="logo-icon"></div>
+            <a href="/feed" class="tituloLogo">Rolas</a>
+        </div>
+        
+        <div class="nav-links">
+            <a class="nav-link tituloNAV" href="/feed">Home</a>
+            <a class="nav-link tituloNAV" href="/explorar">Explorar</a>
+            <a class="nav-link tituloNAV" href="/mostrarNotificaciones">Notificaciones</a>
+            <a class="nav-link tituloNAV" href="/chats">Chats</a>
+            <a class="nav-link tituloNAV" href="/colecciones">Canciones</a>
+        </div>
+        
+        <div class="user-menu">
+             <!-- Botón que abre el modal -->
+          <button type="button" class="btn btn-primary" onclick="abrirModal()">
+            Cerrar Sesión
+          </button>
+        </div>
+    </div>
+    <!-- Modal de confirmación -->
+    <div id="modalLogout" class="modal" style="display: none">
+        <div class="modal-content">
+          <p>¿Estás seguro de que deseas cerrar sesión?</p>
+          <div class="modal-buttons">
+            <form th:action="@{/logout}" method="post">
+              <button type="submit" class="btn btn-danger">Sí, salir</button>
+            </form>
+            <button
+              type="button"
+              class="btn btn-secondary"
+              onclick="cerrarModal()"
+            >
+              Cancelar
+            </button>
+          </div>
+        </div>
+      </div>
+    <div class="container">
+        
+    <div class="profile-header">
+        <div class="profile-info">
+            <div class="profile-details">
+                <h1 class="profile-name" th:text="${usuario.nombre}">Nombre</h1>
+                <div class="profile-handle" th:text="'@' + ${usuario.username}">@usuario</div>
+
+                <div class="profile-stats">
+                    <div class="stat-item">
+                        <div class="stat-value" th:text="${usuario.getNumPosts}">0</div>
+                        <div class="stat-label">Posts</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" th:text="${siguiendo}">0</div>
+                        <div class="stat-label">Following</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" th:text="${seguidores}">0</div>
+                        <div class="stat-label">Followers</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+        
+        <!-- Formulario de edición de perfil -->
+<form class="edit-profile-form" th:action="@{/perfil}" method="post" enctype="multipart/form-data">
+    <div class="form-title">Editar Perfil</div>
+
+
+	<div class="profile-avatar-container">
+	    <label for="profilePictureInput" class="profile-avatar" style="cursor: pointer; position: relative;">
+	        <img th:src="@{'/uploads/' + ${usuario.profilePicture}}" alt="" class="avatar-img">
+	        <div class="change-avatar"
+	             style="opacity: 0; position: absolute; bottom: 0; left: 0; right: 0;
+	                    background-color: rgba(0,0,0,0.6); color: white;
+	                    text-align: center; padding: 5px 0; transition: opacity 0.3s;">
+	            Cambiar
+	        </div>
+	    </label>
+	    <input type="file" id="profilePictureInput" name="imagen" accept="image/*" style="display: none;">
+	</div>
+
+
+
+    <div class="form-section">
+        <div class="form-section-title">Información básica</div>
+
+        <div class="form-group">
+            <label class="form-label" for="nombre">Nombre</label>
+            <input type="text" id="nombre" name="nombre" class="form-input" th:value="${usuario.nombre}">
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="username">Nombre de usuario</label>
+            <input type="text" id="username" name="username" class="form-input" th:value="${usuario.username}">
+            <div class="form-hint">Este será tu @username único en la plataforma</div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="email">Correo</label>
+            <input type="email" id="email" name="email" class="form-input" th:value="${usuario.email}">
+            <div class="form-hint">ejemplo@gmail.com</div>
+        </div>
+
+        <div class="form-group"  th:if="${usuario.artista != null}" >
+            <label class="form-label" for="email">Biografia</label>
+            <textarea name="artista.bio"
+          th:text="${usuario.artista.bio}" 
+          class="form-input form-textarea"></textarea>
+        </div>
+
+    </div>
+
+    <div class="profile-controls">
+        <a href="/feed" class="btn btn-secondary">Cancelar</a>
+        <button class="btn btn-primary" type="submit">Guardar cambios</button>
+    </div>
+</form>
+
+<div class="eliminaCuenta">
+    <button type="button" class="btn btn-danger" onclick="abrirModalEliminarCuenta()">
+        Eliminar cuenta
+      </button>
+</div>
+
+  
+  <!-- Modal de confirmación para eliminar cuenta -->
+  <div id="modalEliminarCuenta" class="modal" style="display: none;">
+    <div class="modal-content">
+      <p>¿Estás seguro de que deseas eliminar tu cuenta? Esta acción no se puede deshacer.</p>
+      <div class="modal-buttons">
+        <form th:action="@{/perfil/eliminar}" method="post">
+          <button type="submit" class="btn btn-danger">Sí, eliminar</button>
+        </form>
+        <button type="button" class="btn btn-secondary" onclick="cerrarModalEliminarCuenta()">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+    const avatarLabel = document.querySelector('.profile-avatar');
+    const avatarText = avatarLabel.querySelector('.change-avatar');
+    const fileInput = document.getElementById('profilePictureInput');
+    const avatarImg = avatarLabel.querySelector('.avatar-img');
+
+    avatarLabel.addEventListener('mouseenter', () => avatarText.style.opacity = '1');
+    avatarLabel.addEventListener('mouseleave', () => avatarText.style.opacity = '0');
+
+    fileInput.addEventListener('change', function () {
+        const file = this.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                avatarImg.src = e.target.result;
+            }
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Contador de caracteres para biografía
+    const bioTextarea = document.getElementById('bio');
+    if (bioTextarea) {
+        const charCount = document.querySelector('.character-count');
+        const maxLength = 250;
+
+        bioTextarea.addEventListener('input', function () {
+            const currentLength = this.value.length;
+            charCount.textContent = currentLength + '/' + maxLength;
+
+            if (currentLength > maxLength) {
+                charCount.style.color = 'var(--error-color)';
+                bioTextarea.style.borderColor = 'var(--error-color)';
+            } else {
+                charCount.style.color = 'var(--secondary-text)';
+                bioTextarea.style.borderColor = '';
+            }
+        });
+    }
+
+    function abrirModalEliminarCuenta() {
+    document.getElementById("modalEliminarCuenta").style.display = "block";
+  }
+  function cerrarModalEliminarCuenta() {
+    document.getElementById("modalEliminarCuenta").style.display = "none";
+  }
+
+  function abrirModal() {
+        document.getElementById("modalLogout").style.display = "block";
+      }
+
+function cerrarModal() {
+  document.getElementById("modalLogout").style.display = "none";
+    }
+
+</script>
+
+
+</body>
+</html>

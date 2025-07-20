@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Perfil de Usuario</title>
+    <link rel="stylesheet" href="/css/stylesmostrarPerfil.css" />
+  </head>
+  <body>
+    <div class="bg-gradient bg-gradient-1"></div>
+    <div class="bg-gradient bg-gradient-2"></div>
+
+    <div class="header">
+      <div class="logo">
+        <img
+          class="imagi"
+          src="https://images.vexels.com/media/users/3/150846/isolated/preview/a77bce5e752802277f78088150b16923-musica-de-icono-de-auriculares-de-audio.png"
+          alt="rolas"
+        />
+        <div class="logo-icon"></div>
+        <a href="/feed" class="tituloLogo">Rolas</a>
+      </div>
+
+      <div class="nav-links">
+        <a class="nav-link tituloNAV" href="/feed">Home</a>
+        <a class="nav-link tituloNAV" href="/explorar">Explorar</a>
+        <a class="nav-link tituloNAV" href="/mostrarNotificaciones"
+          >Notificaciones</a
+        >
+        <a class="nav-link tituloNAV" href="/chats">Chats</a>
+        <a class="nav-link tituloNAV" href="/colecciones">Colecciones</a>
+      </div>
+
+      <div class="user-menu">
+        <!-- Botón que abre el modal -->
+        <button type="button" class="btn btn-primary" onclick="abrirModal()">
+          Cerrar Sesión
+        </button>
+      </div>
+    </div>
+
+    <div class="modal" id="modalLogout">
+      <div class="modal-content">
+        <h2>¿Estás seguro de que quieres cerrar sesión?</h2>
+        <div class="modal-buttons">
+          <button class="btn btn-secondary" onclick="cerrarModal()">
+            Cancelar
+          </button>
+          <form th:action="@{/logout}" method="post">
+            <button type="submit" class="btn btn-danger">Cerrar Sesión</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+      <!-- Header del perfil -->
+      <div class="profile-header">
+        <div class="avatar">
+          <img
+            th:src="@{'/uploads/' + ${usuario.profilePicture}}"
+            alt="Avatar"
+            class="avatar-img"
+          />
+        </div>
+        <div class="profile-info">
+          <h1 class="username" th:text="${usuario.nombre}">Nombre</h1>
+          <p class="handle" th:text="'@' + ${usuario.username}">@username</p>
+          <div class="stats">
+            <a th:href="@{'/follows/' + ${usuario.id}}" class="stat">
+              <div class="stat">
+                <div class="stat-number" th:text="${usuario.seguidores}">0</div>
+                <div class="stat-label">Seguidores</div>
+              </div>
+            </a>
+            <a th:href="@{'/follows/' + ${usuario.id}}" class="stat">
+              <div class="stat">
+                <div class="stat-number" th:text="${usuario.siguiendo}">0</div>
+                <div class="stat-label">Siguiendo</div>
+              </div>
+            </a>
+            <div class="stat">
+              <div class="stat-number" th:text="${cancionesCount}">0</div>
+              <div class="stat-label">Canciones</div>
+            </div>
+          </div>
+          <div class="profile-actions">
+            <button
+              class="btn btn-primary"
+              id="follow-btn"
+              th:if="${!isFollowing}"
+              th:onclick="'followUser(' + ${usuario.id} + ')'"
+            >
+              Seguir
+            </button>
+            <button
+              class="btn btn-secondary"
+              id="unfollow-btn"
+              th:if="${isFollowing}"
+              th:onclick="'unfollowUser(' + ${usuario.id} + ')'"
+            >
+              Dejar de seguir
+            </button>
+          </div>
+        </div>
+        <!-- ...dentro de .profile-header, después de .profile-info... -->
+        <th:block th:if="${usuario.id == usuarioAutenticado.id}">
+          <div
+            class="profile-edit-btn-container"
+            style="margin-left: auto; align-self: flex-end"
+          >
+            <a href="/perfil" class="btn btn-primary" style="margin-top: 12px">
+              Editar perfil
+            </a>
+          </div>
+        </th:block>
+      </div>
+
+      <!-- Navegación de tabs -->
+      <div class="profile-tabs">
+        <button class="tab active" onclick="showTab('posts', event)">
+          Post
+        </button>
+        <button
+          class="tab"
+          onclick="showTab('canciones', event)"
+          th:if="${esArtista}"
+        >
+          Canciones
+        </button>
+        <button class="tab" onclick="showTab('playlists', event)">
+          Playlists
+        </button>
+        <button
+          class="tab"
+          onclick="showTab('albums', event)"
+          th:if="${esArtista}"
+        >
+          Álbumes
+        </button>
+      </div>
+
+      <!-- Modal Editar Post Mejorado -->
+      <div id="editModal" class="modal" style="display: none">
+        <div
+          class="modal-content"
+          style="padding: 0; overflow: hidden; max-width: 420px"
+        >
+          <!-- Header con gradiente -->
+          <div
+            style="
+              background: linear-gradient(90deg, #8b5cf6 0%, #06b6d4 100%);
+              padding: 22px 32px 16px 32px;
+              border-radius: 12px 12px 0 0;
+              color: #fff;
+              box-shadow: 0 2px 12px rgba(79, 70, 229, 0.1);
+              text-align: center;
+            "
+          >
+            <h3
+              style="
+                margin: 0;
+                font-size: 1.35rem;
+                font-weight: 700;
+                letter-spacing: 0.5px;
+              "
+            >
+              Editar post
+            </h3>
+          </div>
+          <form
+            id="editPostForm"
+            method="post"
+            enctype="multipart/form-data"
+            style="padding: 28px 24px 18px 24px; background: #232442"
+          >
+            <input
+              type="hidden"
+              name="removeImage"
+              id="removeImageFlag"
+              value="false"
+            />
+            <label
+              for="editContent"
+              style="
+                font-weight: 600;
+                color: #a5b4fc;
+                margin-bottom: 8px;
+                display: block;
+              "
+            >
+              Texto del post
+            </label>
+            <textarea
+              name="content"
+              id="editContent"
+              class="post-input"
+              required
+              style="
+                width: 100%;
+                min-height: 80px;
+                border-radius: 10px;
+                border: 1.5px solid #4f46e5;
+                background: #18192e;
+                color: #fff;
+                padding: 12px;
+                margin-bottom: 18px;
+                font-size: 1rem;
+                resize: vertical;
+              "
+            ></textarea>
+            <div
+              id="editImageContainer"
+              style="margin: 10px 0 18px 0; position: relative"
+            >
+              <img
+                id="editImagePreview"
+                src=""
+                alt="Imagen actual"
+                style="
+                  max-width: 100%;
+                  border-radius: 10px;
+                  box-shadow: 0 2px 12px rgba(79, 70, 229, 0.1);
+                "
+              />
+              <button
+                type="button"
+                onclick="removeEditImage()"
+                style="
+                  position: absolute;
+                  top: 8px;
+                  right: 8px;
+                  background: #ef4444;
+                  color: #fff;
+                  border: none;
+                  border-radius: 50%;
+                  width: 28px;
+                  height: 28px;
+                  font-size: 1.1rem;
+                  cursor: pointer;
+                  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.15);
+                "
+                title="Quitar imagen"
+              >
+                ✖
+              </button>
+            </div>
+            <input
+              type="file"
+              name="imageUrl"
+              id="editImageInput"
+              accept="image/*"
+              style="display: none"
+              onchange="previewEditImage(event)"
+            />
+            <span
+              id="editImageName"
+              style="
+                font-size: 0.95em;
+                color: #4f46e5;
+                display: block;
+                margin-bottom: 8px;
+              "
+            ></span>
+            <label
+              for="editImageInput"
+              class="btn"
+              style="
+                margin-bottom: 18px;
+                background: linear-gradient(90deg, #4f46e5 0%, #06b6d4 100%);
+                color: #fff;
+                border: none;
+                border-radius: 20px;
+                padding: 8px 20px;
+                cursor: pointer;
+                font-weight: 600;
+                display: inline-block;
+              "
+              >Cambiar imagen</label
+            >
+            <div class="modal-buttons" style="margin-top: 18px">
+              <button
+                type="button"
+                class="btn btn-secondary"
+                onclick="closeEditModal()"
+                style="
+                  background: transparent;
+                  color: #a5b4fc;
+                  border: 2px solid #4f46e5;
+                "
+              >
+                Cancelar
+              </button>
+              <button
+                type="submit"
+                class="btn btn-primary"
+                style="
+                  background: linear-gradient(90deg, #8b5cf6 0%, #06b6d4 100%);
+                  color: #fff;
+                  border: none;
+                "
+              >
+                Guardar cambios
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <div id="deleteModal" class="modal" style="display: none">
+        <div class="modal-content">
+          <h3>¿Eliminar este post?</h3>
+          <p>
+            ¿Estás seguro de que deseas eliminar este post? Esta acción no se
+            puede deshacer.
+          </p>
+          <div class="modal-buttons">
+            <button class="btn btn-secondary" onclick="closeDeleteModal()">
+              Cancelar
+            </button>
+            <form
+              id="deletePostForm"
+              method="post"
+              th:action="@{/posts/__ID__/delete}"
+            >
+              <button type="submit" class="btn btn-danger">Eliminar</button>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contenido de Posts -->
+      <div id="posts" class="tab-content active">
+        <div class="posts-list">
+          <div
+            class="post"
+            th:each="post : ${posts}"
+            th:attr="data-post-id=${post.id}"
+          >
+            <!-- Información del post -->
+            <div
+              class="post-header"
+              style="display: flex; align-items: center; gap: 12px"
+            >
+              <div class="creator-avatar">
+                <img
+                  th:if="${post.user.profilePicture != null}"
+                  th:src="@{'/uploads/' + ${post.user.profilePicture}}"
+                  class="avatar-imgcreator"
+                  alt="Avatar"
+                  style="width: 48px; height: 48px; border-radius: 50%"
+                />
+                <div
+                  th:if="${post.user.profilePicture == null}"
+                  th:text="${post.user.nombre.substring(0,1)}"
+                  class="avatar-placeholder"
+                  style="
+                    width: 48px;
+                    height: 48px;
+                    border-radius: 50%;
+                    background: #8b5cf6;
+                    color: white;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                  "
+                ></div>
+              </div>
+              <div class="post-user-info">
+                <div class="post-user-name" th:text="${post.user.nombre}">
+                  Nombre
+                </div>
+                <div class="post-username">
+                  <span th:text="'@' + ${post.user.username}">@usuario</span> ·
+                  <span
+                    class="post-time"
+                    th:text="${#temporals.format(post.createdAt, 'HH:mm')}"
+                    >Hace 2h</span
+                  >
+                </div>
+              </div>
+
+              <th:block th:if="${post.user.id == usuario.id}">
+                <div class="post-menu">
+                  <button class="menu-btn" onclick="togglePostMenu(this)">
+                    ⋮
+                  </button>
+                  <div class="menu-dropdown" style="display: none">
+                    <button th:onclick="'openEditModal(' + ${post.id} + ')'">
+                      Editar
+                    </button>
+                    <button
+                      th:onclick="'openDeleteModal(' + ${post.id} + ')'"
+                      style="color: #ef4444"
+                    >
+                      Eliminar
+                    </button>
+                  </div>
+                </div>
+              </th:block>
+            </div>
+
+            <!-- Contenido del post -->
+            <div class="post-content">
+              <p th:text="${post.content}">Contenido del post</p>
+            </div>
+
+            <div th:if="${!#strings.isEmpty(post.imageUrl)}">
+              <img
+                th:src="@{'/uploads/' + ${post.imageUrl}}"
+                alt="Imagen del post"
+                class="post-image"
+                style="
+                  width: 100%;
+                  max-width: 400px;
+                  border-radius: 12px;
+                  margin-top: 10px;
+                "
+              />
+            </div>
+
+            <!-- Interacciones -->
+            <div class="post-interactions" style="margin-top: 10px">
+              <!-- Botón de Like -->
+              <form
+                th:action="@{/posts/{postId}/likes(postId=${post.id})}"
+                method="post"
+                style="display: inline"
+              >
+                <button
+                  type="submit"
+                  class="interaction"
+                  th:classappend="${post.likedByCurrentUser} ? ' liked' : ''"
+                  onclick="handleLikeClick(this, event)"
+                  th:onclick="|handleLikeClick(this, event); submitLike(${post.id});|"
+                >
+                  <span
+                    class="heart-icon"
+                    th:classappend="${post.likedByCurrentUser} ? ' filled' : ' outline'"
+                    th:text="${post.likedByCurrentUser} ? '❤️' : '🤍'"
+                    >🤍</span
+                  >
+                  <span th:text="${post.likeCount}">0</span>
+                </button>
+              </form>
+
+              <!-- Botón para mostrar comentarios -->
+              <button
+                type="button"
+                class="interaction"
+                th:onclick="|toggleComments('comments-' + ${post.id})|"
+              >
+                💬
+                <span th:text="${postCommentCounts[post.id]}">0</span>
+              </button>
+            </div>
+
+            <!-- Comentarios -->
+            <div
+              th:id="'comments-' + ${post.id}"
+              class="comments-section"
+              style="display: none; margin-top: 10px"
+            >
+              <!-- Lista de comentarios -->
+              <div class="comments-list">
+                <div
+                  th:each="comment : ${comments}"
+                  th:if="${comment != null and comment.post.id == post.id}"
+                  class="comment"
+                  style="margin-bottom: 10px"
+                >
+                  <div
+                    class="comment-header"
+                    style="display: flex; align-items: center; gap: 8px"
+                  >
+                    <div class="comment-avatar">
+                      <img
+                        th:if="${comment.user.profilePicture != null}"
+                        th:src="@{'/uploads/' + ${comment.user.profilePicture}}"
+                        alt="Avatar"
+                        style="width: 32px; height: 32px; border-radius: 50%"
+                      />
+                      <div
+                        th:if="${comment.user.profilePicture == null}"
+                        th:text="${comment.user.nombre.substring(0,1)}"
+                        class="comment-avatar-placeholder"
+                        style="
+                          width: 32px;
+                          height: 32px;
+                          border-radius: 50%;
+                          background: #8b5cf6;
+                          color: white;
+                          display: flex;
+                          align-items: center;
+                          justify-content: center;
+                        "
+                      ></div>
+                    </div>
+                    <div class="comment-user-info">
+                      <div
+                        class="comment-user-name"
+                        th:text="${comment.user.nombre}"
+                      >
+                        Nombre
+                      </div>
+                      <div class="comment-username">
+                        <span th:text="'@' + ${comment.user.username}"
+                          >@usuario</span
+                        >
+                        <span class="separator">·</span>
+                        <span
+                          class="comment-time"
+                          th:text="${#temporals.format(comment.createdAt, 'HH:mm')}"
+                          >Hace 1h</span
+                        >
+                      </div>
+                    </div>
+                  </div>
+                  <div class="comment-content">
+                    <p th:text="${comment.commentText}" class="comment-text">
+                      Texto del comentario
+                    </p>
+                    <div th:if="${!#strings.isEmpty(comment.imagenAdjuntada)}">
+                      <img
+                        th:src="@{'/uploads/' + ${comment.imagenAdjuntada}}"
+                        alt="Imagen del comentario"
+                        class="comment-image"
+                        style="width: 80px; border-radius: 8px; margin-top: 5px"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Formulario para agregar comentario -->
+              <form
+                th:action="@{/posts/{postId}/comments(postId=${post.id})}"
+                method="post"
+                enctype="multipart/form-data"
+                class="comment-form"
+              >
+                <div class="comment-textarea-container">
+                  <textarea
+                    name="commentText"
+                    class="comment-input"
+                    placeholder="Escribe un comentario..."
+                    required
+                  ></textarea>
+                </div>
+                <div class="comment-actions" style="margin-top: 8px">
+                  <div>
+                    <input
+                      type="file"
+                      name="imageUrl"
+                      id="commentFileInput-${post.id}"
+                      class="comment-file-input"
+                      accept="image/*"
+                    />
+                    <label
+                      for="commentFileInput-${post.id}"
+                      class="comment-file-label"
+                      style="cursor: pointer"
+                    >
+                      <span class="file-icon">📷</span>
+                      <span>Adjuntar imagen</span>
+                    </label>
+                  </div>
+                  <button type="submit" class="comment-submit-btn">
+                    Comentar
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contenido de Canciones -->
+      <!-- Contenido de Canciones -->
+      <!-- Contenido de Canciones -->
+      <div id="canciones" class="tab-content" th:if="${esArtista}">
+        <div class="content-card">
+          <h3 class="card-title">Canciones Recientes</h3>
+          <div class="item-list">
+            <div class="item" th:each="cancion : ${canciones}">
+              <div class="item-image">
+                <img
+                  th:src="@{'/uploads/' + ${cancion.coverUrl}}"
+                  alt="Portada de la canción"
+                  style="width: 50px; height: 50px; border-radius: 8px"
+                />
+              </div>
+              <div class="item-info">
+                <div class="item-title" th:text="${cancion.title}">Titulo</div>
+                <div class="item-subtitle">
+                  <span th:text="${cancion.duration}">3:45</span>
+                  •
+                  <span th:text="${cancion.gender}">-</span>
+                  •
+                  <span
+                    th:text="${#dates.format(cancion.createdAt, 'dd/MM/yyyy')}"
+                    >-</span
+                  >
+                </div>
+              </div>
+              <div>
+                <a
+                  th:href="@{/mostrarCancion/{id}(id=${cancion.id})}"
+                  class="btn btn-primary"
+                  style="padding: 6px 14px; font-size: 13px"
+                  >Ver Canción</a
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contenido de Playlists -->
+      <!-- Contenido de Playlists -->
+      <div id="playlists" class="tab-content">
+        <div class="content-card">
+          <h3 class="card-title">Playlists</h3>
+          <div class="item-list">
+            <div class="item" th:each="playlist : ${playlists}">
+              <div class="item-image">
+                <img
+                  th:if="${playlist.coverImage != null}"
+                  th:src="@{'/' + ${playlist.coverImage}}"
+                  alt="Portada Playlist"
+                  style="width: 50px; height: 50px; border-radius: 8px"
+                />
+              </div>
+              <div class="item-info">
+                <div class="item-title" th:text="${playlist.title}">Titulo</div>
+              </div>
+              <div>
+                <a
+                  th:href="@{/mostrarPlaylist/{id}(id=${playlist.id})}"
+                  class="btn btn-primary"
+                  style="padding: 6px 14px; font-size: 13px"
+                  >Ver Canción</a
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contenido de Álbumes -->
+      <div id="albums" class="tab-content" th:if="${esArtista}">
+        <div class="content-card">
+          <h3 class="card-title">Álbumes</h3>
+          <div class="item-list">
+            <div class="item" th:each="album : ${albums}">
+              <div class="item-image">
+                <img
+                  th:if="${album.coverArt != null}"
+                  th:src="@{'/uploads/' + ${album.coverArt}}"
+                  alt="Portada Álbum"
+                  style="width: 50px; height: 50px; border-radius: 8px"
+                />
+              </div>
+              <div class="item-info">
+                <div class="item-title" th:text="${album.title}">Titulo</div>
+              </div>
+              <div>
+                <a
+                  th:href="@{/mostrarAlbum/{id}(id=${album.id})}"
+                  class="btn btn-primary"
+                  style="padding: 6px 14px; font-size: 13px"
+                  >Ver Canción</a
+                >
+              </div>
+            </div>
+            <div th:if="${#lists.isEmpty(albums)}">
+              <span>No hay álbumes para mostrar.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="watermark">Diseño para mostrarPerfil - Propuesta de mejora</div>
+
+    <script>
+      console.log("Follow button:", document.getElementById("follow-btn"));
+      console.log("Unfollow button:", document.getElementById("unfollow-btn"));
+      function followUser(userId) {
+        fetch(`/users/${userId}/follow`, { method: "POST" })
+          .then((response) => response.text())
+          .then((status) => {
+            if (status === "followed") {
+              const followBtn = document.getElementById("follow-btn");
+              const unfollowBtn = document.getElementById("unfollow-btn");
+
+              if (followBtn) followBtn.style.display = "none";
+              if (unfollowBtn) unfollowBtn.style.display = "inline-block";
+            }
+          })
+          .catch((error) =>
+            console.error("Error al seguir al usuario:", error)
+          );
+      }
+
+      function unfollowUser(userId) {
+        fetch(`/users/${userId}/unfollow`, { method: "POST" })
+          .then((response) => response.text())
+          .then((status) => {
+            if (status === "unfollowed") {
+              const followBtn = document.getElementById("follow-btn");
+              const unfollowBtn = document.getElementById("unfollow-btn");
+
+              if (unfollowBtn) unfollowBtn.style.display = "none";
+              if (followBtn) followBtn.style.display = "inline-block";
+            }
+          })
+          .catch((error) =>
+            console.error("Error al dejar de seguir al usuario:", error)
+          );
+      }
+
+      function showTab(tabName) {
+        // Ocultar todos los contenidos
+        const contents = document.querySelectorAll(".tab-content");
+        contents.forEach((content) => {
+          content.classList.remove("active");
+        });
+
+        // Remover clase active de todos los tabs
+        const tabs = document.querySelectorAll(".tab");
+        tabs.forEach((tab) => {
+          tab.classList.remove("active");
+        });
+
+        // Activar el contenido seleccionado
+        document.getElementById(tabName).classList.add("active");
+
+        // Activar el tab correspondiente
+        event.target.classList.add("active");
+      }
+
+      // Agregar efectos de hover y animaciones
+      document.addEventListener("DOMContentLoaded", function () {
+        // Animación para las estadísticas
+        const statNumbers = document.querySelectorAll(".stat-number");
+        statNumbers.forEach((stat) => {
+          stat.addEventListener("mouseenter", function () {
+            this.style.transform = "scale(1.1)";
+            this.style.transition = "transform 0.3s ease";
+          });
+
+          stat.addEventListener("mouseleave", function () {
+            this.style.transform = "scale(1)";
+          });
+        });
+      });
+
+      function abrirModal() {
+        document.getElementById("modalLogout").style.display = "block";
+      }
+
+      function cerrarModal() {
+        document.getElementById("modalLogout").style.display = "none";
+      }
+
+      function toggleComments(commentsId) {
+        const commentsSection = document.getElementById(commentsId);
+        if (
+          commentsSection.style.display === "none" ||
+          commentsSection.style.display === ""
+        ) {
+          commentsSection.style.display = "block";
+        } else {
+          commentsSection.style.display = "none";
+        }
+      }
+
+      // Mejorar la experiencia del textarea
+      document.addEventListener("DOMContentLoaded", function () {
+        const textareas = document.querySelectorAll(".comment-input");
+
+        textareas.forEach((textarea) => {
+          textarea.addEventListener("input", function () {
+            this.style.height = "auto";
+            this.style.height = Math.min(this.scrollHeight, 150) + "px";
+          });
+        });
+      });
+
+      function handleLikeClick(button, event) {
+        // Crear efecto de ondas
+        createRipple(button, event);
+
+        const heartIcon = button.querySelector(".heart-icon");
+        const isLiked = button.classList.contains("liked");
+
+        if (!isLiked) {
+          // Dar like
+          button.classList.add("liked");
+          heartIcon.textContent = "❤️";
+          heartIcon.classList.remove("outline");
+          heartIcon.classList.add("filled");
+
+          // Crear partículas
+          createParticles(button);
+        } else {
+          // Quitar like
+          button.classList.remove("liked");
+          heartIcon.textContent = "🤍";
+          heartIcon.classList.remove("filled");
+          heartIcon.classList.add("outline");
+        }
+      }
+
+      function createRipple(button, e) {
+        const ripple = document.createElement("span");
+        const rect = button.getBoundingClientRect();
+        const size = Math.max(rect.width, rect.height);
+        const x = e.clientX - rect.left - size / 2;
+        const y = e.clientY - rect.top - size / 2;
+
+        ripple.classList.add("ripple");
+        ripple.style.width = ripple.style.height = size + "px";
+        ripple.style.left = x + "px";
+        ripple.style.top = y + "px";
+
+        button.appendChild(ripple);
+
+        setTimeout(() => {
+          ripple.remove();
+        }, 600);
+      }
+
+      function createParticles(button) {
+        const particles = ["❤️", "💖", "✨", "💕", "🌟"];
+
+        for (let i = 0; i < 6; i++) {
+          setTimeout(() => {
+            const particle = document.createElement("span");
+            particle.classList.add("particle");
+            particle.textContent =
+              particles[Math.floor(Math.random() * particles.length)];
+
+            const rect = button.getBoundingClientRect();
+            particle.style.left = rect.left + Math.random() * rect.width + "px";
+            particle.style.top = rect.top + "px";
+            particle.style.position = "fixed";
+
+            document.body.appendChild(particle);
+
+            setTimeout(() => {
+              particle.remove();
+            }, 1000);
+          }, i * 100);
+        }
+      }
+
+      let currentPostId = null;
+
+      // Mostrar/ocultar menú de 3 puntos
+      function togglePostMenu(btn) {
+        document
+          .querySelectorAll(".menu-dropdown")
+          .forEach((d) => (d.style.display = "none"));
+        const dropdown = btn.nextElementSibling;
+        dropdown.style.display =
+          dropdown.style.display === "block" ? "none" : "block";
+        event.stopPropagation();
+      }
+      document.body.addEventListener("click", () => {
+        document
+          .querySelectorAll(".menu-dropdown")
+          .forEach((d) => (d.style.display = "none"));
+      });
+
+      // Eliminar post
+      function openDeleteModal(postId) {
+        currentPostId = postId;
+        document.getElementById("deleteModal").style.display = "block";
+        // Cambia la acción del form
+        document.getElementById(
+          "deletePostForm"
+        ).action = `/posts/${postId}/delete`;
+      }
+      function closeDeleteModal() {
+        document.getElementById("deleteModal").style.display = "none";
+      }
+
+      // Editar post
+      function openEditModal(postId) {
+        currentPostId = postId;
+        // Aquí deberías cargar los datos del post vía AJAX o tenerlos en el DOM
+        // Ejemplo simple (ajusta según tu estructura):
+        const postContent = document.querySelector(
+          `[data-post-id='${postId}'] .post-content p`
+        ).textContent;
+        const postImage = document.querySelector(
+          `[data-post-id='${postId}'] .post-image`
+        );
+        document.getElementById("editContent").value = postContent;
+        if (postImage) {
+          document.getElementById("editImagePreview").src = postImage.src;
+          document.getElementById("editImageContainer").style.display = "block";
+        } else {
+          document.getElementById("editImageContainer").style.display = "none";
+        }
+        document.getElementById("editModal").style.display = "block";
+        document.getElementById(
+          "editPostForm"
+        ).action = `/posts/${postId}/edit`;
+        document.getElementById("removeImageFlag").value = "false";
+      }
+
+      function closeEditModal() {
+        document.getElementById("editModal").style.display = "none";
+      }
+      function removeEditImage() {
+        document.getElementById("editImagePreview").src = "";
+        document.getElementById("editImageContainer").style.display = "none";
+        document.getElementById("removeImageFlag").value = "true";
+      }
+
+      function previewEditImage(event) {
+        const input = event.target;
+        const img = document.getElementById("editImagePreview");
+        const name = document.getElementById("editImageName");
+        const container = document.getElementById("editImageContainer");
+        if (input.files && input.files[0]) {
+          const file = input.files[0];
+          img.src = URL.createObjectURL(file);
+          name.textContent = file.name;
+          container.style.display = "block";
+          document.getElementById("removeImageFlag").value = "false";
+        } else {
+          name.textContent = "";
+        }
+      }
+    </script>
+  </body>
+</html>

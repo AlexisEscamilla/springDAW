@@ -1,0 +1,585 @@
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Rolas</title>
+    <link rel="stylesheet" href="/css/stylesColeccion.css" />
+  </head>
+  <body>
+    <div class="bg-gradient bg-gradient-1"></div>
+    <div class="bg-gradient bg-gradient-2"></div>
+    <div class="bg-gradient bg-gradient-3"></div>
+
+    <div class="container">
+      <header>
+        <div class="logo">
+          <img
+            class="imagi"
+            src="https://images.vexels.com/media/users/3/150846/isolated/preview/a77bce5e752802277f78088150b16923-musica-de-icono-de-auriculares-de-audio.png"
+            alt="rolas"
+          />
+          <div class="logo-icon"></div>
+          <a href="/feed">Rolas</a>
+        </div>
+
+        <div class="action-buttons">
+          <!-- Botón que abre el modal -->
+          <button type="button" class="btn btn-primary" onclick="abrirModal()">
+            Cerrar Sesión
+          </button>
+        </div>
+
+        <!-- Modal de confirmación -->
+        <div id="modalLogout" class="modal" style="display: none">
+          <div class="modal-content">
+            <p>¿Estás seguro de que deseas cerrar sesión?</p>
+            <div class="modal-buttons">
+              <form th:action="@{/logout}" method="post">
+                <button type="submit" class="btn btn-danger">Sí, salir</button>
+              </form>
+              <button
+                type="button"
+                class="btn btn-secondary"
+                onclick="cerrarModal()"
+              >
+                Cancelar
+              </button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <main class="feed-container">
+        <!-- Left Sidebar -->
+        <aside class="sidebar">
+          <div class="profile-card">
+            <div class="profile-avatar">
+              <!-- Si el usuario tiene imagen de perfil -->
+              <img
+                th:if="${usuario.profilePicture != null}"
+                th:src="@{'/uploads/' + ${usuario.profilePicture}}"
+                class="avatar-img"
+                alt="Avatar"
+              />
+            </div>
+
+            <h2 th:text="${usuario.nombre}">Nombre</h2>
+            <div class="profile-username" th:text="'@' + ${usuario.username}">
+              @usuario
+            </div>
+            <div class="profile-stats">
+              <div class="stat">
+                <div class="stat-value">0</div>
+                <div class="stat-label">Posts</div>
+              </div>
+              <div class="stat">
+                <div class="stat-value" th:text="${usuario.siguiendo}">0</div>
+                <div class="stat-label">Following</div>
+              </div>
+              <div class="stat">
+                <div class="stat-value" th:text="${usuario.seguidores}">0</div>
+                <div class="stat-label">Followers</div>
+              </div>
+            </div>
+          </div>
+          <div class="sidebar-menu">
+            <a
+              href="#"
+              class="menu-item"
+              th:if="${esArtista}"
+              th:classappend="${tipo == 'canciones'} ? 'active'"
+              onclick="cambiarContenido('canciones')"
+            >
+              <div class="menu-text">Canciones</div>
+            </a>
+            <a
+              href="#"
+              class="menu-item"
+              th:if="${esArtista}"
+              th:classappend="${tipo == 'albums'} ? 'active'"
+              onclick="cambiarContenido('albums')"
+            >
+              <div class="menu-text">Albums</div>
+            </a>
+            <a
+              href="#"
+              class="menu-item"
+              th:classappend="${tipo == 'playlists'} ? 'active'"
+              onclick="cambiarContenido('playlists')"
+            >
+              <div class="menu-text">Playlists</div>
+            </a>
+          </div>
+        </aside>
+
+        <!-- Main Feed -->
+        <section class="feed">
+          <!-- Contenedor dinámico -->
+          <div id="contenido-dinamico">
+            <!-- Mostrar canciones -->
+            <div th:if="${tipo == 'canciones'} and ${esArtista}">
+              <div class="post-creator">
+                <div class="post-actions">
+                  <a href="/subirCancion">
+                    <button class="btn btn-primary btn-subir">
+                      Subir canción
+                    </button>
+                  </a>
+                </div>
+              </div>
+              <div class="post">
+                <div th:if="${#lists.isEmpty(canciones)}" class="no-canciones">
+                  <p>
+                    No tienes canciones subidas. ¡Sube tu primera canción ahora!
+                  </p>
+                </div>
+                <div
+                  th:each="cancion : ${canciones}"
+                  class="trending-cardLista"
+                  th:data-file-url="${cancion.fileUrl}"
+                >
+                  <div class="profile-songlist">
+                    <img
+                      th:src="@{'/uploads/' + ${cancion.coverUrl}}"
+                      class="avatar-imgcreatorlist"
+                      alt="Portada de la canción"
+                    />
+                  </div>
+                  <div class="trending-content">
+                    <div class="trending-title" th:text="${cancion.title}">
+                      Título de la canción
+                    </div>
+                    <div class="trending-meta" th:text="${cancion.duration}">
+                      Duración
+                    </div>
+                  </div>
+                  <a
+                    th:href="@{/mostrarCancion/{id}(id=${cancion.id})}"
+                    class="btn btn-details"
+                    >Ver Canción</a
+                  >
+                  <button class="btn btn-play">▶</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Mostrar álbumes -->
+
+            <div th:if="${tipo == 'albums'} and ${esArtista}">
+              <div class="post-creator">
+                <div class="post-actions">
+                  <a href="/subirAlbum">
+                    <button class="btn btn-primary btn-subir">
+                      Crear Album
+                    </button>
+                  </a>
+                </div>
+              </div>
+
+              <div class="post">
+                <div th:if="${#lists.isEmpty(albums)}" class="no-albums">
+                  <p>No tienes álbumes creados. ¡Crea tu primer álbum ahora!</p>
+                </div>
+                <div th:each="album : ${albums}" class="trending-cardLista">
+                  <div class="profile-songlist">
+                    <img
+                      th:src="@{'/uploads/' + ${album.coverArt}}"
+                      class="avatar-imgcreatorlist"
+                      alt="Portada del álbum"
+                    />
+                  </div>
+                  <div class="trending-content">
+                    <div class="trending-title" th:text="${album.title}">
+                      Título del álbum
+                    </div>
+                    <div class="trending-meta" th:text="${album.releaseDate}">
+                      Fecha de lanzamiento
+                    </div>
+                    <a
+                      th:href="@{/mostrarAlbum/{id}(id=${album.id})}"
+                      class="btn btn-details"
+                      >Ver Álbum</a
+                    >
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Mostrar playlist -->
+
+            <div th:if="${tipo == 'playlists'}">
+              <div class="post-creator">
+                <div class="post-actions">
+                  <a href="/subirPlaylist">
+                    <button class="btn btn-primary btn-subir">
+                      Crear Playlist
+                    </button>
+                  </a>
+                </div>
+              </div>
+
+              <div class="post">
+                <div th:if="${#lists.isEmpty(playlists)}" class="no-albums">
+                  <p>
+                    No tienes playlist creados. ¡Crea tu primer playlist ahora!
+                  </p>
+                </div>
+                <div
+                  th:each="playlist : ${playlists}"
+                  class="trending-cardLista"
+                >
+                  <div class="profile-songlist">
+                    <img
+                      th:src="@{${playlist.coverImage}}"
+                      class="avatar-imgcreatorlist"
+                      alt="Portada"
+                    />
+                  </div>
+                  <div class="trending-content">
+                    <div class="trending-title" th:text="${playlist.title}">
+                      Título del playlist
+                    </div>
+                    <div class="trending-meta" th:text="${playlist.createdAt}">
+                      Fecha de creación
+                    </div>
+                  </div>
+                  <div class="trending-actions">
+                    <!-- Botón para desplegar canciones -->
+                    <button
+                      class="btn btn-secondary btn-toggle-songs"
+                      th:onclick="'toggleSongs(' + ${playlist.id} + ')'"
+                    >
+                      V
+                    </button>
+                    <!-- Botón para agregar canciones -->
+                    <button
+                      class="btn btn-primary btn-add-songs"
+                      th:onclick="'openAddSongsModal(' + ${playlist.id} + ')'"
+                    >
+                      +
+                    </button>
+                    <a
+                      th:href="@{/mostrarPlaylist/{id}(id=${playlist.id})}"
+                      class="btn btn-details"
+                      >Ver Playlist</a
+                    >
+                  </div>
+                  <!-- Contenedor para las canciones del playlist -->
+                  <div
+                    id="songs-container-[[${playlist.id}]]"
+                    class="songs-container"
+                    style="display: none"
+                  >
+                    <ul>
+                      <li
+                        th:each="song : ${playlist.playlistSongs}"
+                        th:text="${song.song.title}"
+                      >
+                        Título de la canción
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Right Sidebar -->
+        <!-- Right Sidebar -->
+        <aside
+          id="right-sidebar"
+          class="trending-sidebar sidebar"
+          style="display: none"
+        >
+          <h3 style="margin-bottom: 16px">Informacion</h3>
+          <div class="trending-card" style="place-items: center">
+            <div class="trending-title">Titulo</div>
+            <div class="trending-meta">Esclava(Remix)</div>
+            <div class="trending-title">Duracion</div>
+            <div class="trending-meta">280</div>
+            <div class="trending-title">Genero</div>
+            <div class="trending-meta">Trap</div>
+            <div class="trending-title">Album</div>
+            <div class="trending-meta">Bellakos</div>
+            <div class="profile-song">
+              <!-- Si el usuario tiene imagen de perfil -->
+              <img
+                th:if="${usuario.profilePicture != null}"
+                th:src="@{'/uploads/' + ${usuario.profilePicture}}"
+                class="avatar-imgcreator"
+                alt="Avatar"
+              />
+            </div>
+          </div>
+        </aside>
+      </main>
+    </div>
+
+    <div id="music-player" class="music-player" style="display: none">
+      <div class="player-controls">
+        <button id="prev-btn" class="player-btn">⏮</button>
+        <button id="play-pause-btn" class="player-btn">▶</button>
+        <button id="next-btn" class="player-btn">⏭</button>
+        <input
+          id="volume-slider"
+          type="range"
+          min="0"
+          max="1"
+          step="0.1"
+          value="1"
+          class="volume-slider"
+        />
+      </div>
+
+      <div class="player-progress">
+        <input
+          id="progress-bar"
+          type="range"
+          min="0"
+          max="100"
+          step="0.1"
+          value="0"
+          class="progress-bar"
+        />
+        <div class="progress-time">
+          <span id="current-time">0:00</span> /
+          <span id="total-time">0:00</span>
+        </div>
+      </div>
+      <div class="player-info">
+        <img id="player-cover" src="" alt="Cover" class="player-cover" />
+        <div class="player-details">
+          <div id="player-title" class="player-title">Título de la canción</div>
+          <div id="player-artist" class="player-artist">Artista</div>
+        </div>
+      </div>
+      <audio id="audio-player"></audio>
+    </div>
+
+    <script>
+      function cambiarContenido(tipo) {
+        const url = `/colecciones?tipo=${tipo}`;
+        fetch(url)
+          .then((response) => response.text())
+          .then((html) => {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, "text/html");
+            const nuevoContenido = doc.querySelector(
+              "#contenido-dinamico"
+            ).innerHTML;
+            document.querySelector("#contenido-dinamico").innerHTML =
+              nuevoContenido;
+
+            // Actualizar la clase activa en el sidebar
+            document
+              .querySelectorAll(".menu-item")
+              .forEach((item) => item.classList.remove("active"));
+            document
+              .querySelector(
+                `.menu-item[onclick="cambiarContenido('${tipo}')"]`
+              )
+              .classList.add("active");
+          })
+          .catch((error) =>
+            console.error("Error al cargar el contenido:", error)
+          );
+      }
+
+      // Selecciona todos los elementos trending-cardLista
+      const trendingCards = document.querySelectorAll(".trending-content");
+      const rightSidebar = document.getElementById("right-sidebar");
+
+      // Agrega un evento de clic a cada card
+      trendingCards.forEach((card) => {
+        card.addEventListener("click", () => {
+          // Muestra el right-sidebar
+          rightSidebar.style.display = "block";
+        });
+      });
+
+      // Función para desplegar/ocultar las canciones del playlist
+      function toggleSongs(playlistId) {
+        const container = document.getElementById(
+          "songs-container-" + playlistId
+        );
+        if (!container) {
+          console.error(
+            `No se encontró el contenedor para el playlist con ID: ${playlistId}`
+          );
+          return;
+        }
+
+        container.classList.toggle("open");
+
+        if (container.classList.contains("open")) {
+          container.style.display = "block";
+        } else {
+          container.style.display = "none";
+        }
+      }
+
+      // Función para abrir un modal para agregar canciones al playlist
+      function openAddSongsModal(playlistId) {
+        alert(
+          `Abrir modal para agregar canciones al playlist con ID: ${playlistId}`
+        );
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        const audioPlayer = document.getElementById("audio-player");
+        const musicPlayer = document.getElementById("music-player");
+        const playPauseBtn = document.getElementById("play-pause-btn");
+        const prevBtn = document.getElementById("prev-btn");
+        const nextBtn = document.getElementById("next-btn");
+        const volumeSlider = document.getElementById("volume-slider");
+        const playerCover = document.getElementById("player-cover");
+        const playerTitle = document.getElementById("player-title");
+        const playerArtist = document.getElementById("player-artist");
+        const progressBar = document.getElementById("progress-bar");
+        const currentTimeEl = document.getElementById("current-time");
+        const totalTimeEl = document.getElementById("total-time");
+
+        let currentSongIndex = 0;
+        let playlist = [];
+
+        // Restaurar el estado del reproductor al cargar la página
+        const savedState = localStorage.getItem("musicPlayerState");
+        if (savedState) {
+          const state = JSON.parse(savedState);
+          playlist = state.playlist;
+          currentSongIndex = state.currentSongIndex;
+
+          // Inicializar el reproductor con la canción guardada
+          initializePlayer(playlist[currentSongIndex]);
+          audioPlayer.currentTime = state.currentTime;
+
+          // Reproducir la canción si estaba en reproducción
+          if (state.isPlaying) {
+            audioPlayer.play();
+            playPauseBtn.textContent = "⏸";
+          } else {
+            playPauseBtn.textContent = "▶";
+          }
+        }
+
+        // Función para formatear el tiempo en minutos:segundos
+        function formatTime(seconds) {
+          const minutes = Math.floor(seconds / 60);
+          const secs = Math.floor(seconds % 60);
+          return `${minutes}:${secs < 10 ? "0" + secs : secs}`;
+        }
+
+        // Actualizar la barra de progreso y el tiempo actual
+        // Actualizar la barra de progreso y el tiempo actual
+        audioPlayer.addEventListener("timeupdate", () => {
+          const currentTime = audioPlayer.currentTime;
+          const duration = audioPlayer.duration;
+          if (!isNaN(duration) && duration > 0) {
+            progressBar.value = (currentTime / duration) * 100;
+            currentTimeEl.textContent = formatTime(currentTime);
+            totalTimeEl.textContent = formatTime(duration);
+          }
+        });
+
+        // Permitir al usuario adelantar o retroceder
+        progressBar.addEventListener("input", () => {
+          const duration = audioPlayer.duration;
+          if (!isNaN(duration) && duration > 0) {
+            audioPlayer.currentTime = (progressBar.value / 100) * duration;
+          }
+        });
+
+        // Función para reproducir una canción
+        function playSong(song) {
+          audioPlayer.src = song.fileUrl; // Configurar la URL del archivo de audio
+          playerCover.src = song.coverUrl; // Configurar la portada
+          playerTitle.textContent = song.title; // Configurar el título
+          playerArtist.textContent = song.artist; // Configurar el artista
+          audioPlayer.play(); // Reproducir la canción
+          musicPlayer.style.display = "flex"; // Mostrar el reproductor
+          playPauseBtn.textContent = "⏸"; // Cambiar a botón de pausa
+        }
+
+        // Manejar el botón de Play/Pause
+        playPauseBtn.addEventListener("click", () => {
+          if (audioPlayer.paused) {
+            audioPlayer.play();
+            playPauseBtn.textContent = "⏸";
+          } else {
+            audioPlayer.pause();
+            playPauseBtn.textContent = "▶";
+          }
+        });
+
+        // Manejar el botón de volumen
+        volumeSlider.addEventListener("input", () => {
+          audioPlayer.volume = volumeSlider.value;
+        });
+
+        // Manejar el botón de siguiente
+        nextBtn.addEventListener("click", () => {
+          if (currentSongIndex < playlist.length - 1) {
+            currentSongIndex++;
+            playSong(playlist[currentSongIndex]);
+          }
+        });
+
+        // Manejar el botón de anterior
+        prevBtn.addEventListener("click", () => {
+          if (currentSongIndex > 0) {
+            currentSongIndex--;
+            playSong(playlist[currentSongIndex]);
+          }
+        });
+
+        // Función para inicializar el reproductor con una canción
+        function initializePlayer(song) {
+          playlist = [song]; // Puedes agregar más canciones al playlist
+          currentSongIndex = 0;
+          playSong(song);
+        }
+
+        // Manejar el clic en el botón Play de una canción
+        document.querySelectorAll(".btn-play").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            const songElement = btn.closest(".trending-cardLista");
+            const song = {
+              fileUrl: songElement.getAttribute("data-file-url"), // Obtener la URL del archivo
+              coverUrl: songElement.querySelector(".avatar-imgcreatorlist").src,
+              title: songElement.querySelector(".trending-title").textContent,
+              artist: songElement.querySelector(".trending-meta").textContent,
+            };
+            initializePlayer(song);
+          });
+        });
+
+        // Guardar el estado del reproductor antes de salir de la página
+        window.addEventListener("beforeunload", () => {
+          const state = {
+            currentSongIndex,
+            currentTime: audioPlayer.currentTime,
+            isPlaying: !audioPlayer.paused,
+            playlist,
+          };
+          localStorage.setItem("musicPlayerState", JSON.stringify(state));
+        });
+      });
+
+      function likeSong(songId) {
+        fetch(`/songs/${songId}/like`, { method: "POST" })
+          .then((response) => response.text())
+          .then((message) => alert(message))
+          .catch((error) => console.error("Error al dar like:", error));
+      }
+
+      function abrirModal() {
+        document.getElementById("modalLogout").style.display = "block";
+      }
+
+      function cerrarModal() {
+        document.getElementById("modalLogout").style.display = "none";
+      }
+    </script>
+  </body>
+</html>

@@ -1,21 +1,29 @@
 package com.example.rolas.controller;
 
 import com.example.rolas.model.User;
-
+import com.example.rolas.service.UserService;
 
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import com.example.rolas.Repositorio.UserRepositorio;
+import com.example.rolas.config.JwtUtil;
 import com.example.rolas.Repositorio.SongsRepositorio;
 import com.example.rolas.Repositorio.AlbumArtistsRepositorio;
 import com.example.rolas.Repositorio.AlbumsRepositorio;
@@ -37,6 +45,9 @@ public class WebController {
 	
 	@Autowired
 	private AlbumsRepositorio albumRepositorio;
+	
+	@Autowired
+	private UserService userService;
 
 	@Autowired
 	private AlbumArtistsRepositorio albumArtistsRepositorio;
@@ -110,5 +121,23 @@ public class WebController {
         
         return "mostrarPlaylist";
     }
+    
+    @PostMapping("/login")
+    public ResponseEntity<?> loginUser(@RequestBody LoginRequest loginRequest) {
+        Optional<User> userOptional = userService.authenticateUser(loginRequest);
+
+        if (userOptional.isPresent()) {
+            String token = JwtUtil.generateToken(loginRequest.getUsername());
+
+            Map<String, String> response = new HashMap<>();
+            response.put("token", token);
+            response.put("username", loginRequest.getUsername());
+            
+            return ResponseEntity.ok(response);
+        }
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciales inválidas");
+    }
+
     
 }

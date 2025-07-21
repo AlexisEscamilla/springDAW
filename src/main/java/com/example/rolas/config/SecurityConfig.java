@@ -26,22 +26,21 @@ public class SecurityConfig {
 
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-	    http
-	        .cors(Customizer.withDefaults())  // <-- HABILITA CORS
-	        .csrf().disable()
-	        .authorizeHttpRequests((authorize) -> authorize
-	            .requestMatchers("/", "/index", "/register", "/login", "/css/**", "/js/**", "/images/**").permitAll()
-	            .requestMatchers("/api/auth/**").permitAll()
-	            .requestMatchers("/feed").authenticated()
-	            .anyRequest().authenticated()
-	        )
-	        .formLogin().disable()
-	        .logout(logout -> logout
-	            .logoutUrl("/logout")
-	            .logoutSuccessUrl("/login?logout")
-	            .permitAll()
-	        );
-
+		http
+	    .cors(Customizer.withDefaults())
+	    .csrf(csrf -> csrf.disable()) // <-- así para Spring Boot 3.x
+	    .authorizeHttpRequests((authorize) -> authorize
+	        .requestMatchers("/", "/index", "/register", "/login", "/css/**", "/js/**", "/images/**").permitAll()
+	        .requestMatchers("/api/auth/**").permitAll()
+	        .requestMatchers("/feed").authenticated()
+	        .anyRequest().authenticated()
+	    )
+	    
+	    .formLogin(form -> form
+	    	    .loginPage("/login")
+	    	    .defaultSuccessUrl("/feed", true)
+	    	    .permitAll()
+	    	);
 	    return http.build();
 	}
 

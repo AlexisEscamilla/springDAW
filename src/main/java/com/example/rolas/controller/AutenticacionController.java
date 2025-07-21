@@ -78,11 +78,8 @@ public class AutenticacionController {
 
         if (userOptional.isPresent()) {
             String token = JwtUtil.generateToken(loginRequest.getUsername());
-
             Map<String, String> response = new HashMap<>();
             response.put("token", token);
-            response.put("username", loginRequest.getUsername());
-
             return ResponseEntity.ok(response);
         }
 

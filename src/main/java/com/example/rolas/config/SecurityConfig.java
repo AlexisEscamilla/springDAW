@@ -36,22 +36,23 @@ public class SecurityConfig {
             HttpSecurity http,
             JwtAuthenticationFilter jwtAuthenticationFilter
     ) throws Exception {
-        http
-            .cors(Customizer.withDefaults())
-            .csrf(csrf -> csrf.disable())
-            .authorizeHttpRequests((authorize) -> authorize
-                .requestMatchers("/", "/index", "/register", "/login", "/css/**", "/js/**", "/images/**").permitAll()
-                .requestMatchers("/api/auth/**").permitAll()
-                .requestMatchers("/feed").authenticated()
-                .anyRequest().authenticated()
-            )
-            .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-            .formLogin(form -> form
-                .loginPage("/login")
-                .defaultSuccessUrl("/feed", true)
-                .permitAll()
-            );
+    	http
+        .csrf(csrf -> csrf.disable())
+        .authorizeHttpRequests((authorize) -> authorize
+            .requestMatchers("/api/auth/**").permitAll() // JWT
+            .requestMatchers("/", "/index", "/register", "/login", "/css/**", "/js/**", "/images/**").permitAll()
+            .anyRequest().authenticated()
+        )
+        .sessionManagement(sess -> sess
+            .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED) // Para soportar sesiones en web
+        )
+        .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+        .formLogin(form -> form
+            .loginPage("/login")
+            .defaultSuccessUrl("/feed", true)
+            .permitAll()
+        );
+
 
         return http.build();
     }

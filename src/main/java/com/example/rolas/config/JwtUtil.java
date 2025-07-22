@@ -3,6 +3,7 @@ package com.example.rolas.config;
 import java.util.Date;
 
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Component;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -10,7 +11,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 
-
+@Component
 public class JwtUtil {
 	private static final String SECRET_KEY = "cdcc32679d61b9e095af3cfd3fa6eb955244a1b186ddc576349e861ed9d75265"; // tu clave base64
 

@@ -26,31 +26,35 @@ import org.springframework.beans.factory.annotation.Autowired;
 @EnableWebSecurity
 public class SecurityConfig {
 
-	@Autowired
-    private JwtAuthenticationFilter jwtAuthenticationFilter;
-	
-	@Bean
-	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-	    http
-	        .cors(Customizer.withDefaults())
-	        .csrf(csrf -> csrf.disable())
-	        .authorizeHttpRequests((authorize) -> authorize
-	            .requestMatchers("/", "/index", "/register", "/login", "/css/**", "/js/**", "/images/**").permitAll()
-	            .requestMatchers("/api/auth/**").permitAll()
-	            .requestMatchers("/feed").authenticated()
-	            .anyRequest().authenticated()
-	        )
-	        .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-	        .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-	        .formLogin(form -> form
-	            .loginPage("/login")
-	            .defaultSuccessUrl("/feed", true)
-	            .permitAll()
-	        );
+    @Bean
+    public JwtAuthenticationFilter jwtAuthenticationFilter(JwtUtil jwtUtil, UserDetailsService userDetailsService) {
+        return new JwtAuthenticationFilter(jwtUtil, userDetailsService);
+    }
 
-	    return http.build();
-	}
+    @Bean
+    public SecurityFilterChain securityFilterChain(
+            HttpSecurity http,
+            JwtAuthenticationFilter jwtAuthenticationFilter
+    ) throws Exception {
+        http
+            .cors(Customizer.withDefaults())
+            .csrf(csrf -> csrf.disable())
+            .authorizeHttpRequests((authorize) -> authorize
+                .requestMatchers("/", "/index", "/register", "/login", "/css/**", "/js/**", "/images/**").permitAll()
+                .requestMatchers("/api/auth/**").permitAll()
+                .requestMatchers("/feed").authenticated()
+                .anyRequest().authenticated()
+            )
+            .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+            .formLogin(form -> form
+                .loginPage("/login")
+                .defaultSuccessUrl("/feed", true)
+                .permitAll()
+            );
 
+        return http.build();
+    }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -60,16 +64,16 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("*")); // Usa dominios específicos en producción
+        configuration.setAllowedOrigins(List.of("*"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
-        configuration.setAllowCredentials(false); // O true si usas cookies
+        configuration.setAllowCredentials(false);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
-    
+
     @Bean
     public AuthenticationManager authenticationManager(
             HttpSecurity http,
@@ -82,7 +86,5 @@ public class SecurityConfig {
             .and()
             .build();
     }
-    
-    
 }
 

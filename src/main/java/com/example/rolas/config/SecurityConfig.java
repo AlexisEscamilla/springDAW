@@ -32,28 +32,35 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(
-            HttpSecurity http,
-            JwtAuthenticationFilter jwtAuthenticationFilter
-    ) throws Exception {
-    	http
-        .csrf(csrf -> csrf.disable())
-        .authorizeHttpRequests((authorize) -> authorize
-            .requestMatchers("/api/auth/**").permitAll() // JWT
-            .requestMatchers("/", "/index", "/register", "/login", "/css/**", "/js/**", "/images/**").permitAll()
-            .anyRequest().authenticated()
-        )
-        .sessionManagement(sess -> sess
-            .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED) // Para soportar sesiones en web
-        )
-        .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-        .formLogin(form -> form
-            .loginPage("/login")
-            .defaultSuccessUrl("/feed", true)
-            .permitAll()
-        );
+    public SecurityFilterChain apiSecurityFilterChain(HttpSecurity http, JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
+        http
+            .securityMatcher("/api/**") // Solo aplica a rutas /api/**
+            .csrf(csrf -> csrf.disable())
+            .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/api/auth/**").permitAll()
+                .anyRequest().authenticated()
+            )
+            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+            .formLogin(form -> form.disable()); // Deshabilita login form en API
+        return http.build();
+    }
 
-
+    @Bean
+    public SecurityFilterChain webSecurityFilterChain(HttpSecurity http) throws Exception {
+        http
+            .securityMatcher("/**") // Aplica a todo lo que no sea /api/**
+            .csrf(csrf -> csrf.disable())
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/", "/index", "/register", "/login", "/css/**", "/js/**", "/images/**").permitAll()
+                .requestMatchers("/feed").authenticated()
+                .anyRequest().authenticated()
+            )
+            .formLogin(form -> form
+                .loginPage("/login")
+                .defaultSuccessUrl("/feed", true)
+                .permitAll()
+            );
         return http.build();
     }
 

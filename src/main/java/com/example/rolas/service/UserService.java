@@ -1,5 +1,6 @@
 package com.example.rolas.service;
 
+import com.example.rolas.model.Followers;
 import com.example.rolas.model.User;
 import com.example.rolas.DTO.RegistroRequest;
 import com.example.rolas.Repositorio.*;
@@ -23,6 +24,9 @@ public class UserService implements UserDetailsService {
     
     @Autowired
     private PasswordEncoder passwordEncoder;
+    
+    @Autowired
+    private FollowersRepositorio followerRepositorio;
     
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -82,4 +86,27 @@ public class UserService implements UserDetailsService {
     public List<User> getSuggestedUsers(User currentUser, int limit) {
     	 return userRepository.findSuggestedUsers(currentUser.getId(), limit);
     }
+    
+    public boolean toggleFollow(int currentUserId, int userIdToFollow) {
+        if (currentUserId == userIdToFollow) return false; // No puede seguirse a sí mismo
+
+        Followers currentUser = followerRepositorio.findById(currentUserId)
+            .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        Followers userToFollow = followerRepositorio.findById(userIdToFollow)
+            .orElseThrow(() -> new RuntimeException("Usuario a seguir no encontrado"));
+
+        Optional<User> usuarioSeguir = userRepository.findById(currentUser.getId());
+        User user = usuarioSeguir.get();
+        // Suponiendo que tienes una relación Set<User> following en User
+        if (currentUser.getFollowing().equals(userToFollow)) {
+            followerRepositorio.delete(currentUser);
+            return false; // Ya no lo sigue
+        } else {
+            currentUser.setFollowing(user);
+            followerRepositorio.save(currentUser);
+            return true; // Ahora lo sigue
+        }
+    }
+
+    
 }

@@ -2,15 +2,18 @@ package com.example.rolas.service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.rolas.Repositorio.FollowersRepositorio;
+import com.example.rolas.Repositorio.PostLikesRepositorio;
 import com.example.rolas.Repositorio.PostRepositorio;
 import com.example.rolas.Repositorio.UserRepositorio;
 import com.example.rolas.model.Post;
+import com.example.rolas.model.PostLikes;
 import com.example.rolas.model.User;
 
 @Service
@@ -18,6 +21,9 @@ public class PostService {
 
     @Autowired
     private PostRepositorio postRepository;
+    
+    @Autowired
+    private PostLikesRepositorio postlikesRepository;
     
     @Autowired
     private UserRepositorio userRepository;
@@ -78,4 +84,31 @@ public class PostService {
         }
         postRepository.delete(post);
     }
+
+    public boolean toggleLike(int postId, int userId) {
+        Optional<Post> postOpt = postRepository.findById(postId);
+        Optional<User> userOpt = userRepository.findById(userId);
+
+        if (postOpt.isEmpty() || userOpt.isEmpty()) {
+            return false;
+        }
+
+        Post post = postOpt.get();
+        User user = userOpt.get();
+        
+        // Verificar si ya existe un like para este usuario y post
+        if (postlikesRepository.existsByUserIdAndPostId(userId, postId)) {
+            // Si ya existe el like, lo eliminamos
+            postlikesRepository.deleteByUserIdAndPostId(userId, postId);
+            return false; // Ya no le gusta
+        } else {
+            // Si no existe, creamos un nuevo like
+            PostLikes newLike = new PostLikes();
+            newLike.setUser(user);
+            newLike.setPost(post);
+            postlikesRepository.save(newLike);
+            return true; // Ahora le gusta
+        }
+    }
+    
 }

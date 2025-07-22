@@ -8,8 +8,10 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -24,23 +26,28 @@ import org.springframework.beans.factory.annotation.Autowired;
 @EnableWebSecurity
 public class SecurityConfig {
 
+	@Autowired
+    private JwtAuthenticationFilter jwtAuthenticationFilter;
+	
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-		http
-	    .cors(Customizer.withDefaults())
-	    .csrf(csrf -> csrf.disable()) // <-- así para Spring Boot 3.x
-	    .authorizeHttpRequests((authorize) -> authorize
-	        .requestMatchers("/", "/index", "/register", "/login", "/css/**", "/js/**", "/images/**").permitAll()
-	        .requestMatchers("/api/auth/**").permitAll()
-	        .requestMatchers("/feed").authenticated()
-	        .anyRequest().authenticated()
-	    )
-	    
-	    .formLogin(form -> form
-	    	    .loginPage("/login")
-	    	    .defaultSuccessUrl("/feed", true)
-	    	    .permitAll()
-	    	);
+	    http
+	        .cors(Customizer.withDefaults())
+	        .csrf(csrf -> csrf.disable())
+	        .authorizeHttpRequests((authorize) -> authorize
+	            .requestMatchers("/", "/index", "/register", "/login", "/css/**", "/js/**", "/images/**").permitAll()
+	            .requestMatchers("/api/auth/**").permitAll()
+	            .requestMatchers("/feed").authenticated()
+	            .anyRequest().authenticated()
+	        )
+	        .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+	        .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+	        .formLogin(form -> form
+	            .loginPage("/login")
+	            .defaultSuccessUrl("/feed", true)
+	            .permitAll()
+	        );
+
 	    return http.build();
 	}
 

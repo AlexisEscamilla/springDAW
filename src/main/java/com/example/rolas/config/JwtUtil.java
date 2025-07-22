@@ -2,6 +2,9 @@ package com.example.rolas.config;
 
 import java.util.Date;
 
+import org.springframework.security.core.userdetails.UserDetails;
+
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
@@ -19,6 +22,19 @@ public class JwtUtil {
                    .getSubject();
     }
 	
+	public Date extractExpiration(String token) {
+        return extractClaims(token).getExpiration();
+    }
+
+    private Claims extractClaims(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(Keys.hmacShaKeyFor(Decoders.BASE64.decode(SECRET_KEY)))
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+    }
+    
+	
     public static String generateToken(String username) {
         return Jwts.builder()
                 .setSubject(username)
@@ -27,5 +43,16 @@ public class JwtUtil {
                 .signWith(Keys.hmacShaKeyFor(Decoders.BASE64.decode(SECRET_KEY)), SignatureAlgorithm.HS256)
                 .compact();
     }
+    
+    private Boolean isTokenExpired(String token) {
+        return extractExpiration(token).before(new Date());
+    }
+
+    public Boolean validateToken(String token, UserDetails userDetails) {
+        final String username = extractUsername(token);
+        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+    }
+    
+    
 }
 

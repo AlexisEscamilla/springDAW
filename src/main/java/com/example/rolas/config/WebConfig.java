@@ -22,7 +22,7 @@ public class WebConfig implements WebMvcConfigurer {
     
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**")
+        registry.addMapping("/uploads/**")
             .allowedOrigins("*") // O mejor, usar el dominio de tu app si lo conoces
             .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS");
     }

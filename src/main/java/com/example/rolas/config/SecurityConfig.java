@@ -3,6 +3,7 @@ package com.example.rolas.config;
 import com.example.rolas.service.UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -32,6 +33,7 @@ public class SecurityConfig {
     }
 
     @Bean
+    @Order(1)
     public SecurityFilterChain apiSecurityFilterChain(HttpSecurity http, JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
         http
             .securityMatcher("/api/**") // Solo aplica a rutas /api/**
@@ -47,13 +49,15 @@ public class SecurityConfig {
     }
 
     @Bean
+    @Order(2)
     public SecurityFilterChain webSecurityFilterChain(HttpSecurity http) throws Exception {
         http
-            .securityMatcher("/**") // Aplica a todo lo que no sea /api/**
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/", "/index", "/register", "/login", "/css/**", "/js/**", "/images/**").permitAll()
-                .requestMatchers("/feed").authenticated()
+                .requestMatchers(
+                    "/", "/index", "/register", "/login",
+                    "/css/**", "/js/**", "/images/**", "/uploads/**", "/favicon.ico"
+                ).permitAll()
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form
@@ -63,6 +67,7 @@ public class SecurityConfig {
             );
         return http.build();
     }
+
 
     @Bean
     public PasswordEncoder passwordEncoder() {

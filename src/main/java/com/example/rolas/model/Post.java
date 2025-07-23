@@ -107,6 +107,8 @@ public class Post {
     public boolean isLikedByCurrentUser() {
         return likedByCurrentUser;
     }
+    
+    
 
     public void setLikedByCurrentUser(boolean likedByCurrentUser) {
         this.likedByCurrentUser = likedByCurrentUser;

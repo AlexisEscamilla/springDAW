@@ -1,9 +1,11 @@
-package com.example.rolas.controller;
+package com.example.rolas.RestController;
 
 import com.example.rolas.model.User;
 import com.example.rolas.service.UserService;
+import com.example.rolas.DTO.UserDTO;
 import com.example.rolas.config.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
@@ -25,13 +27,19 @@ public class UsersRestController {
         return ResponseEntity.ok(suggestions);
     }
 
-    // GET /api/user/profile - Perfil del usuario autenticado
     @GetMapping("/user/profile")
     public ResponseEntity<?> getProfile(@RequestHeader("Authorization") String token) {
         String username = JwtUtil.extractUsername(token.replace("Bearer ", ""));
         User user = userService.findByUsername(username);
-        return ResponseEntity.ok(user);
+
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuario no encontrado");
+        }
+
+        UserDTO userDTO = new UserDTO(user);
+        return ResponseEntity.ok(userDTO);
     }
+
 
     // POST /api/users/{id}/follow - Seguir usuario
     @PostMapping("/users/{id}/follow")

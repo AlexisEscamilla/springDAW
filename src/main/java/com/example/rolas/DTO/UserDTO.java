@@ -9,7 +9,8 @@ public class UserDTO {
     private String profilePicture;
     private int seguidores;
     private int siguiendo;
-
+    private ArtistDTO artista;
+    
     public UserDTO(User user) {
         this.id = user.getId();
         this.nombre = user.getNombre();
@@ -17,6 +18,11 @@ public class UserDTO {
         this.profilePicture = user.getProfilePicture();
         this.seguidores = user.getSeguidores();
         this.siguiendo = user.getSiguiendo();
+        
+        if (user.getArtista() != null) {
+            this.artista = new ArtistDTO(user.getArtista());
+        }
+        
     }
 
 	public Integer getId() {

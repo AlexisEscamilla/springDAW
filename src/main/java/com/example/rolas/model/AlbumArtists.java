@@ -1,5 +1,7 @@
 package com.example.rolas.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -11,6 +13,7 @@ public class AlbumArtists {
 
     @ManyToOne
     @JoinColumn(name = "album_id", referencedColumnName = "id", nullable = false)
+    @JsonIgnore
     private Albums album;
 
     @ManyToOne

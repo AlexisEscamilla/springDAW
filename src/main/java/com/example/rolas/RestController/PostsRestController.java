@@ -1,4 +1,4 @@
-package com.example.rolas.controller;
+package com.example.rolas.RestController;
 
 import com.example.rolas.model.Post;
 import com.example.rolas.model.User;

@@ -2,6 +2,9 @@ package com.example.rolas.DTO;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import com.example.rolas.model.Post;
 
 
 
@@ -16,7 +19,29 @@ public class PostDTO {
     private int commentCount;
     private boolean likedByCurrentUser;
     private List<PostCommentsDTO> comments;
-    // Getters y setters
+    
+    public PostDTO(Post post, boolean likedByCurrentUser) {
+        this.id = post.getId();
+        this.content = post.getContent();
+        this.imageUrl = post.getImageUrl();
+        this.username = post.getUser().getUsername();
+        this.profilePicture = post.getUser().getProfilePicture();
+        this.createdAt = post.getCreatedAt();
+        this.likeCount = post.getLikeCount();
+        this.likedByCurrentUser = likedByCurrentUser;
+        this.commentCount = post.getComments().size();
+        this.comments = post.getComments().stream()
+            .map(PostCommentsDTO::new)
+            .collect(Collectors.toList());
+    }
+    
+    
+    public PostDTO() {
+		// TODO Auto-generated constructor stub
+	}
+
+
+	// Getters y setters
 	public Integer getId() {
 		return id;
 	}

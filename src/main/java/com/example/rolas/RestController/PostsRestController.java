@@ -6,6 +6,7 @@ import com.example.rolas.service.PostService;
 import com.example.rolas.service.UserService;
 import com.example.rolas.DTO.PostDTO;
 import com.example.rolas.DTO.PostMapper;
+import com.example.rolas.Repositorio.PostRepositorio;
 import com.example.rolas.config.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -26,7 +27,8 @@ public class PostsRestController {
     @Autowired
     private PostMapper postMapper;
 
-    
+    @Autowired
+    private PostRepositorio postrepo;
 
     // GET /api/posts - Obtener feed
     @GetMapping("/posts")
@@ -34,6 +36,19 @@ public class PostsRestController {
         String username = JwtUtil.extractUsername(token.replace("Bearer ", ""));
         User currentUser = userService.findByUsername(username);
         List<Post> posts = postService.getPostsFromFollowing(currentUser.getId());
+
+        List<PostDTO> postDtos = posts.stream()
+            .map(post -> PostMapper.toDto(post, currentUser))
+            .collect(Collectors.toList());
+
+        return ResponseEntity.ok(postDtos);
+    }
+    
+    @GetMapping("/posts/{idUser}")
+    public ResponseEntity<?> getFeedUser(@RequestHeader("Authorization") String token) {
+        String username = JwtUtil.extractUsername(token.replace("Bearer ", ""));
+        User currentUser = userService.findByUsername(username);
+        List<Post> posts = postrepo.findByUserIdOrderByCreatedAtDesc(currentUser.getId());;
 
         List<PostDTO> postDtos = posts.stream()
             .map(post -> PostMapper.toDto(post, currentUser))

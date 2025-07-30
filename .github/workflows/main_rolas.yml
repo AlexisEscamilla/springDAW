@@ -12,8 +12,7 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     permissions:
-      id-token: write       # Para autenticación con Azure
-      contents: read        # Para acciones como checkout
+      contents: read
 
     steps:
       - name: Checkout repo
@@ -41,3 +40,4 @@ jobs:
           app-name: 'rolas'
           slot-name: 'Production'
           package: 'target/*.jar'
+

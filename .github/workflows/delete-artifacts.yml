@@ -1,15 +1,31 @@
 name: Delete Old Artifacts
 
 on:
-  workflow_dispatch:  # Esto te permite ejecutarlo manualmente desde GitHub
+  workflow_dispatch: # Permite ejecutarlo manualmente desde GitHub
+  schedule:
+    # Ejecuta automáticamente cada día a las 2:00 AM UTC
+    - cron: '0 2 * * *'
 
 jobs:
   cleanup:
     runs-on: ubuntu-latest
+    
     steps:
-      - name: Delete artifacts
+      - name: Delete artifacts older than 3 days
         uses: geekyeggo/delete-artifact@v2
         with:
           # Borra artifacts con más de 3 días de antigüedad
           age: '3d'
-          # Puedes usar `name` para eliminar solo artifacts específicos
+          # Para borrar TODOS los artifacts sin excepción, descomenta la siguiente línea:
+          # skipRecent: false
+      
+      # Alternativa: Si quieres borrar todos los artifacts inmediatamente
+      - name: Delete ALL artifacts (use with caution)
+        uses: geekyeggo/delete-artifact@v2
+        with:
+          # Usa '*' para borrar todos los artifacts
+          name: '*'
+          # Incluye artifacts recientes también
+          skipRecent: false
+        # Descomenta solo si quieres borrar TODO inmediatamente
+        if: false

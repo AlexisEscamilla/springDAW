@@ -1,55 +1,71 @@
-name: Delete Old Artifacts
+name: Delete All Artifacts
 
 on:
-  workflow_dispatch: # Permite ejecutarlo manualmente desde GitHub
-  schedule:
-    # Ejecuta automáticamente cada día a las 2:00 AM UTC
-    - cron: '0 2 * * *'
+  workflow_dispatch: # Permite ejecutarlo manualmente
 
 jobs:
   cleanup:
     runs-on: ubuntu-latest
+    permissions:
+      actions: write # Necesario para eliminar artifacts
+      contents: read
     
     steps:
-      - name: Delete ALL artifacts
-        uses: geekyeggo/delete-artifact@v2
-        with:
-          # Usa '*' para borrar todos los artifacts
-          name: '*'
-          useGlob: true
-          failOnError: false
-      
-      # Alternativa más moderna y robusta
-      - name: Delete artifacts using actions/github-script (alternative)
+      - name: Delete all artifacts using GitHub API
         uses: actions/github-script@v7
         with:
           script: |
-            const artifacts = await github.rest.actions.listWorkflowRunArtifacts({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              run_id: context.runId,
-            });
+            console.log('🔍 Buscando artifacts para eliminar...');
             
             // Obtener todos los artifacts del repositorio
-            const allArtifacts = await github.rest.actions.listArtifactsForRepo({
+            const artifacts = await github.rest.actions.listArtifactsForRepo({
               owner: context.repo.owner,
               repo: context.repo.repo,
               per_page: 100
             });
             
-            // Borrar todos los artifacts
-            for (const artifact of allArtifacts.data.artifacts) {
-              console.log(`Deleting artifact: ${artifact.name} (ID: ${artifact.id})`);
+            console.log(`📦 Encontrados ${artifacts.data.artifacts.length} artifacts`);
+            
+            if (artifacts.data.artifacts.length === 0) {
+              console.log('✅ No hay artifacts para eliminar');
+              return;
+            }
+            
+            // Eliminar cada artifact
+            let deletedCount = 0;
+            let errorCount = 0;
+            
+            for (const artifact of artifacts.data.artifacts) {
               try {
+                console.log(`🗑️ Eliminando: ${artifact.name} (ID: ${artifact.id}, Tamaño: ${(artifact.size_in_bytes / 1024 / 1024).toFixed(2)} MB)`);
+                
                 await github.rest.actions.deleteArtifact({
                   owner: context.repo.owner,
                   repo: context.repo.repo,
                   artifact_id: artifact.id,
                 });
-                console.log(`✅ Deleted: ${artifact.name}`);
+                
+                deletedCount++;
+                console.log(`✅ Eliminado exitosamente: ${artifact.name}`);
+                
               } catch (error) {
-                console.log(`❌ Failed to delete ${artifact.name}: ${error.message}`);
+                errorCount++;
+                console.log(`❌ Error eliminando ${artifact.name}: ${error.message}`);
               }
             }
-        # Descomenta esta línea si el primer método no funciona
-        if: false
+            
+            console.log(`\n📊 Resumen:`);
+            console.log(`✅ Artifacts eliminados: ${deletedCount}`);
+            console.log(`❌ Errores: ${errorCount}`);
+            console.log(`📦 Total procesados: ${artifacts.data.artifacts.length}`);
+            
+            if (deletedCount > 0) {
+              console.log('🎉 ¡Limpieza completada exitosamente!');
+            }
+
+      # Método alternativo con delete-artifact v5 (más reciente)
+      - name: Fallback - Delete with v5 action
+        uses: geekyeggo/delete-artifact@v5
+        with:
+          name: '*'
+        if: failure() # Solo se ejecuta si el método anterior falla

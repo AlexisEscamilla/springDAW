@@ -11,21 +11,45 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-      - name: Delete artifacts older than 3 days
-        uses: geekyeggo/delete-artifact@v2
-        with:
-          # Borra artifacts con más de 3 días de antigüedad
-          age: '3d'
-          # Para borrar TODOS los artifacts sin excepción, descomenta la siguiente línea:
-          # skipRecent: false
-      
-      # Alternativa: Si quieres borrar todos los artifacts inmediatamente
-      - name: Delete ALL artifacts (use with caution)
+      - name: Delete ALL artifacts
         uses: geekyeggo/delete-artifact@v2
         with:
           # Usa '*' para borrar todos los artifacts
           name: '*'
-          # Incluye artifacts recientes también
-          skipRecent: false
-        # Descomenta solo si quieres borrar TODO inmediatamente
+          useGlob: true
+          failOnError: false
+      
+      # Alternativa más moderna y robusta
+      - name: Delete artifacts using actions/github-script (alternative)
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const artifacts = await github.rest.actions.listWorkflowRunArtifacts({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: context.runId,
+            });
+            
+            // Obtener todos los artifacts del repositorio
+            const allArtifacts = await github.rest.actions.listArtifactsForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              per_page: 100
+            });
+            
+            // Borrar todos los artifacts
+            for (const artifact of allArtifacts.data.artifacts) {
+              console.log(`Deleting artifact: ${artifact.name} (ID: ${artifact.id})`);
+              try {
+                await github.rest.actions.deleteArtifact({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  artifact_id: artifact.id,
+                });
+                console.log(`✅ Deleted: ${artifact.name}`);
+              } catch (error) {
+                console.log(`❌ Failed to delete ${artifact.name}: ${error.message}`);
+              }
+            }
+        # Descomenta esta línea si el primer método no funciona
         if: false

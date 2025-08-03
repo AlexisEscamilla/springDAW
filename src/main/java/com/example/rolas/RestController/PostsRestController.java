@@ -24,8 +24,6 @@ public class PostsRestController {
     @Autowired
     private UserService userService;
     
-    @Autowired
-    private PostMapper postMapper;
 
     @Autowired
     private PostRepositorio postrepo;

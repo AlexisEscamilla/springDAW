@@ -1,7 +1,10 @@
 package com.example.rolas.RestController;
 
+import com.example.rolas.model.Post;
 import com.example.rolas.model.User;
 import com.example.rolas.service.UserService;
+import com.example.rolas.DTO.PostDTO;
+import com.example.rolas.DTO.PostMapper;
 import com.example.rolas.DTO.UserDTO;
 import com.example.rolas.config.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api")
@@ -52,4 +56,5 @@ public class UsersRestController {
         boolean following = userService.toggleFollow(currentUser.getId(), userIdToFollow);
         return ResponseEntity.ok(Map.of("following", following));
     }
+    
 }

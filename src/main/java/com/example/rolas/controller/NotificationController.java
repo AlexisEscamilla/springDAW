@@ -1,6 +1,7 @@
 package com.example.rolas.controller;
 
 import com.example.rolas.DTO.NotificationDTO;
+import com.example.rolas.DTO.SourceUserDTO;
 import com.example.rolas.model.Notification;
 import com.example.rolas.model.User;
 import com.example.rolas.service.NotificationService;
@@ -63,7 +64,7 @@ public class NotificationController {
             dto.setCreatedAtFormatted(notification.getCreatedAt().format(formatter));
             dto.setContentId(notification.getContentId());
 
-            NotificationDTO.SourceUserDTO sourceUserDTO = new NotificationDTO.SourceUserDTO();
+            SourceUserDTO sourceUserDTO = new SourceUserDTO();
             if (notification.getSourceUser() != null) {
                 sourceUserDTO.setId(notification.getSourceUser().getId());
                 sourceUserDTO.setUsername(notification.getSourceUser().getUsername());

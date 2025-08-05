@@ -11,7 +11,8 @@ public class NotificationDTO {
     private String createdAtFormatted;
 
     // getters y setters
-
+    	
+    
     public String getCreatedAtFormatted() {
 		return createdAtFormatted;
 	}
@@ -20,24 +21,6 @@ public class NotificationDTO {
 		this.createdAtFormatted = createdAtFormatted;
 	}
 
-	public static class SourceUserDTO {
-        private Integer id;
-        private String username;
-        // getters y setters
-		public Integer getId() {
-			return id;
-		}
-		public void setId(Integer id) {
-			this.id = id;
-		}
-		public String getUsername() {
-			return username;
-		}
-		public void setUsername(String username) {
-			this.username = username;
-		}
-        
-    }
 
 	public Long getId() {
 		return id;

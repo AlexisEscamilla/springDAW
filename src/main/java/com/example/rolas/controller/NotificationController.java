@@ -2,6 +2,7 @@ package com.example.rolas.controller;
 
 import com.example.rolas.DTO.NotificationDTO;
 import com.example.rolas.DTO.SourceUserDTO;
+import com.example.rolas.Repositorio.NotificationRepository;
 import com.example.rolas.model.Notification;
 import com.example.rolas.model.User;
 import com.example.rolas.service.NotificationService;
@@ -22,6 +23,9 @@ public class NotificationController {
 
     @Autowired
     private NotificationService notificationService;
+    
+    @Autowired
+    private NotificationRepository notificationrepositorio;
 
     @Autowired
     private UserService userService;
@@ -29,7 +33,7 @@ public class NotificationController {
     @GetMapping
     public String getNotifications(@AuthenticationPrincipal UserDetails userDetails, Model model) {
         User user = userService.findByUsername(userDetails.getUsername());
-        List<Notification> notificaciones = notificationService.getNotificationsForUser(user.getId());
+        List<Notification> notificaciones = notificationrepositorio.findByUserIdOrderByCreatedAtDesc(user.getId());
 
         model.addAttribute("user", user);
         model.addAttribute("notificaciones", notificaciones);
@@ -52,7 +56,7 @@ public class NotificationController {
     @ResponseBody
     public List<NotificationDTO> getNotificationsData(@AuthenticationPrincipal UserDetails userDetails) {
         User user = userService.findByUsername(userDetails.getUsername());
-        List<Notification> notifications = notificationService.getNotificationsForUser(user.getId());
+        List<Notification> notifications = notificationrepositorio.findByUserIdOrderByCreatedAtDesc(user.getId());
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         

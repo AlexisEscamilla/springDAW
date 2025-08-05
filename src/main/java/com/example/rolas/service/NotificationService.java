@@ -8,6 +8,7 @@ import com.example.rolas.Repositorio.NotificationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,32 +26,30 @@ public class NotificationService {
         notification.setContentId(contentId);
         return notificationRepository.save(notification);
     }
-
-    public List<Notification> getNotificationsForUser(Integer userId) {
-        return notificationRepository.findByUserIdOrderByCreatedAtDesc(userId);
-    }
     
-    
-    public List<NotificationDTO> getNotificationsForUsuario(Integer userId) {
+    public List<NotificationDTO> getNotificationsForUser(Integer userId) {
         List<Notification> notifications = notificationRepository.findByUserIdOrderByCreatedAtDesc(userId);
-        return notifications.stream().map(notification -> {
-            NotificationDTO dto = new NotificationDTO();
-            dto.setId(notification.getId());
-            dto.setType(notification.getType());
-            dto.setCreatedAt(notification.getCreatedAt());
-            dto.setContentId(notification.getContentId());
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
-            if (notification.getSourceUser() != null) {
+        return notifications.stream().map(n -> {
+            NotificationDTO dto = new NotificationDTO();
+            dto.setId(n.getId());
+            dto.setType(n.getType());
+            dto.setContentId(n.getContentId());
+            dto.setCreatedAt(n.getCreatedAt());
+            dto.setCreatedAtFormatted(n.getCreatedAt().format(formatter));
+
+            if (n.getSourceUser() != null) {
                 dto.setSourceUser(new SourceUserDTO(
-                    notification.getSourceUser().getId(),
-                    notification.getSourceUser().getUsername()
+                    n.getSourceUser().getId(),
+                    n.getSourceUser().getUsername()
                 ));
             }
 
-            dto.setCreatedAtFormatted(notification.getCreatedAt().toString()); // puedes formatear aquí
             return dto;
         }).collect(Collectors.toList());
     }
+
     
 
 }

@@ -28,7 +28,7 @@ public class NotificacionesRestController {
     @Autowired
     private UserService userService;
 
-    @GetMapping("/notificaciones")
+    @GetMapping("/notificaciones/{idUser}")
     public ResponseEntity<?> getNotificationsForUser(@RequestHeader("Authorization") String token) {
         String username = JwtUtil.extractUsername(token.replace("Bearer ", ""));
         User currentUser = userService.findByUsername(username);

@@ -14,14 +14,14 @@ import java.util.List;
 import java.util.stream.Collectors;
 	
 @RestController
-@RequestMapping("/api/notifications")
+@RequestMapping("/api")
 public class NotificacionesRestController {
 
     
     @Autowired
     private NotificationService notificationService;
 
-    @GetMapping("/user/{userId}")
+    @GetMapping("/notificaciones/{userId}")
     public ResponseEntity<List<NotificationDTO>> getNotificationsForUser(@PathVariable Integer userId) {
         List<NotificationDTO> dtoList = notificationService.getNotificationsForUser(userId);
         return ResponseEntity.ok(dtoList);

@@ -1,10 +1,14 @@
 package com.example.rolas.RestController;
 
 import com.example.rolas.model.Notification;
+import com.example.rolas.model.User;
 import com.example.rolas.service.NotificationService;
+import com.example.rolas.service.UserService;
 import com.example.rolas.DTO.NotificationDTO;
 import com.example.rolas.DTO.SourceUserDTO;
 import com.example.rolas.Repositorio.NotificationRepository;
+import com.example.rolas.config.JwtUtil;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,10 +24,16 @@ public class NotificacionesRestController {
     
     @Autowired
     private NotificationService notificationService;
+    
+    @Autowired
+    private UserService userService;
 
-    @GetMapping("/notificaciones/{userId}")
-    public ResponseEntity<List<NotificationDTO>> getNotificationsForUser(@PathVariable Integer userId) {
-        List<NotificationDTO> dtoList = notificationService.getNotificationsForUser(userId);
+    @GetMapping("/notificaciones")
+    public ResponseEntity<?> getNotificationsForUser(@RequestHeader("Authorization") String token) {
+        String username = JwtUtil.extractUsername(token.replace("Bearer ", ""));
+        User currentUser = userService.findByUsername(username);
+        
+        List<NotificationDTO> dtoList = notificationService.getNotificationsForUser(currentUser.getId());
         return ResponseEntity.ok(dtoList);
     }
 }

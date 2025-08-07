@@ -40,6 +40,7 @@ public class PostDTO {
 		// TODO Auto-generated constructor stub
 	}
 
+    
 
 	// Getters y setters
 	public Integer getId() {

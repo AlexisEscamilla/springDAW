@@ -1,16 +1,24 @@
 package com.example.rolas.RestController;
 
 import com.example.rolas.model.Post;
+import com.example.rolas.model.PostComments;
 import com.example.rolas.model.User;
 import com.example.rolas.service.PostService;
 import com.example.rolas.service.UserService;
+import com.example.rolas.DTO.PostCommentsDTO;
 import com.example.rolas.DTO.PostDTO;
 import com.example.rolas.DTO.PostMapper;
+import com.example.rolas.Repositorio.PostCommentsRepositorio;
 import com.example.rolas.Repositorio.PostRepositorio;
+import com.example.rolas.Repositorio.UserRepositorio;
 import com.example.rolas.config.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
+
+import java.security.Principal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -24,9 +32,18 @@ public class PostsRestController {
     @Autowired
     private UserService userService;
     
+    @Autowired
+    private UserRepositorio userrepo;
+    
+    @Autowired
+    private PostMapper postmapper;
 
     @Autowired
     private PostRepositorio postrepo;
+    
+    @Autowired
+    private PostCommentsRepositorio postCommentsRepository;
+
 
     // GET /api/posts - Obtener feed
     @GetMapping("/posts")
@@ -82,4 +99,38 @@ public class PostsRestController {
         boolean liked = postService.toggleLike(postId, user.getId());
         return ResponseEntity.ok(Map.of("liked", liked));
     }
+    
+    @PostMapping("/{postId}/comments")
+    public ResponseEntity<PostCommentsDTO> postComment(
+            @PathVariable Integer postId,
+            @RequestBody CommentRequest commentRequest,
+            Principal principal) {
+
+        // Obtener el usuario que está comentando
+        User currentUser = userrepo.findByUsername(principal.getName())
+                .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
+
+        // Buscar el post al que se va a comentar
+        Post post = postrepo.findById(postId)
+                .orElseThrow();
+
+        // Crear el nuevo comentario
+        PostComments comment = new PostComments();
+        comment.setUser(currentUser);
+        comment.setPost(post);
+        comment.setCommentText(commentRequest.getCommentText());
+        comment.setImagenAdjuntada(commentRequest.getImagenAdjuntada());
+        comment.setCreatedAt(LocalDateTime.now());
+
+        // Guardar en la base de datos
+        PostComments savedComment = postCommentsRepository.save(comment);
+
+        // Convertir a DTO para la respuesta
+        PostCommentsDTO commentDTO = postmapper.toCommentDto(savedComment);
+
+        return ResponseEntity.ok(commentDTO);
+    }
+
+    
+    
 }

@@ -47,7 +47,8 @@ public class SecurityConfig {
             .formLogin(form -> form.disable()); // Deshabilita login form en API
         return http.build();
     }
-
+    
+    //aaaaa
     @Bean
     @Order(2)
     public SecurityFilterChain webSecurityFilterChain(HttpSecurity http) throws Exception {
@@ -56,7 +57,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(
                     "/", "/index", "/register", "/login",
-                    "/css/**", "/js/**", "/images/**", "/uploads/**", "/favicon.ico"
+                    "/css/**", "/js/**", "/static/images/**", "/uploads/**", "/favicon.ico"
                 ).permitAll()
                 .anyRequest().authenticated()
             )

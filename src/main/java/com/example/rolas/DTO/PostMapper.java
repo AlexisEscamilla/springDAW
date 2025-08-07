@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
 
 import com.example.rolas.model.Post;
+import com.example.rolas.model.PostComments;
 import com.example.rolas.model.User;
 
 @Component
@@ -44,4 +45,21 @@ public class PostMapper {
 
         return dto;
     }
+    
+    public PostCommentsDTO toCommentDto(PostComments comment) {
+        PostCommentsDTO dto = new PostCommentsDTO();
+        dto.setId(comment.getId());
+        dto.setContent(comment.getCommentText());
+        dto.setImagenAdjuntada(comment.getImagenAdjuntada());
+        dto.setCreatedAt(comment.getCreatedAt());
+
+        User user = comment.getUser();
+        if (user != null) {
+            dto.setUsername(user.getUsername());
+            dto.setProfilePicture(user.getProfilePicture());
+        }
+
+        return dto;
+    }
+
 }

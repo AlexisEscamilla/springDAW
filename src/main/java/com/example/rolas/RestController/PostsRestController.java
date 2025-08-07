@@ -100,7 +100,7 @@ public class PostsRestController {
         return ResponseEntity.ok(Map.of("liked", liked));
     }
     
-    @PostMapping("/{postId}/comments")
+    @PostMapping("/posts/{id}/like")
     public ResponseEntity<PostCommentsDTO> postComment(
             @PathVariable Integer postId,
             @RequestBody CommentRequest commentRequest,

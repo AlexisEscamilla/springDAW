@@ -100,21 +100,18 @@ public class PostsRestController {
         return ResponseEntity.ok(Map.of("liked", liked));
     }
     
-    @PostMapping("/posts/{id}/comments")
+    @PostMapping("/posts/{postId}/comments")
     public ResponseEntity<PostCommentsDTO> postComment(
             @PathVariable Integer postId,
             @RequestBody CommentRequest commentRequest,
             Principal principal) {
 
-        // Obtener el usuario que está comentando
         User currentUser = userrepo.findByUsername(principal.getName())
                 .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
 
-        // Buscar el post al que se va a comentar
         Post post = postrepo.findById(postId)
                 .orElseThrow();
 
-        // Crear el nuevo comentario
         PostComments comment = new PostComments();
         comment.setUser(currentUser);
         comment.setPost(post);
@@ -122,15 +119,10 @@ public class PostsRestController {
         comment.setImagenAdjuntada(commentRequest.getImagenAdjuntada());
         comment.setCreatedAt(LocalDateTime.now());
 
-        // Guardar en la base de datos
         PostComments savedComment = postCommentsRepository.save(comment);
 
-        // Convertir a DTO para la respuesta
         PostCommentsDTO commentDTO = postmapper.toCommentDto(savedComment);
 
         return ResponseEntity.ok(commentDTO);
     }
-
-    
-    
 }

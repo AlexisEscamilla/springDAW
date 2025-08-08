@@ -101,7 +101,7 @@ public class PostsRestController {
     }
     
     @PostMapping("/posts/{postId}/comments")
-    public ResponseEntity<PostCommentsDTO> postComment(
+    public ResponseEntity<?> postComment(
             @PathVariable Integer postId,
             @RequestBody CommentRequest commentRequest,
             Principal principal) {

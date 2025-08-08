@@ -120,6 +120,9 @@ public class PostsRestController {
         comment.setCreatedAt(LocalDateTime.now());
 
         PostComments savedComment = postCommentsRepository.save(comment);
+     // Aumentar contador de comentarios
+        post.setCommentCount((post.getCommentCount() == null ? 0 : post.getCommentCount()) + 1);
+        postrepo.save(post);
 
         PostCommentsDTO commentDTO = postmapper.toCommentDto(savedComment);
 

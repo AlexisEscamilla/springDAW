@@ -40,7 +40,7 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/**").permitAll()
+                .requestMatchers("/api/auth/**","/api/buscar/**").permitAll()
                 .anyRequest().authenticated()
             )
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
@@ -57,7 +57,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(
                     "/", "/index", "/register", "/login",
-                    "/css/**", "/js/**", "/static/images/**", "/uploads/**", "/favicon.ico"
+                    "/css/**", "/js/**", "/static/images/**", "/uploads/**", "/favicon.ico","/api/auth/**","/api/buscar/**"
                 ).permitAll()
                 .anyRequest().authenticated()
             )

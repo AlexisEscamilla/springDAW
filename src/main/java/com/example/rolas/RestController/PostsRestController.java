@@ -5,6 +5,9 @@ import com.example.rolas.model.PostComments;
 import com.example.rolas.model.User;
 import com.example.rolas.service.PostService;
 import com.example.rolas.service.UserService;
+
+import jakarta.transaction.Transactional;
+
 import com.example.rolas.DTO.PostCommentsDTO;
 import com.example.rolas.DTO.PostDTO;
 import com.example.rolas.DTO.PostMapper;
@@ -100,6 +103,7 @@ public class PostsRestController {
         return ResponseEntity.ok(Map.of("liked", liked));
     }
     
+    @Transactional
     @PostMapping("/posts/{postId}/comments")
     public ResponseEntity<?> postComment(
             @PathVariable Integer postId,
@@ -119,13 +123,17 @@ public class PostsRestController {
         comment.setImagenAdjuntada(commentRequest.getImagenAdjuntada());
         comment.setCreatedAt(LocalDateTime.now());
 
+        // Guardar comentario
         PostComments savedComment = postCommentsRepository.save(comment);
-     // Aumentar contador de comentarios
-        post.setCommentCount((post.getCommentCount() == null ? 0 : post.getCommentCount()) + 1);
+
+        // Aumentar contador de comentarios de forma segura
+        Integer count = post.getCommentCount() == null ? 0 : post.getCommentCount();
+        post.setCommentCount(count + 1);
         postrepo.save(post);
 
         PostCommentsDTO commentDTO = postmapper.toCommentDto(savedComment);
 
         return ResponseEntity.ok(commentDTO);
     }
+
 }
